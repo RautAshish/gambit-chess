@@ -66,8 +66,11 @@ object PieceRenderer {
 
     private fun detailFor(type: PieceType): Path? = when (type) {
         PieceType.BISHOP -> Path().apply { // slit in the mitre
-            moveTo(22.5f, 12f); lineTo(22.5f, 19f)
-            moveTo(19f, 15.5f); lineTo(26f, 15.5f)
+            moveTo(22.5f, 11f); lineTo(22.5f, 19f)
+            moveTo(19.5f, 15f); lineTo(25.5f, 15f)
+        }
+        PieceType.KNIGHT -> Path().apply { // eye
+            addOvalCompat(18.0f, 12.8f, 19.6f, 14.4f)
         }
         else -> null
     }
@@ -83,13 +86,16 @@ object PieceRenderer {
     }
 
     private fun pawn(): Path = Path().apply {
-        // head
-        addOvalCompat(18f, 9f, 27f, 18f)
-        // body (trapezoid + neck)
-        moveTo(16f, 36f)
-        cubicTo(16f, 28f, 19f, 24f, 19f, 20f)
-        lineTo(26f, 20f)
-        cubicTo(26f, 24f, 29f, 28f, 29f, 36f)
+        addOvalCompat(18.5f, 8.5f, 26.5f, 16.5f)
+        moveTo(18f, 19.5f)
+        cubicTo(18f, 18.3f, 27f, 18.3f, 27f, 19.5f)
+        lineTo(27f, 21f)
+        cubicTo(27f, 22.2f, 18f, 22.2f, 18f, 21f)
+        close()
+        moveTo(19.5f, 22f)
+        cubicTo(17.5f, 27f, 16.5f, 31f, 15f, 35.8f)
+        lineTo(30f, 35.8f)
+        cubicTo(28.5f, 31f, 27.5f, 27f, 25.5f, 22f)
         close()
         base()
     }
@@ -107,64 +113,97 @@ object PieceRenderer {
     }
 
     private fun knight(): Path = Path().apply {
-        // Staunton horse profile facing left
-        moveTo(13f, 36f)
-        lineTo(13f, 33f)
-        cubicTo(13f, 28f, 16f, 25f, 20f, 23f)
-        cubicTo(15f, 23f, 12f, 21f, 13f, 16f)
-        lineTo(15f, 18f)
-        cubicTo(16f, 12f, 20f, 8f, 25f, 9f)
-        cubicTo(31f, 10f, 33f, 17f, 33f, 25f)
-        cubicTo(33f, 31f, 32f, 34f, 31f, 36f)
+        moveTo(14f, 35.8f)
+        lineTo(14f, 33f)
+        cubicTo(14f, 28f, 16.5f, 25.5f, 20.5f, 23.5f)
+        cubicTo(17f, 23.5f, 13.5f, 22f, 13f, 18.5f)
+        lineTo(11f, 16f)
+        cubicTo(10.3f, 14.8f, 11.2f, 13.8f, 12.6f, 14.3f)
+        lineTo(14.6f, 15.3f)
+        cubicTo(14.6f, 12.6f, 16.2f, 10.2f, 18.6f, 8.8f)
+        lineTo(19.6f, 5.6f)
+        lineTo(21.8f, 8.6f)
+        cubicTo(27f, 8.2f, 31f, 12f, 32.2f, 17.5f)
+        cubicTo(33.4f, 23f, 33.2f, 29f, 32.2f, 35.8f)
         close()
         base()
     }
 
     private fun bishop(): Path = Path().apply {
-        // mitre
-        addOvalCompat(20.5f, 5f, 24.5f, 9f) // top knob
-        moveTo(22.5f, 9f)
-        cubicTo(28f, 12f, 30f, 20f, 27f, 28f)
-        lineTo(18f, 28f)
-        cubicTo(15f, 20f, 17f, 12f, 22.5f, 9f)
+        addOvalCompat(20.7f, 4.5f, 24.3f, 8.0f)
+        moveTo(22.5f, 8.2f)
+        cubicTo(27.5f, 10.5f, 29f, 16f, 27.5f, 22.5f)
+        lineTo(17.5f, 22.5f)
+        cubicTo(16f, 16f, 17.5f, 10.5f, 22.5f, 8.2f)
         close()
-        // collar
-        moveTo(16f, 32f)
-        cubicTo(16f, 29f, 29f, 29f, 29f, 32f)
-        lineTo(29f, 34f)
-        cubicTo(29f, 36f, 16f, 36f, 16f, 34f)
+        moveTo(16.5f, 24.5f)
+        cubicTo(16.5f, 23f, 28.5f, 23f, 28.5f, 24.5f)
+        lineTo(28.5f, 26f)
+        cubicTo(28.5f, 27.5f, 16.5f, 27.5f, 16.5f, 26f)
+        close()
+        moveTo(18.5f, 27.5f)
+        cubicTo(17.5f, 30f, 16f, 33f, 14f, 35.8f)
+        lineTo(31f, 35.8f)
+        cubicTo(29f, 33f, 27.5f, 30f, 26.5f, 27.5f)
         close()
         base()
     }
 
     private fun queen(): Path = Path().apply {
-        // five-point crown
-        moveTo(10f, 16f); lineTo(13f, 30f); lineTo(32f, 30f); lineTo(35f, 16f)
-        lineTo(29.5f, 25f); lineTo(27f, 13f); lineTo(22.5f, 24f)
-        lineTo(18f, 13f); lineTo(15.5f, 25f)
+        addOvalCompat(7.9f, 7.9f, 11.1f, 11.1f)
+        addOvalCompat(14.4f, 5.4f, 17.6f, 8.6f)
+        addOvalCompat(20.9f, 4.4f, 24.1f, 7.6f)
+        addOvalCompat(27.4f, 5.4f, 30.6f, 8.6f)
+        addOvalCompat(33.9f, 7.9f, 37.1f, 11.1f)
+        moveTo(11f, 20f)
+        lineTo(9.5f, 11f)
+        lineTo(14.8f, 16.5f)
+        lineTo(16f, 8.5f)
+        lineTo(20.3f, 15.5f)
+        lineTo(22.5f, 7.5f)
+        lineTo(24.7f, 15.5f)
+        lineTo(29f, 8.5f)
+        lineTo(30.2f, 16.5f)
+        lineTo(35.5f, 11f)
+        lineTo(34f, 20f)
         close()
-        // body below crown
-        moveTo(13f, 30f)
-        cubicTo(12f, 33f, 13f, 35f, 14f, 36f)
-        lineTo(31f, 36f)
-        cubicTo(32f, 35f, 33f, 33f, 32f, 30f)
+        moveTo(12f, 20f)
+        cubicTo(12f, 18.6f, 33f, 18.6f, 33f, 20f)
+        lineTo(33f, 22.5f)
+        cubicTo(33f, 24f, 12f, 24f, 12f, 22.5f)
+        close()
+        moveTo(15f, 24f)
+        cubicTo(13.8f, 27.5f, 14.2f, 31f, 13.2f, 35.8f)
+        lineTo(31.8f, 35.8f)
+        cubicTo(30.8f, 31f, 31.2f, 27.5f, 30f, 24f)
         close()
         base()
     }
 
     private fun king(): Path = Path().apply {
-        // bell-shaped body flaring from a neck up to the crown band
-        moveTo(16f, 36f)
-        cubicTo(13f, 30f, 14f, 24f, 18f, 22f)
-        lineTo(27f, 22f)
-        cubicTo(31f, 24f, 32f, 30f, 29f, 36f)
+        moveTo(21.2f, 3.2f)
+        lineTo(23.8f, 3.2f)
+        lineTo(23.8f, 12.2f)
+        lineTo(21.2f, 12.2f)
         close()
-        // crown band
-        moveTo(17f, 20f); lineTo(28f, 20f); lineTo(28f, 23f); lineTo(17f, 23f); close()
-        // vertical cross bar
-        moveTo(21f, 7f); lineTo(24f, 7f); lineTo(24f, 20f); lineTo(21f, 20f); close()
-        // horizontal cross bar
-        moveTo(18f, 11f); lineTo(27f, 11f); lineTo(27f, 14f); lineTo(18f, 14f); close()
+        moveTo(18f, 6.2f)
+        lineTo(27f, 6.2f)
+        lineTo(27f, 8.8f)
+        lineTo(18f, 8.8f)
+        close()
+        moveTo(16.5f, 20f)
+        cubicTo(16.5f, 12.5f, 28.5f, 12.5f, 28.5f, 20f)
+        close()
+        moveTo(14f, 20f)
+        cubicTo(14f, 18.4f, 31f, 18.4f, 31f, 20f)
+        lineTo(31f, 23f)
+        cubicTo(31f, 24.6f, 14f, 24.6f, 14f, 23f)
+        close()
+        moveTo(15f, 24.5f)
+        cubicTo(13.5f, 28f, 14f, 31.5f, 12.5f, 35.8f)
+        lineTo(32.5f, 35.8f)
+        cubicTo(31f, 31.5f, 31.5f, 28f, 30f, 24.5f)
+        close()
         base()
     }
 

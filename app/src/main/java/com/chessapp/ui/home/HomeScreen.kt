@@ -7,6 +7,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -39,6 +41,8 @@ private val MUTED = UiColor(0xFF8A8B7E)
  */
 @Composable
 fun HomeScreen(
+    selectedDifficulty: ChessAI.Difficulty,
+    onSelectDifficulty: (ChessAI.Difficulty) -> Unit,
     onPlayAi: (ChessAI.Difficulty, Color) -> Unit,
     onPlayLocal: () -> Unit,
     onPuzzles: () -> Unit,
@@ -48,7 +52,7 @@ fun HomeScreen(
 ) {
     Column(
         Modifier.fillMaxSize().background(BG)
-            .verticalScroll(rememberScrollState()).padding(24.dp),
+            .verticalScroll(rememberScrollState()).statusBarsPadding().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.height(12.dp))
@@ -60,19 +64,29 @@ fun HomeScreen(
         Text("play. learn. repeat.", color = MUTED, fontSize = 13.sp, letterSpacing = 2.sp)
         Spacer(Modifier.height(20.dp))
 
-        var playAs by remember { mutableStateOf(Color.WHITE) }
-        PrimaryTile("Play vs Computer", "Four difficulty levels") {
-            onPlayAi(ChessAI.Difficulty.MEDIUM, playAs)
+        // rememberSaveable: the colour choice survives leaving Home (#9).
+        var playAsName by rememberSaveable { mutableStateOf(Color.WHITE.name) }
+        val playAs = Color.valueOf(playAsName)
+
+        // One visual group (#15): the card is the ACTION, the rows below are its
+        // options — difficulty chips select (highlighted), they don't launch (#20).
+        Surface(color = PANEL, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) {
+            Column(Modifier.padding(12.dp)) {
+                PrimaryTile(
+                    "Play vs Computer",
+                    "${selectedDifficulty.name.lowercase().replaceFirstChar { it.uppercase() }} \u00B7 as ${playAs.name.lowercase().replaceFirstChar { it.uppercase() }}"
+                ) { onPlayAi(selectedDifficulty, playAs) }
+                Spacer(Modifier.height(10.dp))
+                PlayAsRow(playAs) { playAsName = it.name }
+                Spacer(Modifier.height(8.dp))
+                DifficultySelector(selectedDifficulty, onSelectDifficulty)
+            }
         }
-        Spacer(Modifier.height(8.dp))
-        PlayAsRow(playAs) { playAs = it }
-        Spacer(Modifier.height(8.dp))
-        DifficultyRow { d, _ -> onPlayAi(d, playAs) }
         Spacer(Modifier.height(20.dp))
 
         SecondaryTile("Pass & Play") { onPlayLocal() }
-        SecondaryTile("Play Online") { onPlayOnline() }
-        SecondaryTile("Puzzles") { onPuzzles() }
+        SecondaryTile("Play Online", comingSoon = true) { onPlayOnline() }
+        SecondaryTile("Puzzles", comingSoon = true) { onPuzzles() }
         SecondaryTile("Saved Games") { onSavedGames() }
         SecondaryTile("Settings") { onSettings() }
     }
@@ -116,31 +130,37 @@ private fun PrimaryTile(title: String, subtitle: String, onClick: () -> Unit) {
 }
 
 @Composable
-private fun DifficultyRow(onPlayAi: (ChessAI.Difficulty, Color) -> Unit) {
+private fun DifficultySelector(selected: ChessAI.Difficulty, onSelect: (ChessAI.Difficulty) -> Unit) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         for (d in ChessAI.Difficulty.entries) {
+            val sel = d == selected
             OutlinedButton(
-                onClick = { onPlayAi(d, Color.WHITE) },
+                onClick = { onSelect(d) },
                 modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(vertical = 8.dp, horizontal = 2.dp)
+                contentPadding = PaddingValues(vertical = 8.dp, horizontal = 2.dp),
+                border = BorderStroke(1.dp, if (sel) BRASS else MUTED)
             ) {
                 Text(d.name.lowercase().replaceFirstChar { it.uppercase() },
-                    fontSize = 11.sp, color = BONE)
+                    color = if (sel) BRASS else MUTED, fontSize = 13.sp)
             }
         }
     }
 }
 
 @Composable
-private fun SecondaryTile(title: String, onClick: () -> Unit) {
+private fun SecondaryTile(title: String, comingSoon: Boolean = false, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        enabled = !comingSoon,
+        modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
         shape = RoundedCornerShape(12.dp),
         color = PANEL
     ) {
-        Box(Modifier.padding(18.dp)) {
-            Text(title, color = BONE, fontSize = 16.sp)
+        Row(Modifier.padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(title, color = if (comingSoon) MUTED else BONE, fontSize = 17.sp)
+            Spacer(Modifier.weight(1f))
+            if (comingSoon) Text("Coming soon", color = MUTED, fontSize = 11.sp)
+            else Text("\u203A", color = MUTED, fontSize = 17.sp)
         }
     }
 }

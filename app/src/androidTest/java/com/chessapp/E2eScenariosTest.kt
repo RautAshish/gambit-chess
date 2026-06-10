@@ -212,10 +212,12 @@ class E2eScenariosTest {
     }
 
     @Test
-    fun allDifficultiesStartAGame() {
+    fun allDifficultiesSelectable_andStartGame() {
+        // Chips SELECT a difficulty (persisted); the primary card starts the game.
         for (d in listOf("Easy", "Medium", "Hard", "Expert")) {
             waitForText("GAMBIT")
             rule.onNodeWithText(d).performClick()
+            rule.onNodeWithText("Play vs Computer").performClick()
             waitForText("White to move")
             rule.onNodeWithText("\u2039 Home").performClick()
         }

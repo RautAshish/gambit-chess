@@ -46,7 +46,7 @@ class E2eNewFeaturesTest {
     fun playAsBlack_aiMovesFirst_thenHumanReplies() {
         waitForText("Play as")
         rule.onNodeWithText("Black").performClick()
-        rule.onNodeWithText("Medium").performClick()
+        rule.onNodeWithText("Play vs Computer").performClick()
         // The AI (White) must open the game on its own.
         waitForText("Black to move", timeoutMs = 60_000)
         waitForText("1.", timeoutMs = 60_000, substring = true)
@@ -95,6 +95,7 @@ class E2eNewFeaturesTest {
         waitForText("Play as")
         // EXPERT is the slowest thinker: widest window for the race.
         rule.onNodeWithText("Expert").performClick()
+        rule.onNodeWithText("Play vs Computer").performClick()
         waitForText("White to move")
         tapSquare(4, 1); tapSquare(4, 3)                 // 1. e4
         waitForText("Thinking\u2026", timeoutMs = 60_000)

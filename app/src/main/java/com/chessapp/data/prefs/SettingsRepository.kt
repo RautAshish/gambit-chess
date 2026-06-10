@@ -19,7 +19,8 @@ data class Settings(
     val darkBoard: Boolean = false,
     val useStockfish: Boolean = false,
     val clockMinutes: Int = 10,
-    val clockIncrementSeconds: Int = 5
+    val clockIncrementSeconds: Int = 5,
+    val boardTheme: String = "CLASSIC"   // CLASSIC | WALNUT | FOREST
 )
 
 class SettingsRepository(private val context: Context) {
@@ -34,6 +35,7 @@ class SettingsRepository(private val context: Context) {
         val STOCKFISH = booleanPreferencesKey("stockfish")
         val CLOCK_MIN = intPreferencesKey("clock_min")
         val CLOCK_INC = intPreferencesKey("clock_inc")
+            val BOARD_THEME = stringPreferencesKey("board_theme")
     }
 
     val settings: Flow<Settings> = context.dataStore.data.map { p ->
@@ -47,7 +49,8 @@ class SettingsRepository(private val context: Context) {
             darkBoard = p[Keys.DARK_BOARD] ?: false,
             useStockfish = p[Keys.STOCKFISH] ?: false,
             clockMinutes = p[Keys.CLOCK_MIN] ?: 10,
-            clockIncrementSeconds = p[Keys.CLOCK_INC] ?: 5
+            clockIncrementSeconds = p[Keys.CLOCK_INC] ?: 5,
+            boardTheme = prefs[Keys.BOARD_THEME] ?: "CLASSIC"
         )
     }
 
@@ -63,6 +66,8 @@ class SettingsRepository(private val context: Context) {
     suspend fun setFlipped(on: Boolean) = update { it[Keys.FLIPPED] = on }
     suspend fun setDarkBoard(on: Boolean) = update { it[Keys.DARK_BOARD] = on }
     suspend fun setUseStockfish(on: Boolean) = update { it[Keys.STOCKFISH] = on }
+    suspend fun setBoardTheme(v: String) = context.dataStore.edit { it[Keys.BOARD_THEME] = v }
+
     suspend fun setClock(minutes: Int, incSeconds: Int) = update {
         it[Keys.CLOCK_MIN] = minutes; it[Keys.CLOCK_INC] = incSeconds
     }

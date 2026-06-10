@@ -7,6 +7,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,8 +38,16 @@ import com.chessapp.domain.model.*
 private val BG = UiColor(0xFF1C1F17)
 private val PANEL = UiColor(0xFF272B20)
 private val BONE = UiColor(0xFFEFE6D2)
+// Board themes (#3): CLASSIC reads as black-and-white without glare; WALNUT is
+// the tournament-wood look; FOREST is the original green.
 private val LIGHT_SQ = UiColor(0xFFD9CFB4)
 private val DARK_SQ = UiColor(0xFF6E7E55)
+data class BoardPalette(val light: UiColor, val dark: UiColor)
+fun paletteFor(theme: String): BoardPalette = when (theme) {
+    "WALNUT" -> BoardPalette(UiColor(0xFFE3C9A2), UiColor(0xFF8B5E3C))
+    "FOREST" -> BoardPalette(UiColor(0xFFD9CFB4), UiColor(0xFF6E7E55))
+    else -> BoardPalette(UiColor(0xFFEDEAE2), UiColor(0xFF5A5A54))   // CLASSIC
+}
 private val BRASS = UiColor(0xFFC9A227)
 private val SELECT = UiColor(0x803C8C5F)
 private val TARGET = UiColor(0x55201C16)
@@ -46,7 +55,7 @@ private val LAST = UiColor(0x55C9A227)
 private val CHECK = UiColor(0x99C0392B)
 
 @Composable
-fun ChessScreen(vm: ChessViewModel, flipped: Boolean = false, onBack: () -> Unit = {}) {
+fun ChessScreen(vm: ChessViewModel, flipped: Boolean = false, onBack: () -> Unit = {}, boardTheme: String = "CLASSIC") {
     val state by vm.state.collectAsState()
 
     // Pause the clock when the app goes to the background; resume on return.
@@ -65,12 +74,15 @@ fun ChessScreen(vm: ChessViewModel, flipped: Boolean = false, onBack: () -> Unit
 
     Box(Modifier.fillMaxSize().background(BG)) {
         Column(
-            Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()),
+            Modifier.fillMaxSize().statusBarsPadding().padding(16.dp).verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 TextButton(onClick = onBack) { Text("\u2039 Home", color = BRASS) }
                 Spacer(Modifier.weight(1f))
+                TextButton(onClick = { vm.toggleSound() }) {
+                    Text(if (state.soundOn) "Mute" else "Unmute", color = MUTED)
+                }
             }
             CapturedTray(state.capturedByBlack, label = "Black captured",
                 balance = -state.materialBalance)
@@ -79,7 +91,7 @@ fun ChessScreen(vm: ChessViewModel, flipped: Boolean = false, onBack: () -> Unit
             Spacer(Modifier.height(8.dp))
             StatusBar(state)
             Spacer(Modifier.height(8.dp))
-            BoardCanvas(state, flipped) { vm.onSquareTapped(it) }
+            BoardCanvas(state, flipped, paletteFor(boardTheme)) { vm.onSquareTapped(it) }
             Spacer(Modifier.height(8.dp))
             ClockRow(Color.WHITE, state.whiteClock,
                 active = state.useClock && state.board.sideToMove == Color.WHITE)
@@ -108,8 +120,9 @@ fun ChessScreen(vm: ChessViewModel, flipped: Boolean = false, onBack: () -> Unit
                 }
             )
         }
-        if (state.gameOver) {
-            GameOverDialog(state) { vm.newGame() }
+        var resultDismissed by remember(state.result) { mutableStateOf(false) }
+        if (state.gameOver && !resultDismissed) {
+            GameOverDialog(state, onViewBoard = { resultDismissed = true }) { vm.newGame() }
         }
     }
 }
@@ -151,6 +164,17 @@ private fun CapturedTray(captured: List<Piece>, label: String, balance: Int) {
 
 @Composable
 private fun StatusBar(state: BoardUiState) {
+    // Once the game has a result (incl. resignation/timeout/agreement, which the
+    // board status can't express), the status line carries it — so the outcome
+    // stays visible after the dialog is dismissed to inspect the final position.
+    if (state.gameOver) {
+        Text(
+            "${state.resultHeadline} \u00B7 ${state.resultDetail}",
+            color = BRASS, fontSize = 17.sp, fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(vertical = 6.dp)
+        )
+        return
+    }
     val text = when (state.status) {
         GameStatus.CHECKMATE -> "Checkmate"
         GameStatus.STALEMATE -> "Stalemate \u2014 draw"
@@ -262,11 +286,11 @@ private fun PromotionDialog(color: Color, onPick: (PieceType) -> Unit, onDismiss
 }
 
 @Composable
-private fun GameOverDialog(state: BoardUiState, onNewGame: () -> Unit) {
+private fun GameOverDialog(state: BoardUiState, onViewBoard: () -> Unit, onNewGame: () -> Unit) {
     val title = state.resultHeadline.ifBlank { "Game over" }
     val detail = state.resultDetail
     AlertDialog(
-        onDismissRequest = {},
+        onDismissRequest = onViewBoard,
         containerColor = PANEL,
         title = { Text(title, color = BRASS, fontWeight = FontWeight.Bold) },
         text = { Text(detail, color = BONE) },
@@ -275,12 +299,15 @@ private fun GameOverDialog(state: BoardUiState, onNewGame: () -> Unit) {
                 onClick = onNewGame,
                 colors = ButtonDefaults.buttonColors(containerColor = BRASS, contentColor = BG)
             ) { Text("New game") }
+        },
+        dismissButton = {
+            TextButton(onClick = onViewBoard) { Text("View board", color = BRASS) }
         }
     )
 }
 
 @Composable
-private fun BoardCanvas(state: BoardUiState, flipped: Boolean, onTap: (Square) -> Unit) {
+private fun BoardCanvas(state: BoardUiState, flipped: Boolean, pal: BoardPalette, onTap: (Square) -> Unit) {
     val measurer = rememberTextMeasurer()
     // Animation progress 0..1 for the sliding piece.
     val anim = state.animating
@@ -318,7 +345,7 @@ private fun BoardCanvas(state: BoardUiState, flipped: Boolean, onTap: (Square) -
                 val light = (file + rank) % 2 == 1
                 val tl = Offset(c * cell, r * cell)
                 val sz = Size(cell, cell)
-                drawRect(if (light) LIGHT_SQ else DARK_SQ, tl, sz)
+                drawRect(if (light) pal.light else pal.dark, tl, sz)
 
                 if (sq == state.lastMove?.from || sq == state.lastMove?.to) drawRect(LAST, tl, sz)
                 if (sq == state.selected) drawRect(SELECT, tl, sz)
@@ -332,7 +359,7 @@ private fun BoardCanvas(state: BoardUiState, flipped: Boolean, onTap: (Square) -
 
                 // Coordinate labels on the edges.
                 if (state.showCoordinates) {
-                    val labelColor = if (light) DARK_SQ else LIGHT_SQ
+                    val labelColor = if (light) pal.dark else pal.light
                     if (c == 0) {
                         val lay = measurer.measure((rank + 1).toString(),
                             TextStyle(color = labelColor, fontSize = (cell * 0.16f / 2.625f).sp,

@@ -28,8 +28,11 @@ fun SettingsScreen(repo: SettingsRepository, onBack: () -> Unit) {
     val settings by repo.settings.collectAsState(initial = Settings())
     val scope = rememberCoroutineScope()
 
-    Column(Modifier.fillMaxSize().background(BG).verticalScroll(rememberScrollState())) {
+    Column(Modifier.fillMaxSize().background(BG).verticalScroll(rememberScrollState()).statusBarsPadding()) {
         TopRow("Settings", onBack)
+
+        Section("Board theme")
+        ThemePicker(settings.boardTheme) { scope.launch { repo.setBoardTheme(it) } }
 
         Section("Gameplay")
         ToggleRow("Show legal moves", settings.showLegalMoves) {
@@ -59,6 +62,11 @@ fun SettingsScreen(repo: SettingsRepository, onBack: () -> Unit) {
         ClockPicker(settings.clockMinutes, settings.clockIncrementSeconds) { m, inc ->
             scope.launch { repo.setClock(m, inc) }
         }
+        Text(
+            clockDescription(settings.clockMinutes, settings.clockIncrementSeconds),
+            color = MUTED, fontSize = 12.sp,
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
+        )
         Spacer(Modifier.height(32.dp))
     }
 }
@@ -144,4 +152,28 @@ private fun ClockPicker(minutes: Int, inc: Int, onPick: (Int, Int) -> Unit) {
             }
         }
     }
+}
+
+@Composable
+private fun ThemePicker(current: String, onPick: (String) -> Unit) {
+    Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        for ((key, label) in listOf("CLASSIC" to "Classic", "WALNUT" to "Walnut", "FOREST" to "Forest")) {
+            val sel = current == key
+            OutlinedButton(
+                onClick = { onPick(key) },
+                modifier = Modifier.weight(1f),
+                border = BorderStroke(1.dp, if (sel) BRASS else MUTED)
+            ) { Text(label, color = if (sel) BRASS else MUTED, fontSize = 13.sp) }
+        }
+    }
+}
+
+/** Plain-language explanation of the selected time control (#7). */
+fun clockDescription(min: Int, inc: Int): String = when {
+    min <= 0 -> "No clocks \u2014 think as long as you like."
+    min == 1 && inc == 0 -> "Bullet: 1 minute each for the whole game. Lightning fast \u2014 expect chaos."
+    min == 5 -> "Blitz: 5 minutes each, +${inc}s added after every move you make."
+    min == 10 -> "Rapid: 10 minutes each, +${inc}s per move. A comfortable casual pace."
+    min == 30 -> "Classical: 30 minutes each. Tournament-style thinking time."
+    else -> "$min minutes per side" + if (inc > 0) ", +${inc}s added per move." else "."
 }

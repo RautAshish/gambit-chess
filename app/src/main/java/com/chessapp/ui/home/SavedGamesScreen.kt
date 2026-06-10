@@ -37,11 +37,33 @@ fun SavedGamesScreen(
 ) {
     val games by repo.observeSavedGames().collectAsState(initial = emptyList())
 
-    Column(Modifier.fillMaxSize().background(BG)) {
+    Column(Modifier.fillMaxSize().background(BG).statusBarsPadding()) {
+        var confirmDeleteAll by remember { mutableStateOf(false) }
+        val headerScope = rememberCoroutineScope()
         Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             TextButton(onClick = onBack) { Text("Back", color = BRASS) }
             Spacer(Modifier.width(8.dp))
             Text("Saved Games", color = BONE, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.weight(1f))
+            if (games.isNotEmpty()) {
+                TextButton(onClick = { confirmDeleteAll = true }) { Text("Delete all", color = MUTED) }
+            }
+        }
+        if (confirmDeleteAll) {
+            AlertDialog(
+                onDismissRequest = { confirmDeleteAll = false },
+                containerColor = PANEL,
+                title = { Text("Delete all saved games?", color = BONE, fontWeight = FontWeight.Bold) },
+                text = { Text("This removes every saved game and can't be undone.", color = BONE) },
+                confirmButton = {
+                    TextButton(onClick = { confirmDeleteAll = false; headerScope.launch { repo.deleteAll() } }) {
+                        Text("Delete all", color = BRASS)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { confirmDeleteAll = false }) { Text("Cancel", color = MUTED) }
+                }
+            )
         }
 
         if (games.isEmpty()) {

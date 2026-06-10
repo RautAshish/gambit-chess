@@ -45,6 +45,9 @@ interface GameDao {
 
     @Query("DELETE FROM saved_games WHERE id = :id")
     suspend fun deleteById(id: Long)
+
+    @Query("DELETE FROM saved_games")
+    suspend fun deleteAll()
 }
 
 @Dao

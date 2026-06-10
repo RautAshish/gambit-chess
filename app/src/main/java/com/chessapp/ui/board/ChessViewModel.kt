@@ -57,7 +57,8 @@ data class BoardUiState(
     val drawOfferPending: Boolean = false,   // opponent (or local other side) offered a draw
     val drawDeclined: Boolean = false,       // transient: AI/opponent declined our offer
     val canResign: Boolean = false,
-    val canOfferDraw: Boolean = false
+    val canOfferDraw: Boolean = false,
+    val soundOn: Boolean = true
 )
 
 /**
@@ -83,6 +84,7 @@ class ChessViewModel(
     private var savedRowId: Long = 0L
     private var clockLoopJob: kotlinx.coroutines.Job? = null
     private var aiJob: kotlinx.coroutines.Job? = null
+    private var inForeground = true
     // Bumped on every newGame/resume; in-flight AI work checks it before mutating
     // state so a stale coroutine can never drop a move onto a fresh game.
     private var gameGeneration = 0
@@ -96,16 +98,32 @@ class ChessViewModel(
     val state: StateFlow<BoardUiState> = _state.asStateFlow()
 
     init {
+        // Collect settings CONTINUOUSLY so changes (mute, show-legal-moves, theme)
+        // apply to the game in progress. The first emission also performs game
+        // setup; clock configuration intentionally applies from the next game.
         viewModelScope.launch {
-            settings = settingsRepo.settings.first()
-            clock = ChessClock(settings.clockMinutes * 60_000L, settings.clockIncrementSeconds * 1000L)
-            if (settings.clockMinutes > 0) {
-                clock.start(Color.WHITE)
-                startClockLoop()
+            var initialized = false
+            settingsRepo.settings.collect { s ->
+                settings = s
+                if (!initialized) {
+                    initialized = true
+                    clock = ChessClock(s.clockMinutes * 60_000L, s.clockIncrementSeconds * 1000L)
+                    if (s.clockMinutes > 0) {
+                        clock.start(Color.WHITE)
+                        startClockLoop()
+                    }
+                    _state.value = snapshot()
+                    if (playerColor == Color.BLACK) maybeTriggerAi()
+                } else {
+                    _state.value = snapshot()
+                }
             }
-            _state.value = snapshot()
-            if (playerColor == Color.BLACK) maybeTriggerAi()
         }
+    }
+
+    /** Quick mute from the game screen; persists like the Settings toggle. */
+    fun toggleSound() {
+        viewModelScope.launch { settingsRepo.setSound(!settings.soundEnabled) }
     }
 
     private val clockEnabled get() = settings.clockMinutes > 0
@@ -118,7 +136,7 @@ class ChessViewModel(
                 // Timestamp clock self-computes; the loop just refreshes the UI and
                 // watches for a flag.
                 if (clock.flagged != null) {
-                    sound.play(SoundManager.Cue.GAME_END, settings.soundEnabled, settings.hapticsEnabled)
+                    if (inForeground) sound.play(SoundManager.Cue.GAME_END, settings.soundEnabled, settings.hapticsEnabled)
                     _state.value = snapshot()
                     autoSave()
                     break
@@ -181,7 +199,8 @@ class ChessViewModel(
             resultDetail = detail,
             drawOfferPending = drawOfferPending,
             canResign = live,
-            canOfferDraw = live && !drawOfferPending
+            canOfferDraw = live && !drawOfferPending,
+            soundOn = settings.soundEnabled
         )
     }
 
@@ -257,7 +276,7 @@ class ChessViewModel(
             if (gen != gameGeneration) return@launch       // reset during the slide
             if (!engine.makeMove(move)) { _state.value = snapshot(animating = null); return@launch }
             if (clockEnabled) clock.press(movingPiece.color)
-            sound.play(cue, settings.soundEnabled, settings.hapticsEnabled)
+            if (inForeground) sound.play(cue, settings.soundEnabled, settings.hapticsEnabled)
             _state.value = snapshot(last = move, animating = null)
             autoSave()
             checkGameEndSound()
@@ -273,7 +292,12 @@ class ChessViewModel(
         _state.value = _state.value.copy(thinking = true)
         val gen = gameGeneration
         aiJob = viewModelScope.launch {
+            val t0 = System.currentTimeMillis()
             val move = opponent.bestMove(engine.board)
+            // A reply that lands instantly feels aggressive and is hard to follow;
+            // pace it like a human glancing at the board.
+            val elapsed = System.currentTimeMillis() - t0
+            if (elapsed < MIN_AI_REPLY_MS) delay(MIN_AI_REPLY_MS - elapsed)
             if (gen != gameGeneration) return@launch   // game was reset mid-think
             if (move != null) {
                 val boardBefore = engine.board
@@ -289,7 +313,7 @@ class ChessViewModel(
                 }
                 engine.makeMove(move)
                 if (clockEnabled) clock.press(playerColor.opposite())
-                sound.play(cue, settings.soundEnabled, settings.hapticsEnabled)
+                if (inForeground) sound.play(cue, settings.soundEnabled, settings.hapticsEnabled)
                 _state.value = snapshot(last = move, animating = null)
                 autoSave()
                 checkGameEndSound()
@@ -301,7 +325,7 @@ class ChessViewModel(
 
     private fun checkGameEndSound() {
         if (_state.value.gameOver) {
-            sound.play(SoundManager.Cue.GAME_END, settings.soundEnabled, settings.hapticsEnabled)
+            if (inForeground) sound.play(SoundManager.Cue.GAME_END, settings.soundEnabled, settings.hapticsEnabled)
         }
     }
 
@@ -322,15 +346,26 @@ class ChessViewModel(
 
     fun undo() {
         if (_state.value.animating != null) return
+        // Undo during the AI's think must invalidate that think, or the stale
+        // reply lands on the rewound position (or never re-triggers).
+        gameGeneration++
+        aiJob?.cancel()
         if (engine.undo()) {
             // In vs-AI, step back past the AI's reply so it's the human's turn again.
             if (isVsAi && engine.board.sideToMove != playerColor) engine.undo()
             _state.value = snapshot(last = engine.moveHistory().lastOrNull())
             autoSave()
+            // If we rewound to a position where it's STILL the AI's turn (only
+            // possible when its move was the first of the game), it must move again.
+            if (isVsAi && engine.board.sideToMove != playerColor && !_state.value.gameOver) {
+                maybeTriggerAi()
+            }
         }
     }
 
     fun redo() {
+        gameGeneration++
+        aiJob?.cancel()
         if (engine.redo()) { _state.value = snapshot(last = engine.moveHistory().lastOrNull()); autoSave() }
     }
 
@@ -356,7 +391,7 @@ class ChessViewModel(
         if (_state.value.gameOver) return
         resignedBy = controllingColor
         if (clockEnabled) clock.pause()
-        sound.play(SoundManager.Cue.GAME_END, settings.soundEnabled, settings.hapticsEnabled)
+        if (inForeground) sound.play(SoundManager.Cue.GAME_END, settings.soundEnabled, settings.hapticsEnabled)
         _state.value = snapshot()
         autoSave()
     }
@@ -376,7 +411,7 @@ class ChessViewModel(
             if (aiBalance <= 1) {
                 drawAgreed = true
                 if (clockEnabled) clock.pause()
-                sound.play(SoundManager.Cue.GAME_END, settings.soundEnabled, settings.hapticsEnabled)
+                if (inForeground) sound.play(SoundManager.Cue.GAME_END, settings.soundEnabled, settings.hapticsEnabled)
                 _state.value = snapshot()
                 autoSave()
             } else {
@@ -394,7 +429,7 @@ class ChessViewModel(
         drawAgreed = true
         drawOfferPending = false
         if (clockEnabled) clock.pause()
-        sound.play(SoundManager.Cue.GAME_END, settings.soundEnabled, settings.hapticsEnabled)
+        if (inForeground) sound.play(SoundManager.Cue.GAME_END, settings.soundEnabled, settings.hapticsEnabled)
         _state.value = snapshot()
         autoSave()
     }
@@ -416,6 +451,7 @@ class ChessViewModel(
     // player for time spent with the app closed (matching casual-app expectations).
 
     fun onAppPaused() {
+        inForeground = false
         if (clockEnabled && !_state.value.gameOver) {
             clock.pause()
             persistClock()
@@ -424,6 +460,7 @@ class ChessViewModel(
     }
 
     fun onAppResumed() {
+        inForeground = true
         if (clockEnabled && !_state.value.gameOver) {
             clock.resume()
             if (!clockLoopRunning()) startClockLoop()
@@ -463,5 +500,5 @@ class ChessViewModel(
         super.onCleared()
     }
 
-    companion object { const val ANIM_MS = 160L }
+    companion object { const val ANIM_MS = 220L; const val MIN_AI_REPLY_MS = 550L }
 }

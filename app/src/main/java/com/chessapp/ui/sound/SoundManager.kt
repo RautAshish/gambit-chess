@@ -56,7 +56,7 @@ class SoundManager(context: Context) {
                 Cue.CHECK -> check
                 Cue.GAME_END -> gameEnd
             }
-            pool.play(id, 1f, 1f, 1, 0, 1f)
+            pool.play(id, 0.8f, 0.8f, 1, 0, 1f)
         }
         if (haptics) vibrate(cue)
     }

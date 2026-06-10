@@ -10,7 +10,9 @@ import com.chessapp.domain.model.*
 class ChessAI(val difficulty: Difficulty = Difficulty.MEDIUM) {
 
     enum class Difficulty(val depth: Int) {
-        EASY(2), MEDIUM(3), HARD(4), EXPERT(5)
+        // EASY searches shallow AND picks loosely among near-best moves (below),
+        // so it plays like an enthusiastic beginner instead of a small engine.
+        EASY(1), MEDIUM(3), HARD(4), EXPERT(5)
     }
 
     private val mateScore = 1_000_000
@@ -28,10 +30,21 @@ class ChessAI(val difficulty: Difficulty = Difficulty.MEDIUM) {
         var alpha = -mateScore * 2
         val beta = mateScore * 2
 
+        val scored = ArrayList<Pair<Move, Int>>(moves.size)
         for (move in moves) {
             val score = -negamax(board.apply(move), difficulty.depth - 1, -beta, -alpha, -sign)
+            scored.add(move to score)
             if (score > bestScore) { bestScore = score; best = move }
             if (score > alpha) alpha = score
+        }
+
+        // Human-feel for EASY: never miss a mate, but otherwise pick randomly among
+        // moves within a generous window of the best score. Beginners play
+        // reasonable-looking, imperfect moves — not depth-perfect ones.
+        if (difficulty == Difficulty.EASY && bestScore < mateScore) {
+            val window = 150
+            val candidates = scored.filter { it.second >= bestScore - window }
+            if (candidates.isNotEmpty()) return candidates.random().first
         }
         return best
     }

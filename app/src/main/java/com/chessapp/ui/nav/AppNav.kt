@@ -2,6 +2,7 @@ package com.chessapp.ui.nav
 
 import android.app.Application
 import androidx.compose.runtime.Composable
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,6 +46,7 @@ fun AppNav(app: Application) {
     val settingsRepo = remember { SettingsRepository(app) }
     val gameRepo = remember { GameRepository(ChessDatabase.get(app).gameDao()) }
     val owner = LocalViewModelStoreOwner.current!!
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
     val settings by settingsRepo.settings.collectAsState(initial = com.chessapp.data.prefs.Settings())
 
     // System back returns to Home from any sub-screen instead of exiting the app.
@@ -54,6 +56,10 @@ fun AppNav(app: Application) {
 
     when (val s = screen) {
         Screen.Home -> HomeScreen(
+            selectedDifficulty = settings.difficulty,
+            onSelectDifficulty = { d ->
+                scope.launch { settingsRepo.setDifficulty(d) }
+            },
             onPlayAi = { diff, color -> gameSerial++; screen = Screen.Game(diff, color, serial = gameSerial) },
             onPlayLocal = {
                 gameSerial++
@@ -73,7 +79,7 @@ fun AppNav(app: Application) {
                 androidx.compose.runtime.LaunchedEffect(s.resumeId) { vm.resume(s.resumeId) }
             }
             ChessScreen(vm, flipped = settings.boardFlipped && s.playerColor == Color.BLACK,
-                onBack = { screen = Screen.Home })
+                onBack = { screen = Screen.Home }, boardTheme = settings.boardTheme)
         }
 
         Screen.Settings -> SettingsScreen(settingsRepo) { screen = Screen.Home }
