@@ -368,3 +368,26 @@ since Actions step logs are on blob storage unreachable from the authoring env):
    emulator being SIGPIPE-killed by piping its output through head (fixed by
    redirecting to emu.log).
 3. Boot completed in ~15s once fixed; connectedDebugAndroidTest ran in 1m27s.
+
+## FULL E2E SCENARIO ROUND (emulator, all clicks) — 20/20 PASS
+
+Commit 63321cd, Android 10 emulator, every test via real screen interaction:
+
+GAMEPLAY: illegal-target tap clears selection and pipeline recovers; undo rolls
+back both plies (button disables at start) and redo re-applies; pass-and-play
+alternates both colors through real board taps.
+GAME ENDINGS: resign confirm dialog -> "Black wins / by resignation" -> New game
+resets; resign Cancel keeps the game live; draw offer vs AI accepted when level
+("Draw / by agreement"); pass-and-play draw offer Decline continues play, Accept
+ends it; scholar's-mate played move-by-move on the board ends with
+"White wins / by checkmate" dialog.
+PROMOTION: 9-move pass-and-play line to a7xb8 opens the "Promote to" picker;
+tapping the rook option produces SAN "axb8=R" (underpromotion verified on-device).
+PERSISTENCE: play vs AI, navigate Home -> Saved Games, tap the saved row, history
+replays ("e4" restored) on the board.
+NAVIGATION/CONFIG: all four difficulty buttons start games; Settings shows all
+controls (one test-authoring fix: Section headers render uppercased).
+
+One iteration needed: 19/20 first run; sole failure was the test expecting
+"Clock" where the UI renders "CLOCK". No app defects found in this round.
+Testability additions: testTags on promotion options and saved-game rows.
