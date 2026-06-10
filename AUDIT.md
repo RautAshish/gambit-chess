@@ -391,3 +391,27 @@ controls (one test-authoring fix: Section headers render uppercased).
 One iteration needed: 19/20 first run; sole failure was the test expecting
 "Clock" where the UI renders "CLOCK". No app defects found in this round.
 Testability additions: testTags on promotion options and saved-game rows.
+
+## BACKLOG ROUND (post-E2E): 4 fixes shipped, all verified on-device (24/24)
+
+FIXED + E2E-VERIFIED (commit a52e50a):
+1. Inert "Use Stockfish" toggle hidden from Settings (was misleading users);
+   test asserts its absence. DataStore field retained for easy re-enable.
+2. "Play as Black" picker on Home, wired to both AI entry points. On-device test:
+   AI (White) opens on its own, human replies 1...e5 as Black.
+3. In-flight AI cancellation on New Game: aiJob.cancel() + gameGeneration guard,
+   covering the bestMove window AND both 160ms animation windows (AI + human
+   commitMove). On-device race test: start EXPERT, play e4, hit New game during
+   "Thinking…", wait 5s — no stray move lands, fresh game intact.
+4. Delete button on saved-game rows (repo.delete existed; UI was missing).
+   On-device test: row count decreases.
+
+REGRESSION CAUGHT BY THE SUITE: the new Play-as row overflowed the non-scrollable
+Home column, pushing the Settings tile off a Pixel-5-sized screen — 5 tests failed
+(every one involving the Settings entry). Fixed by compacting the header (logo
+96->72dp, spacers trimmed) and making Home vertically scrollable. This is exactly
+the class of runtime layout bug static review cannot catch; the E2E investment
+paid for itself within one round.
+
+STILL OPEN: settings don't apply mid-game; clock not persisted across process
+death; Online/Puzzles screens; Stockfish bundling decision; darkBoard field unused.
