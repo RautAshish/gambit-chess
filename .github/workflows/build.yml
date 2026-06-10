@@ -4,7 +4,10 @@ on:
   push:
     branches: [ main, master ]
   pull_request:
-  workflow_dispatch:        # lets you trigger a build manually from the Actions tab
+  workflow_dispatch:
+
+permissions:
+  contents: write   # lets the workflow publish its own log to the ci-logs branch
 
 jobs:
   build:
@@ -21,23 +24,28 @@ jobs:
       - name: Set up Gradle cache
         uses: gradle/actions/setup-gradle@v4
 
-      # Android SDK is preinstalled on ubuntu-latest runners.
+      - name: Tests + debug APK (log captured)
+        shell: bash
+        run: |
+          set -o pipefail
+          ./gradlew :app:testDebugUnitTest :app:assembleDebug --stacktrace --console=plain 2>&1 | tee build.log
 
-      - name: Run unit tests (29 tests - engine, clock, results, parsing)
-        run: ./gradlew :app:testDebugUnitTest --stacktrace
-
-      - name: Build debug APK
-        run: ./gradlew :app:assembleDebug --stacktrace
-
-      - name: Upload APK (download from the Actions run page)
+      - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: gambit-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
 
-      - name: Upload test reports on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-reports
-          path: app/build/reports/
+      - name: Publish build log to ci-logs branch (readable via API)
+        if: always()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tail -c 80000 build.log > ci-build.log || echo "no log" > ci-build.log
+          git config user.email "ci@gambit" && git config user.name "ci-bot"
+          git checkout -B ci-logs
+          git add -f ci-build.log
+          git commit -m "CI log for $GITHUB_SHA" || true
+          git push -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" ci-logs
