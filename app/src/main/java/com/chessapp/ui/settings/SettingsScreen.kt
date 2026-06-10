@@ -52,15 +52,9 @@ fun SettingsScreen(repo: SettingsRepository, onBack: () -> Unit) {
             scope.launch { repo.setDifficulty(it) }
         }
 
-        Section("Engine")
-        ToggleRow("Use Stockfish (strong)", settings.useStockfish) {
-            scope.launch { repo.setUseStockfish(it) }
-        }
-        Text(
-            "Requires bundling Stockfish binaries. Falls back to the built-in engine if unavailable.",
-            color = MUTED, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 20.dp)
-        )
-
+        // The Stockfish toggle is hidden until binaries ship with the app —
+        // surfacing a switch that does nothing would mislead users. The
+        // SettingsRepository field stays so re-enabling is one-line.
         Section("Clock")
         ClockPicker(settings.clockMinutes, settings.clockIncrementSeconds) { m, inc ->
             scope.launch { repo.setClock(m, inc) }

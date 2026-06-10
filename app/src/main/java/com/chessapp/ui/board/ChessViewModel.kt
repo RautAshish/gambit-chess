@@ -82,6 +82,10 @@ class ChessViewModel(
     private var clock = ChessClock(10 * 60_000L, 5_000L)
     private var savedRowId: Long = 0L
     private var clockLoopJob: kotlinx.coroutines.Job? = null
+    private var aiJob: kotlinx.coroutines.Job? = null
+    // Bumped on every newGame/resume; in-flight AI work checks it before mutating
+    // state so a stale coroutine can never drop a move onto a fresh game.
+    private var gameGeneration = 0
 
     // Player-action results, layered on top of the board status.
     private var resignedBy: Color? = null
@@ -241,6 +245,7 @@ class ChessViewModel(
         val boardBefore = engine.board
         val movingPiece = boardBefore.pieceAt(move.from) ?: return
         val cue = cueFor(boardBefore, move)
+        val gen = gameGeneration
 
         // Animate the slide, then apply.
         viewModelScope.launch {
@@ -249,6 +254,7 @@ class ChessViewModel(
                 animating = AnimatingMove(movingPiece, move.from, move.to)
             )
             delay(ANIM_MS)
+            if (gen != gameGeneration) return@launch       // reset during the slide
             if (!engine.makeMove(move)) { _state.value = snapshot(animating = null); return@launch }
             if (clockEnabled) clock.press(movingPiece.color)
             sound.play(cue, settings.soundEnabled, settings.hapticsEnabled)
@@ -265,8 +271,10 @@ class ChessViewModel(
         if (engine.board.sideToMove == playerColor) return
 
         _state.value = _state.value.copy(thinking = true)
-        viewModelScope.launch {
+        val gen = gameGeneration
+        aiJob = viewModelScope.launch {
             val move = opponent.bestMove(engine.board)
+            if (gen != gameGeneration) return@launch   // game was reset mid-think
             if (move != null) {
                 val boardBefore = engine.board
                 val movingPiece = boardBefore.pieceAt(move.from)
@@ -277,6 +285,7 @@ class ChessViewModel(
                         animating = AnimatingMove(movingPiece, move.from, move.to)
                     )
                     delay(ANIM_MS)
+                    if (gen != gameGeneration) return@launch   // reset during the slide
                 }
                 engine.makeMove(move)
                 if (clockEnabled) clock.press(playerColor.opposite())
@@ -326,6 +335,8 @@ class ChessViewModel(
     }
 
     fun newGame() {
+        gameGeneration++
+        aiJob?.cancel()
         savedRowId = 0L
         engine = GameEngine()
         resignedBy = null
@@ -430,6 +441,8 @@ class ChessViewModel(
 
     /** Restore a previously saved game by replaying its moves. */
     fun resume(rowId: Long) {
+        gameGeneration++
+        aiJob?.cancel()
         viewModelScope.launch {
             val restored = gameRepo.load(rowId) ?: return@launch
             engine = restored
@@ -443,6 +456,7 @@ class ChessViewModel(
     }
 
     override fun onCleared() {
+        aiJob?.cancel()
         clockLoopJob?.cancel()
         sound.release()
         opponent.close()

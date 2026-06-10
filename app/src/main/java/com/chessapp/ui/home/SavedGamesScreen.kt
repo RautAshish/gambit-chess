@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.chessapp.data.db.GameRepository
 import com.chessapp.data.db.SavedGame
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -49,15 +50,18 @@ fun SavedGamesScreen(
                     color = MUTED, fontSize = 15.sp)
             }
         } else {
+            val scope = rememberCoroutineScope()
             LazyColumn(Modifier.padding(horizontal = 16.dp)) {
-                items(games, key = { it.id }) { g -> SavedRow(g, onResume) }
+                items(games, key = { it.id }) { g ->
+                    SavedRow(g, onResume, onDelete = { scope.launch { repo.delete(g.id) } })
+                }
             }
         }
     }
 }
 
 @Composable
-private fun SavedRow(g: SavedGame, onResume: (SavedGame) -> Unit) {
+private fun SavedRow(g: SavedGame, onResume: (SavedGame) -> Unit, onDelete: () -> Unit) {
     val fmt = remember { SimpleDateFormat("MMM d, HH:mm", Locale.getDefault()) }
     Surface(
         modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp)
@@ -77,6 +81,7 @@ private fun SavedRow(g: SavedGame, onResume: (SavedGame) -> Unit) {
                 }
             }
             ResultBadge(g.result)
+            TextButton(onClick = onDelete) { Text("Delete", color = MUTED, fontSize = 12.sp) }
         }
     }
 }

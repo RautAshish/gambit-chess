@@ -6,6 +6,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,11 +57,14 @@ fun HomeScreen(
         Text("play. learn. repeat.", color = MUTED, fontSize = 13.sp, letterSpacing = 2.sp)
         Spacer(Modifier.height(40.dp))
 
+        var playAs by remember { mutableStateOf(Color.WHITE) }
         PrimaryTile("Play vs Computer", "Four difficulty levels") {
-            onPlayAi(ChessAI.Difficulty.MEDIUM, Color.WHITE)
+            onPlayAi(ChessAI.Difficulty.MEDIUM, playAs)
         }
-        Spacer(Modifier.height(12.dp))
-        DifficultyRow(onPlayAi)
+        Spacer(Modifier.height(10.dp))
+        PlayAsRow(playAs) { playAs = it }
+        Spacer(Modifier.height(10.dp))
+        DifficultyRow { d, _ -> onPlayAi(d, playAs) }
         Spacer(Modifier.height(20.dp))
 
         SecondaryTile("Pass & Play") { onPlayLocal() }
@@ -64,6 +72,28 @@ fun HomeScreen(
         SecondaryTile("Puzzles") { onPuzzles() }
         SecondaryTile("Saved Games") { onSavedGames() }
         SecondaryTile("Settings") { onSettings() }
+    }
+}
+
+@Composable
+private fun PlayAsRow(selected: Color, onPick: (Color) -> Unit) {
+    Row(
+        Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text("Play as", color = MUTED, fontSize = 13.sp)
+        for (c in listOf(Color.WHITE, Color.BLACK)) {
+            val label = c.name.lowercase().replaceFirstChar { it.uppercase() }
+            OutlinedButton(
+                onClick = { onPick(c) },
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(vertical = 6.dp),
+                border = BorderStroke(1.dp, if (selected == c) BRASS else MUTED)
+            ) {
+                Text(label, color = if (selected == c) BRASS else MUTED, fontSize = 13.sp)
+            }
+        }
     }
 }
 
