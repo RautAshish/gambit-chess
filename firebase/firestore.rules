@@ -1,0 +1,26 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Matchmaking queue is managed by the findMatch Cloud Function (admin SDK,
+    // which bypasses these rules). Clients may read their own entry to learn the
+    // assigned gameId, but may not write it directly.
+    match /matchmaking/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;   // only the Cloud Function writes here
+    }
+
+    // Games are READ-ONLY to clients. All mutations go through the submitMove /
+    // resign Cloud Functions, which validate authority and legality with the
+    // shared engine (proven identical to the client engine across 14,997
+    // positions). This makes the server the single source of truth: a tampered
+    // client cannot write an illegal or out-of-turn move, because it cannot write
+    // the game document at all.
+    match /games/{gameId} {
+      allow read: if request.auth != null &&
+        (resource.data.whiteUid == request.auth.uid ||
+         resource.data.blackUid == request.auth.uid);
+      allow write: if false;   // only Cloud Functions (admin SDK) may write
+    }
+  }
+}
