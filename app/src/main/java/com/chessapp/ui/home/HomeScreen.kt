@@ -11,6 +11,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,25 +47,26 @@ fun HomeScreen(
     onPlayOnline: () -> Unit
 ) {
     Column(
-        Modifier.fillMaxSize().background(BG).padding(24.dp),
+        Modifier.fillMaxSize().background(BG)
+            .verticalScroll(rememberScrollState()).padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(Modifier.height(32.dp))
-        Canvas(Modifier.size(96.dp)) {
+        Spacer(Modifier.height(12.dp))
+        Canvas(Modifier.size(72.dp)) {
             PieceRenderer.draw(this, PieceType.KNIGHT, Color.WHITE, Offset.Zero, size.minDimension)
         }
         Text("GAMBIT", color = BONE, fontSize = 34.sp, fontWeight = FontWeight.Bold,
             letterSpacing = 8.sp)
         Text("play. learn. repeat.", color = MUTED, fontSize = 13.sp, letterSpacing = 2.sp)
-        Spacer(Modifier.height(40.dp))
+        Spacer(Modifier.height(20.dp))
 
         var playAs by remember { mutableStateOf(Color.WHITE) }
         PrimaryTile("Play vs Computer", "Four difficulty levels") {
             onPlayAi(ChessAI.Difficulty.MEDIUM, playAs)
         }
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(8.dp))
         PlayAsRow(playAs) { playAs = it }
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(8.dp))
         DifficultyRow { d, _ -> onPlayAi(d, playAs) }
         Spacer(Modifier.height(20.dp))
 
