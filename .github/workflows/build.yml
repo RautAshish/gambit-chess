@@ -65,21 +65,38 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Run UI smoke tests on emulator (API 29)
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 29
-          target: default
-          arch: x86_64
-          profile: pixel_5
-          disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
-          script: |
-            echo "SCRIPT-STARTED emulator booted ok" > ui.log
-            ./gradlew :app:connectedDebugAndroidTest --stacktrace --console=plain >> ui.log 2>&1
-            status=$?
-            tail -40 ui.log
-            exit $status
+      - name: Boot emulator and run UI tests (fully logged)
+        shell: bash
+        run: |
+          set +e
+          {
+            echo "=== STEP 1: install emulator + system image ==="
+            yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install \
+              "system-images;android-29;default;x86_64" "emulator" "platform-tools" 2>&1 | tail -5
+            echo "=== STEP 2: create AVD ==="
+            echo no | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd \
+              -n ci -k "system-images;android-29;default;x86_64" -d pixel_5 --force
+            echo "=== STEP 3: boot emulator ==="
+            "$ANDROID_HOME/emulator/emulator" -avd ci -no-window -gpu swiftshader_indirect \
+              -no-snapshot -noaudio -no-boot-anim -accel on -verbose 2>&1 | head -40 &
+            sleep 5
+            adb wait-for-device
+            for i in $(seq 1 60); do
+              boot=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+              if [ "$boot" = "1" ]; then echo "BOOT-COMPLETED after ~$((i*5))s"; break; fi
+              sleep 5
+            done
+            adb devices
+            adb shell settings put global window_animation_scale 0 || true
+            adb shell settings put global transition_animation_scale 0 || true
+            adb shell settings put global animator_duration_scale 0 || true
+            echo "=== STEP 4: connectedDebugAndroidTest ==="
+            ./gradlew :app:connectedDebugAndroidTest --stacktrace --console=plain
+            echo "GRADLE_EXIT=$?"
+          } > ui.log 2>&1
+          RC=$(grep -o 'GRADLE_EXIT=[0-9]*' ui.log | tail -1 | cut -d= -f2)
+          tail -60 ui.log
+          exit ${RC:-1}
 
       - name: Publish UI test log
         if: always()
