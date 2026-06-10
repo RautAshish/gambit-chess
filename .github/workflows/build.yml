@@ -77,9 +77,7 @@ jobs:
           api-level: 34
           arch: x86_64
           disable-animations: true
-          script: |
-            set -o pipefail
-            ./gradlew :app:connectedDebugAndroidTest --stacktrace --console=plain 2>&1 | tee ui-test.log
+          script: ./gradlew :app:connectedDebugAndroidTest --stacktrace --console=plain > ui-test.log 2>&1
 
       - name: Publish UI-test log (readable via API)
         if: always()
@@ -87,7 +85,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          tail -c 80000 ui-test.log > ci-ui-test.log || echo "no log" > ci-ui-test.log
+          { tail -c 40000 ui-test.log 2>/dev/null; echo "=== XML TEST RESULTS ==="; find app/build -path "*androidTest*" -name "*.xml" 2>/dev/null | head -3 | xargs -r cat; } | tail -c 80000 > ci-ui-test.log
+          [ -s ci-ui-test.log ] || echo "no log" > ci-ui-test.log
           git config user.email "ci@gambit" && git config user.name "ci-bot"
           git checkout -B ci-ui-logs
           git add -f ci-ui-test.log
