@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color as UiColor
 import androidx.compose.ui.text.font.FontWeight
@@ -60,7 +61,7 @@ private fun SavedRow(g: SavedGame, onResume: (SavedGame) -> Unit) {
     val fmt = remember { SimpleDateFormat("MMM d, HH:mm", Locale.getDefault()) }
     Surface(
         modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp)
-            .clip(RoundedCornerShape(12.dp)).clickable { onResume(g) },
+            .clip(RoundedCornerShape(12.dp)).testTag("savedRow").clickable { onResume(g) },
         color = PANEL
     ) {
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {

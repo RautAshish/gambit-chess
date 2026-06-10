@@ -248,6 +248,7 @@ private fun PromotionDialog(color: Color, onPick: (PieceType) -> Unit, onDismiss
                 for (t in listOf(PieceType.QUEEN, PieceType.ROOK, PieceType.BISHOP, PieceType.KNIGHT)) {
                     Box(
                         Modifier.size(56.dp).clip(RoundedCornerShape(8.dp)).background(DARK_SQ)
+                            .testTag("promote-${t.name}")
                             .pointerInput(t) { detectTapGestures { onPick(t) } }
                     ) {
                         Canvas(Modifier.fillMaxSize()) {
