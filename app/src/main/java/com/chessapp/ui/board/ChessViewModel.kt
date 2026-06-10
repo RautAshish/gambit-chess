@@ -10,7 +10,9 @@ import com.chessapp.data.prefs.SettingsRepository
 import com.chessapp.domain.ai.ChessAI
 import com.chessapp.domain.engine.ChessClock
 import com.chessapp.domain.engine.GameEngine
+import com.chessapp.domain.engine.GameResult
 import com.chessapp.domain.engine.Material
+import com.chessapp.domain.engine.ResultEvaluator
 import com.chessapp.domain.model.*
 import com.chessapp.engine.ChessEnginePort
 import com.chessapp.engine.NativeEngine
