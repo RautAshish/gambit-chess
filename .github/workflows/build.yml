@@ -65,16 +65,21 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Run UI smoke tests on emulator (API 30)
+      - name: Run UI smoke tests on emulator (API 29)
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 30
+          api-level: 29
+          target: default
           arch: x86_64
           profile: pixel_5
           disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
           script: |
-            set -o pipefail
-            ./gradlew :app:connectedDebugAndroidTest --stacktrace --console=plain 2>&1 | tee ui.log
+            echo "SCRIPT-STARTED emulator booted ok" > ui.log
+            ./gradlew :app:connectedDebugAndroidTest --stacktrace --console=plain >> ui.log 2>&1
+            status=$?
+            tail -40 ui.log
+            exit $status
 
       - name: Publish UI test log
         if: always()

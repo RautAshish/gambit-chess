@@ -8,7 +8,6 @@ import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
-import java.util.concurrent.TimeUnit
 
 /**
  * Talks to a Stockfish binary over the UCI protocol via stdin/stdout.
@@ -87,7 +86,11 @@ class StockfishEngine(enginePath: String) : ChessEnginePort {
     override fun close() {
         runCatching {
             send("quit")
-            if (!process.waitFor(1, TimeUnit.SECONDS)) process.destroyForcibly()
+            // NOTE: stick to API-24-safe Process calls. destroyForcibly() and the
+            // timed waitFor(long, TimeUnit) overload require Android API 26 and
+            // would crash on Android 7.x (minSdk 24). destroy() exists since API 1
+            // and SIGKILLs the engine, which is acceptable after "quit".
+            process.destroy()
         }
         runCatching { writer.close() }
         runCatching { reader.close() }
