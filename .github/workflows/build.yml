@@ -69,33 +69,45 @@ jobs:
         shell: bash
         run: |
           set +e
+          export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
+          export ANDROID_AVD_HOME="$HOME/.android/avd"
+          mkdir -p "$ANDROID_AVD_HOME"
           {
             echo "=== STEP 1: install emulator + system image ==="
             yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install \
-              "system-images;android-29;default;x86_64" "emulator" "platform-tools" 2>&1 | tail -5
+              "system-images;android-29;default;x86_64" "emulator" "platform-tools" > /dev/null 2>&1
+            echo "sdkmanager exit=$?"
             echo "=== STEP 2: create AVD ==="
             echo no | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd \
               -n ci -k "system-images;android-29;default;x86_64" -d pixel_5 --force
-            echo "=== STEP 3: boot emulator ==="
-            "$ANDROID_HOME/emulator/emulator" -avd ci -no-window -gpu swiftshader_indirect \
-              -no-snapshot -noaudio -no-boot-anim -accel on -verbose 2>&1 | head -40 &
-            sleep 5
+            echo "avd dir contents:"; ls -la "$ANDROID_AVD_HOME" || true
+            echo "=== STEP 3: boot emulator (output -> emu.log) ==="
+            nohup "$ANDROID_HOME/emulator/emulator" -avd ci -no-window -gpu swiftshader_indirect \
+              -no-snapshot -noaudio -no-boot-anim -accel on > emu.log 2>&1 &
+            adb start-server
             adb wait-for-device
+            BOOTED=0
             for i in $(seq 1 60); do
               boot=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
-              if [ "$boot" = "1" ]; then echo "BOOT-COMPLETED after ~$((i*5))s"; break; fi
+              if [ "$boot" = "1" ]; then echo "BOOT-COMPLETED after ~$((i*5))s"; BOOTED=1; break; fi
               sleep 5
             done
+            echo "--- first 15 lines of emu.log ---"; head -15 emu.log
             adb devices
-            adb shell settings put global window_animation_scale 0 || true
-            adb shell settings put global transition_animation_scale 0 || true
-            adb shell settings put global animator_duration_scale 0 || true
-            echo "=== STEP 4: connectedDebugAndroidTest ==="
-            ./gradlew :app:connectedDebugAndroidTest --stacktrace --console=plain
-            echo "GRADLE_EXIT=$?"
+            if [ "$BOOTED" = "1" ]; then
+              adb shell settings put global window_animation_scale 0 || true
+              adb shell settings put global transition_animation_scale 0 || true
+              adb shell settings put global animator_duration_scale 0 || true
+              echo "=== STEP 4: connectedDebugAndroidTest ==="
+              ./gradlew :app:connectedDebugAndroidTest --stacktrace --console=plain
+              echo "GRADLE_EXIT=$?"
+            else
+              echo "BOOT FAILED - emu.log tail:"; tail -40 emu.log
+              echo "GRADLE_EXIT=1"
+            fi
           } > ui.log 2>&1
           RC=$(grep -o 'GRADLE_EXIT=[0-9]*' ui.log | tail -1 | cut -d= -f2)
-          tail -60 ui.log
+          tail -50 ui.log
           exit ${RC:-1}
 
       - name: Publish UI test log
