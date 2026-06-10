@@ -228,7 +228,7 @@ class E2eScenariosTest {
         rule.onNodeWithText("Settings").performClick()
         waitForText("Sound effects")
         for (label in listOf(
-            "Show legal moves", "Flip board for black", "Sound effects", "Haptics", "Clock"
+            "Show legal moves", "Flip board for black", "Sound effects", "Haptics", "CLOCK"
         )) {
             rule.onAllNodesWithText(label, substring = true).onFirst().assertExists()
         }
