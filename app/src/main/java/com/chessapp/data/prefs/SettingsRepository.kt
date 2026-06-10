@@ -50,7 +50,7 @@ class SettingsRepository(private val context: Context) {
             useStockfish = p[Keys.STOCKFISH] ?: false,
             clockMinutes = p[Keys.CLOCK_MIN] ?: 10,
             clockIncrementSeconds = p[Keys.CLOCK_INC] ?: 5,
-            boardTheme = prefs[Keys.BOARD_THEME] ?: "CLASSIC"
+            boardTheme = p[Keys.BOARD_THEME] ?: "CLASSIC"
         )
     }
 
