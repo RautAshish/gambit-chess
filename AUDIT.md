@@ -337,3 +337,34 @@ ROUND 7 — Property-based fuzzing (23,791 positions / 400 games):
 NET RESULT ROUNDS 3–7: ZERO engine defects found. Three test-authoring errors of
 mine were exposed by correct engine behavior. One UX advisory (EXPERT latency on
 phones). Standing suite remains 29/29.
+
+## CI TESTING ROUND (via GitHub Actions) — the round that was impossible locally
+
+Run on real toolchain (commit e226298), both jobs GREEN:
+
+UNIT + LINT (build job):
+- 41 unit tests (12 classes) PASS under real Gradle/JUnit — includes CPW pos5/6
+  perft, alpha-beta==minimax proof, property fuzzing, integration lockstep.
+- Android Lint found 2 REAL ERRORS invisible to JVM testing: StockfishEngine used
+  Process.destroyForcibly + timed waitFor (API 26) against minSdk 24 — would CRASH
+  on Android 7.x devices. FIXED (API-24-safe destroy()); lint errors now 0.
+  Remaining lint warnings: dependency-version notices only (non-blocking).
+
+EMULATOR UI TESTS (ui-smoke job) — first true end-to-end runtime verification:
+- Pixel 5 profile, Android 10 (API 29) x86_64 emulator, headless, KVM.
+- 8/8 instrumented Compose tests PASS on-device:
+  homeScreenRenders, startGameShowsBoardAndStatus, playE4_engineAccepts_andAiReplies,
+  backButtonReturnsHome, settingsScreenOpensAndReturns, homeScreenRendersBrand,
+  settingsNavigationWorks, savedGamesScreenOpens.
+- This proves on a real device: app launches, Compose renders, navigation works,
+  the board accepts a tapped move (e2-e4), and the AI replies in the live UI.
+
+CI-DEBUGGING LESSONS (3 iterations, all diagnosed via ci-logs/ci-logs-ui branches
+since Actions step logs are on blob storage unreachable from the authoring env):
+1. emulator-runner action failed opaquely before running its script → replaced
+   with manually scripted emulator steps so every line is capturable.
+2. Manual script bugs found via captured log: avdmanager/emulator AVD-home
+   mismatch (fixed by pinning ANDROID_AVD_HOME), adb missing from PATH, and the
+   emulator being SIGPIPE-killed by piping its output through head (fixed by
+   redirecting to emu.log).
+3. Boot completed in ~15s once fixed; connectedDebugAndroidTest ran in 1m27s.
