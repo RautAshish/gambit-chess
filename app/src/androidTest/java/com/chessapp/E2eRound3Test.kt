@@ -67,6 +67,10 @@ class E2eRound3Test {
         rule.onNodeWithText("Play vs Computer").performClick()
         waitForText("Black to move", timeoutMs = 60_000)
         waitForText("1.", timeoutMs = 60_000, substring = true)
+        // Restore White: the colour choice persists across games by design now.
+        rule.onNodeWithText("\u2039 Home").performClick()
+        waitForText("Play as")
+        rule.onNodeWithText("White").performClick()
     }
 
     /** #11: in-game Mute flips the persisted setting (visible in Settings). */

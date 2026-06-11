@@ -57,6 +57,10 @@ fun AppNav(app: Application) {
     when (val s = screen) {
         Screen.Home -> HomeScreen(
             selectedDifficulty = settings.difficulty,
+            selectedColor = if (settings.playAsBlack) Color.BLACK else Color.WHITE,
+            onSelectColor = { c ->
+                scope.launch { settingsRepo.setPlayAsBlack(c == Color.BLACK) }
+            },
             onSelectDifficulty = { d ->
                 scope.launch { settingsRepo.setDifficulty(d) }
             },

@@ -8,7 +8,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -43,6 +42,8 @@ private val MUTED = UiColor(0xFF8A8B7E)
 fun HomeScreen(
     selectedDifficulty: ChessAI.Difficulty,
     onSelectDifficulty: (ChessAI.Difficulty) -> Unit,
+    selectedColor: Color,
+    onSelectColor: (Color) -> Unit,
     onPlayAi: (ChessAI.Difficulty, Color) -> Unit,
     onPlayLocal: () -> Unit,
     onPuzzles: () -> Unit,
@@ -64,9 +65,7 @@ fun HomeScreen(
         Text("play. learn. repeat.", color = MUTED, fontSize = 13.sp, letterSpacing = 2.sp)
         Spacer(Modifier.height(20.dp))
 
-        // rememberSaveable: the colour choice survives leaving Home (#9).
-        var playAsName by rememberSaveable { mutableStateOf(Color.WHITE.name) }
-        val playAs = Color.valueOf(playAsName)
+        val playAs = selectedColor
 
         // One visual group (#15): the card is the ACTION, the rows below are its
         // options — difficulty chips select (highlighted), they don't launch (#20).
@@ -77,7 +76,7 @@ fun HomeScreen(
                     "${selectedDifficulty.name.lowercase().replaceFirstChar { it.uppercase() }} \u00B7 as ${playAs.name.lowercase().replaceFirstChar { it.uppercase() }}"
                 ) { onPlayAi(selectedDifficulty, playAs) }
                 Spacer(Modifier.height(10.dp))
-                PlayAsRow(playAs) { playAsName = it.name }
+                PlayAsRow(playAs) { onSelectColor(it) }
                 Spacer(Modifier.height(8.dp))
                 DifficultySelector(selectedDifficulty, onSelectDifficulty)
             }

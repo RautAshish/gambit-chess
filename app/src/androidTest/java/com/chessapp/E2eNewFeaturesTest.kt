@@ -55,6 +55,9 @@ class E2eNewFeaturesTest {
         // possible white first move (e5 and e6 are always empty, no check exists).
         tapSquare(4, 6); tapSquare(4, 4)
         waitForText("e5", timeoutMs = 60_000, substring = true)
+        rule.onNodeWithText("\u2039 Home").performClick()
+        waitForText("Play as")
+        rule.onNodeWithText("White").performClick()      // restore persisted colour
     }
 
     @Test

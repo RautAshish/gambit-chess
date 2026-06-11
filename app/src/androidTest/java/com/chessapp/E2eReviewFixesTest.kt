@@ -54,6 +54,9 @@ class E2eReviewFixesTest {
         // And the human can still answer.
         tap(4, 6); tap(4, 4)
         waitForText("e5", timeoutMs = 60_000, substring = true)
+        rule.onNodeWithText("\u2039 Home").performClick()
+        waitForText("Play as")
+        rule.onNodeWithText("White").performClick()      // restore persisted colour
     }
 
     /** #10: with "Flip board for black" on, a Black game is oriented black-at-bottom. */
@@ -73,8 +76,10 @@ class E2eReviewFixesTest {
         // this would hit the wrong squares and no "e5" would ever appear.
         tap(4, 6, flipped = true); tap(4, 4, flipped = true)
         waitForText("e5", timeoutMs = 60_000, substring = true)
-        // Restore the setting so other tests (unflipped math) are unaffected.
+        // Restore colour AND flip so other tests (unflipped math) are unaffected.
         rule.onNodeWithText("\u2039 Home").performClick()
+        waitForText("Play as")
+        rule.onNodeWithText("White").performClick()
         waitForText("Settings")
         rule.onNodeWithText("Settings").performClick()
         waitForText("Flip board for black")
