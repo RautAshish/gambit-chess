@@ -65,7 +65,12 @@ fun HomeScreen(
         Text("play. learn. repeat.", color = MUTED, fontSize = 13.sp, letterSpacing = 2.sp)
         Spacer(Modifier.height(20.dp))
 
-        val playAs = selectedColor
+        // Local-immediate selection with persistence as write-through: starting a
+        // game right after tapping a chip must use the tapped value, not wait for
+        // the DataStore round-trip (Round-3 caught this race on device). Fresh
+        // Home compositions initialise from the persisted values.
+        var playAs by remember { mutableStateOf(selectedColor) }
+        var diff by remember { mutableStateOf(selectedDifficulty) }
 
         // One visual group (#15): the card is the ACTION, the rows below are its
         // options — difficulty chips select (highlighted), they don't launch (#20).
@@ -73,12 +78,12 @@ fun HomeScreen(
             Column(Modifier.padding(12.dp)) {
                 PrimaryTile(
                     "Play vs Computer",
-                    "${selectedDifficulty.name.lowercase().replaceFirstChar { it.uppercase() }} \u00B7 as ${playAs.name.lowercase().replaceFirstChar { it.uppercase() }}"
-                ) { onPlayAi(selectedDifficulty, playAs) }
+                    "${diff.name.lowercase().replaceFirstChar { it.uppercase() }} \u00B7 as ${playAs.name.lowercase().replaceFirstChar { it.uppercase() }}"
+                ) { onPlayAi(diff, playAs) }
                 Spacer(Modifier.height(10.dp))
-                PlayAsRow(playAs) { onSelectColor(it) }
+                PlayAsRow(playAs) { playAs = it; onSelectColor(it) }
                 Spacer(Modifier.height(8.dp))
-                DifficultySelector(selectedDifficulty, onSelectDifficulty)
+                DifficultySelector(diff) { d -> diff = d; onSelectDifficulty(d) }
             }
         }
         Spacer(Modifier.height(20.dp))
