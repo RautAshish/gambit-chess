@@ -307,7 +307,7 @@ private fun GameOverDialog(state: BoardUiState, onViewBoard: () -> Unit, onNewGa
 }
 
 @Composable
-private fun BoardCanvas(state: BoardUiState, flipped: Boolean, pal: BoardPalette, onTap: (Square) -> Unit) {
+fun BoardCanvas(state: BoardUiState, flipped: Boolean, pal: BoardPalette, onTap: (Square) -> Unit) {
     val measurer = rememberTextMeasurer()
     // Animation progress 0..1 for the sliding piece.
     val anim = state.animating

@@ -91,6 +91,10 @@ class StockfishEngine(enginePath: String) : ChessEnginePort {
             // would crash on Android 7.x (minSdk 24). destroy() exists since API 1
             // and SIGKILLs the engine, which is acceptable after "quit".
             process.destroy()
+            // Reap off-thread so the child never lingers as a zombie; waitFor()
+            // without a timeout is the only API-24-safe overload, so it must not
+            // run on the caller's (possibly main) thread.
+            Thread { runCatching { process.waitFor() } }.also { it.isDaemon = true }.start()
         }
         runCatching { writer.close() }
         runCatching { reader.close() }

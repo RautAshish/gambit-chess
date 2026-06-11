@@ -56,9 +56,45 @@ fun SettingsScreen(repo: SettingsRepository, onBack: () -> Unit) {
             scope.launch { repo.setDifficulty(it) }
         }
 
-        // The Stockfish toggle is hidden until binaries ship with the app —
-        // surfacing a switch that does nothing would mislead users. The
-        // SettingsRepository field stays so re-enabling is one-line.
+        Section("Engine")
+        val sfAvailable = com.chessapp.engine.stockfish.StockfishInstaller
+            .available(androidx.compose.ui.platform.LocalContext.current)
+        ToggleRow(
+            if (sfAvailable) "Use Stockfish (strong engine)" else "Use Stockfish (not bundled on this device)",
+            settings.useStockfish && sfAvailable
+        ) { if (sfAvailable) scope.launch { repo.setUseStockfish(it) } }
+        Text(
+            if (sfAvailable)
+                "Stockfish 18 \u00B7 applies from your next game. \u00A9 the Stockfish team, GPLv3 \u2014 see THIRD_PARTY_LICENSES in the source repo."
+            else
+                "This build has no Stockfish binary for this device's CPU; the built-in engine is used.",
+            color = MUTED, fontSize = 12.sp,
+            modifier = Modifier.padding(horizontal = 20.dp)
+        )
+
+        Section("Online play")
+        var pid by remember(settings.onlineProjectId) { mutableStateOf(settings.onlineProjectId) }
+        var key by remember(settings.onlineApiKey) { mutableStateOf(settings.onlineApiKey) }
+        OutlinedTextField(
+            value = pid, onValueChange = { pid = it },
+            label = { Text("Firebase project ID", color = MUTED) }, singleLine = true,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+        )
+        Spacer(Modifier.height(8.dp))
+        OutlinedTextField(
+            value = key, onValueChange = { key = it },
+            label = { Text("Web API key", color = MUTED) }, singleLine = true,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+        )
+        TextButton(onClick = { scope.launch { repo.setOnlineConfig(pid, key) } },
+            modifier = Modifier.padding(horizontal = 10.dp)) {
+            Text("Save online settings", color = BRASS)
+        }
+        Text(
+            "Free 5-minute setup \u2014 see SERVER_SETUP.md in the source repo.",
+            color = MUTED, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 20.dp)
+        )
+
         Section("Clock")
         ClockPicker(settings.clockMinutes, settings.clockIncrementSeconds) { m, inc ->
             scope.launch { repo.setClock(m, inc) }

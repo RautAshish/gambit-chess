@@ -1,26 +1,37 @@
 rules_version = '2';
+// Room-code friendly games (REST client, free tier). Writers are restricted to
+// the two participants; structure is shape-checked. Full chess-legality is
+// enforced client-side by both players' identical validators (see
+// RestOnlineRepository.kt) — adequate for invite-by-code casual play. A future
+// ranked mode should switch to the Cloud-Functions authority in functions/.
 service cloud.firestore {
   match /databases/{database}/documents {
+    match /games/{code} {
+      allow get: if request.auth != null;
+      allow list: if false;
 
-    // Matchmaking queue is managed by the findMatch Cloud Function (admin SDK,
-    // which bypasses these rules). Clients may read their own entry to learn the
-    // assigned gameId, but may not write it directly.
-    match /matchmaking/{uid} {
-      allow read: if request.auth != null && request.auth.uid == uid;
-      allow write: if false;   // only the Cloud Function writes here
-    }
+      allow create: if request.auth != null
+        && request.resource.data.whiteUid == request.auth.uid
+        && request.resource.data.blackUid == ""
+        && request.resource.data.moves.size() == 0
+        && request.resource.data.status == "ONGOING";
 
-    // Games are READ-ONLY to clients. All mutations go through the submitMove /
-    // resign Cloud Functions, which validate authority and legality with the
-    // shared engine (proven identical to the client engine across 14,997
-    // positions). This makes the server the single source of truth: a tampered
-    // client cannot write an illegal or out-of-turn move, because it cannot write
-    // the game document at all.
-    match /games/{gameId} {
-      allow read: if request.auth != null &&
-        (resource.data.whiteUid == request.auth.uid ||
-         resource.data.blackUid == request.auth.uid);
-      allow write: if false;   // only Cloud Functions (admin SDK) may write
+      allow update: if request.auth != null && (
+        // joining: the single transition blackUid "" -> me, nothing else moves
+        (resource.data.blackUid == ""
+          && request.resource.data.blackUid == request.auth.uid
+          && request.resource.data.whiteUid == resource.data.whiteUid
+          && request.resource.data.moves == resource.data.moves
+          && request.resource.data.status == resource.data.status)
+        ||
+        // playing: participants only; seats immutable; history append-only
+        (request.auth.uid in [resource.data.whiteUid, resource.data.blackUid]
+          && request.resource.data.whiteUid == resource.data.whiteUid
+          && request.resource.data.blackUid == resource.data.blackUid
+          && request.resource.data.moves.size() >= resource.data.moves.size())
+      );
+
+      allow delete: if false;
     }
   }
 }

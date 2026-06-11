@@ -2,6 +2,7 @@ package com.chessapp.ui.nav
 
 import android.app.Application
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -37,6 +38,8 @@ sealed interface Screen {
     ) : Screen
     data object Settings : Screen
     data object SavedGames : Screen
+    data object Puzzles : Screen
+    data object Online : Screen
 }
 
 @Composable
@@ -69,10 +72,10 @@ fun AppNav(app: Application) {
                 gameSerial++
                 screen = Screen.Game(settings.difficulty, Color.WHITE, passAndPlay = true, serial = gameSerial)
             },
-            onPuzzles = { /* puzzle screen entry point — wired when puzzle UI lands */ },
+            onPuzzles = { screen = Screen.Puzzles },
             onSavedGames = { screen = Screen.SavedGames },
             onSettings = { screen = Screen.Settings },
-            onPlayOnline = { /* online lobby entry point */ }
+            onPlayOnline = { screen = Screen.Online }
         )
 
         is Screen.Game -> {
@@ -87,6 +90,20 @@ fun AppNav(app: Application) {
         }
 
         Screen.Settings -> SettingsScreen(settingsRepo) { screen = Screen.Home }
+
+        Screen.Puzzles -> {
+            val pvm: com.chessapp.ui.puzzle.PuzzleViewModel = viewModel()
+            com.chessapp.ui.puzzle.PuzzleScreen(pvm, settings.boardTheme) { screen = Screen.Home }
+        }
+
+        Screen.Online -> {
+            val ovm: com.chessapp.ui.online.OnlineViewModel = viewModel()
+            com.chessapp.ui.online.OnlineScreen(
+                ovm, settings.boardTheme,
+                onBack = { screen = Screen.Home },
+                onOpenSettings = { screen = Screen.Settings }
+            )
+        }
 
         Screen.SavedGames -> SavedGamesScreen(
             repo = gameRepo,
@@ -115,14 +132,21 @@ private fun buildGameViewModel(
     settingsRepo: SettingsRepository,
     gameRepo: GameRepository
 ): ChessViewModel {
+    val useStockfish = settings.useStockfish
+    val stockfishPath = com.chessapp.engine.stockfish.StockfishInstaller.path(app)
     val factory = object : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
             return ChessViewModel(
                 app = app,
                 playerColor = game.playerColor,
-                opponent = if (game.passAndPlay) com.chessapp.engine.NoEngine
-                           else NativeEngine(game.difficulty),
+                opponent = when {
+                    game.passAndPlay -> com.chessapp.engine.NoEngine
+                    useStockfish && stockfishPath != null ->
+                        com.chessapp.engine.stockfish.StockfishEngine(stockfishPath)
+                            .apply { setSkill(skillFor(game.difficulty)) }
+                    else -> NativeEngine(game.difficulty)
+                },
                 settingsRepo = settingsRepo,
                 gameRepo = gameRepo,
                 difficultyLabel = game.difficulty.name,
@@ -133,4 +157,12 @@ private fun buildGameViewModel(
     // Unique key per game instance so resuming/new games get a fresh VM.
     val key = "game-${game.serial}"
     return ViewModelProvider(owner, factory)[key, ChessViewModel::class.java]
+}
+
+/** Map our four tiers to Stockfish skill levels (0..20). */
+private fun skillFor(d: com.chessapp.domain.ai.ChessAI.Difficulty): Int = when (d) {
+    com.chessapp.domain.ai.ChessAI.Difficulty.EASY -> 3
+    com.chessapp.domain.ai.ChessAI.Difficulty.MEDIUM -> 8
+    com.chessapp.domain.ai.ChessAI.Difficulty.HARD -> 14
+    com.chessapp.domain.ai.ChessAI.Difficulty.EXPERT -> 20
 }

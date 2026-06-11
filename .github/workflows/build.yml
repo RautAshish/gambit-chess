@@ -20,6 +20,15 @@ jobs:
       - name: Set up Gradle cache
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Bundle Stockfish (official sf_18, android arm64)
+        run: |
+          curl -sL -o /tmp/sf.tar \
+            https://github.com/official-stockfish/Stockfish/releases/download/sf_18/stockfish-android-armv8.tar
+          tar xf /tmp/sf.tar -C /tmp
+          BIN=$(find /tmp/stockfish* -type f -name 'stockfish*' | head -1)
+          cp "$BIN" app/src/main/jniLibs/arm64-v8a/libstockfish.so
+          echo "Bundled engine size:" && ls -la app/src/main/jniLibs/arm64-v8a/
+
       - name: Unit tests (41) + debug APK
         shell: bash
         run: |
@@ -64,6 +73,15 @@ jobs:
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
+
+      - name: Bundle Stockfish (official sf_18, android arm64)
+        run: |
+          curl -sL -o /tmp/sf.tar \
+            https://github.com/official-stockfish/Stockfish/releases/download/sf_18/stockfish-android-armv8.tar
+          tar xf /tmp/sf.tar -C /tmp
+          BIN=$(find /tmp/stockfish* -type f -name 'stockfish*' | head -1)
+          cp "$BIN" app/src/main/jniLibs/arm64-v8a/libstockfish.so
+          echo "Bundled engine size:" && ls -la app/src/main/jniLibs/arm64-v8a/
 
       - name: Boot emulator and run UI tests (fully logged)
         shell: bash

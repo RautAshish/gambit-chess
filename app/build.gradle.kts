@@ -8,6 +8,14 @@ plugins {
 }
 
 android {
+    packaging {
+        jniLibs {
+            // Stockfish ships as jniLibs/<abi>/libstockfish.so and must be
+            // EXTRACTED to nativeLibraryDir to be executable (W^X on API 29+).
+            useLegacyPackaging = true
+        }
+    }
+
     namespace = "com.chessapp"
     compileSdk = 35
 

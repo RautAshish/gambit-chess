@@ -1,0 +1,19 @@
+# Online play — 5-minute free setup
+
+Gambit's online mode runs on YOUR free Firebase project (Spark tier, no card).
+
+1. Go to console.firebase.google.com → **Add project** (any name, Analytics off).
+2. **Build → Authentication → Get started → Anonymous → Enable.**
+3. **Build → Firestore Database → Create database** (production mode, any region).
+4. Firestore → **Rules** tab → replace contents with `firebase/firestore.rules`
+   from this repo → Publish.
+5. **Project settings (gear) → General**: copy **Project ID** and **Web API Key**.
+6. In the app: **Settings → Online play** → paste both → Save.
+
+Both players do steps 5–6 with the SAME project values (share them with your
+friend). Then: Play Online → Create game → share the 6-letter code.
+
+Trust model: games are private friendly matches. Both clients validate every
+move with the same engine; Firestore rules restrict writes to the two players.
+For a public/ranked mode, deploy the server-authoritative Cloud Functions in
+`functions/` instead (requires the Blaze plan).
