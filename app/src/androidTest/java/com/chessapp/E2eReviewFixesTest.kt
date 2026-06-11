@@ -12,6 +12,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTouchInput
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -104,7 +105,9 @@ class E2eReviewFixesTest {
         rule.waitUntil(15_000) {
             rule.onAllNodesWithText("View board").fetchSemanticsNodes().isEmpty()
         }
-        rule.onNodeWithTag("board").assertIsDisplayed()      // position visible
-        rule.onNodeWithText("by resignation").assertIsDisplayed()  // status line persists
+        // Status line carries the result (substring: full text is "Black wins \u00B7 by resignation")
+        waitForText("by resignation", substring = true)
+        // The board is in a scrollable column; scroll it into view, then assert.
+        rule.onNodeWithTag("board").performScrollTo().assertIsDisplayed()
     }
 }
