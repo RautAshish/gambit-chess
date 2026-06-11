@@ -124,6 +124,8 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
         push(message = "")
     }
 
+    override fun onCleared() { sound.release() }
+
     private fun push(message: String? = null, wrong: Boolean = false) {
         val b = session.board
         val targets = selected?.let { s ->

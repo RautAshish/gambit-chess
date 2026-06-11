@@ -264,5 +264,5 @@ class OnlineViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch { block(); _state.value = _state.value.copy(busy = false) }
     }
 
-    override fun onCleared() { pollJob?.cancel() }
+    override fun onCleared() { pollJob?.cancel(); sound.release() }
 }
