@@ -177,7 +177,13 @@ class ChessViewModel(
             flaggedSide = flaggedSide
         )
         val over = result != GameResult.Ongoing
-        val (headline, detail) = ResultEvaluator.describe(result)
+        val (rawHeadline, detail) = ResultEvaluator.describe(result)
+        // vs the computer, "Black wins" forces the player to translate who won.
+        // Speak to them directly; pass-and-play keeps the formal wording.
+        val headline = if (isVsAi && rawHeadline.endsWith(" wins")) {
+            val winnerIsMe = rawHeadline.startsWith(if (playerColor == Color.WHITE) "White" else "Black")
+            if (winnerIsMe) "You won!" else "You lost"
+        } else rawHeadline
         val checkSq = if (boardStatus == GameStatus.CHECK || boardStatus == GameStatus.CHECKMATE)
             engine.board.kingSquare(engine.board.sideToMove) else null
         // Resign/draw are available only while the game is live and it's a real game.

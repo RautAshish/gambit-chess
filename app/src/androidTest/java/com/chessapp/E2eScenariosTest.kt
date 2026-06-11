@@ -123,7 +123,7 @@ class E2eScenariosTest {
         rule.onNodeWithText("This ends the game as a loss.").assertIsDisplayed()
         clickInDialog("Resign")
         waitForText("by resignation")
-        rule.onNodeWithText("Black wins").assertIsDisplayed()
+        rule.onNodeWithText("You lost").assertIsDisplayed()   // personalized vs AI
         clickInDialog("New game")
         waitGone("by resignation")
         waitForText("White to move")

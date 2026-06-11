@@ -43,7 +43,7 @@ fun SettingsScreen(repo: SettingsRepository, onBack: () -> Unit) {
             scope.launch { repo.setFlipped(it) }
         }
 
-        Section("Feedback")
+        Section("Sound & haptics")
         ToggleRow("Sound effects", settings.soundEnabled) {
             scope.launch { repo.setSound(it) }
         }

@@ -121,7 +121,12 @@ fun ChessScreen(vm: ChessViewModel, flipped: Boolean = false, onBack: () -> Unit
             )
         }
         var resultDismissed by remember(state.result) { mutableStateOf(false) }
-        if (state.gameOver && !resultDismissed) {
+        // Let the final move's slide and sound land before covering the board.
+        var resultRevealed by remember(state.result) { mutableStateOf(false) }
+        LaunchedEffect(state.gameOver, state.result) {
+            if (state.gameOver) { kotlinx.coroutines.delay(700); resultRevealed = true }
+        }
+        if (state.gameOver && resultRevealed && !resultDismissed) {
             GameOverDialog(state, onViewBoard = { resultDismissed = true }) { vm.newGame() }
         }
     }
