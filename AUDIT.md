@@ -464,3 +464,35 @@ ROUND 5 (closed-loop): 42/42 first try — test drives its own GameEngine mirror
 
 Net: 2 introduced bugs + 2 shipped bugs found and fixed by the mandate.
 Totals at HEAD: 41 unit + 42 instrumented, all green; lint clean.
+
+## FEATURE ROUND: Stockfish + Puzzles + Online (final: 3745135, 46/46 + 45 unit)
+
+STOCKFISH (offline, optional):
+- CI fetches official sf_18 android-arm64 into jniLibs as libstockfish.so;
+  executed from nativeLibraryDir (the only exec-allowed path on API 29+, the old
+  assets->filesDir installer was rewritten); placeholder .so per other ABI so the
+  APK installs everywhere, with a >1MB size guard so placeholders read as absent.
+- UCI port PROVEN locally against a real Stockfish binary: legal bestmoves at
+  skills 2/8/14/20 across positions, mate-in-1 found, "bestmove (none)" -> null,
+  close() leaves no zombie (daemon reaper added after finding one).
+- Engine chosen at game start: settings.useStockfish && binary present ->
+  StockfishEngine with EASY/MED/HARD/EXPERT -> skill 3/8/14/20; else built-in.
+  Settings row states availability honestly. GPLv3: THIRD_PARTY_LICENSES.md.
+
+PUZZLES (offline): 137-puzzle bank MINED from engine self-play, every puzzle
+machine-verified (mateIn1 mates; mateIn2 first move forces mate vs ALL replies)
+and RE-PROVEN in CI by PuzzleBankTest on every build. Screen with hint/retry/
+next, side-to-move-at-bottom orientation, progress persisted, board reuse.
+
+ONLINE (free tier): room-code multiplayer over Firestore REST (no SDK, no
+google-services.json, no paid Functions): anonymous auth with token refresh,
+optimistic-concurrency writes (updateTime preconditions, race retry), BOTH
+clients validate every state with the parity-proven validator + corrupt-history
+detection; participant-scoped firestore.rules; lobby/waiting/game screens;
+config in Settings; SERVER_SETUP.md (5-minute guide). The Cloud-Functions
+server-authoritative variant remains in-repo for a future ranked mode.
+
+CI iterations: 3 compile fixes (flow import, factory scope threading, malformed
+when-blocks — one script abort initially masked the third), then 2 E2E fixes
+(single-arg VM ctors for the default factory; obsolete hidden-toggle test
+flipped to the ships-now policy; puzzle wrong-move test made order-independent).
