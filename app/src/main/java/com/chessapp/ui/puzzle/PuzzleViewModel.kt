@@ -30,10 +30,10 @@ data class PuzzleUiState(
     val themes: List<String> = emptyList()
 )
 
-class PuzzleViewModel(
-    app: Application,
+class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
+
     private val prefs: SettingsRepository = SettingsRepository(app)
-) : AndroidViewModel(app) {
+
 
     private val bank = PuzzleBank.builtIn
     private var session = PuzzleSession(bank[0])

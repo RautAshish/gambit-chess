@@ -61,14 +61,14 @@ class E2eNewFeaturesTest {
     }
 
     @Test
-    fun stockfishToggleIsHidden() {
+    fun stockfishToggleNowVisible_withHonestAvailability() {
+        // Policy reversed by the feature round: the engine section is back because
+        // Stockfish actually ships now. On x86_64 emulators (placeholder .so) the
+        // row must say so instead of offering a switch that does nothing.
         waitForText("Settings")
         rule.onNodeWithText("Settings").performClick()
         waitForText("Sound effects")
-        assertTrue(
-            rule.onAllNodesWithText("Use Stockfish", substring = true)
-                .fetchSemanticsNodes().isEmpty()
-        )
+        waitForText("Use Stockfish", substring = true)
     }
 
     @Test

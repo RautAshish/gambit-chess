@@ -36,10 +36,10 @@ data class OnlineUiState(
     val busy: Boolean = false
 ) { enum class Phase { LOBBY, WAITING, PLAYING } }
 
-class OnlineViewModel(
-    app: Application,
+class OnlineViewModel(app: Application) : AndroidViewModel(app) {
+
     private val prefs: SettingsRepository = SettingsRepository(app)
-) : AndroidViewModel(app) {
+
 
     private var repo: RestOnlineRepository? = null
     private var myUid: String = ""
