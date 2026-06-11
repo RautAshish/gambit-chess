@@ -45,6 +45,7 @@ class E2eNewFeaturesTest {
     @Test
     fun playAsBlack_aiMovesFirst_thenHumanReplies() {
         waitForText("Play as")
+        rule.onNodeWithText("Easy").performClick()       // pin fast AI
         rule.onNodeWithText("Black").performClick()
         rule.onNodeWithText("Play vs Computer").performClick()
         // The AI (White) must open the game on its own.
@@ -108,5 +109,9 @@ class E2eNewFeaturesTest {
         assertTrue(rule.onAllNodesWithText("1.", substring = true)
             .fetchSemanticsNodes().isEmpty())
         rule.onNodeWithText("White to move").assertIsDisplayed()
+        // Restore a fast difficulty: selection persists across tests by design (#20).
+        rule.onNodeWithText("\u2039 Home").performClick()
+        waitForText("Play as")
+        rule.onNodeWithText("Medium").performClick()
     }
 }

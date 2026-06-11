@@ -57,6 +57,7 @@ class E2eRound3Test {
     @Test
     fun playAsBlack_survivesNavigation() {
         waitForText("Play as")
+        rule.onNodeWithText("Easy").performClick()       // pin fast AI
         rule.onNodeWithText("Black").performClick()
         rule.onNodeWithText("Play vs Computer").performClick()
         waitForText("Black to move", timeoutMs = 60_000)
@@ -83,7 +84,11 @@ class E2eRound3Test {
         // Toggle order: legal-moves, flip, SOUND, haptics.
         rule.onAllNodes(isToggleable())[2].assertIsOff()
         rule.onAllNodes(isToggleable())[2].performClick()    // restore for other tests
-        rule.onAllNodes(isToggleable())[2].assertIsOn()
+        rule.waitUntil(10_000) {
+            rule.onAllNodes(isToggleable()).fetchSemanticsNodes()[2]
+                .config[androidx.compose.ui.semantics.SemanticsProperties.ToggleableState] ==
+                androidx.compose.ui.state.ToggleableState.On
+        }
     }
 
     /** #3: switching board theme produces a playable, rendering board. */
@@ -147,6 +152,10 @@ class E2eRound3Test {
         tap(3, 1); tap(3, 3)
         waitForText("d4", timeoutMs = 60_000, substring = true)
         rule.onNodeWithText("Unmute").performClick()          // restore sound
+        // Restore a fast difficulty for subsequent tests.
+        rule.onNodeWithText("\u2039 Home").performClick()
+        waitForText("Play as")
+        rule.onNodeWithText("Medium").performClick()
     }
 
     /** Bug B regression: a decided game locks Undo/Redo. */
