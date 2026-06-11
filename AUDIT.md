@@ -415,3 +415,22 @@ paid for itself within one round.
 
 STILL OPEN: settings don't apply mid-game; clock not persisted across process
 death; Online/Puzzles screens; Stockfish bundling decision; darkBoard field unused.
+
+## PRODUCT REVIEW ROUND (21 observations) — shipped & verified 28/28 on-device
+
+All 21 product-owner observations addressed at commit d8f9151 (details in commit
+7725471 message). Verification: 41/41 unit + lint clean + 28/28 emulator E2E,
+including 4 new regression tests written for the reported bugs:
+undoAsBlack_aiRestartsPlay (#13), flipBoardForBlack_orientsAndAcceptsMoves (#10),
+clockDescriptionShown (#7), gameOverDialog_viewBoardDismisses (#18).
+The undo-as-black and flip-as-black tests pass, proving #13 fixed and #10 working
+as wired. EASY verified: 120/120 legal picks, still finds mate-in-1.
+Two test-authoring iterations were needed (rule-method import; scroll-clipped
+board assert + exact-vs-substring status match) — no app defects in either.
+
+PRODUCT DECISIONS LOGGED:
+- #3 default board: Classic uses ivory/graphite rather than pure white/black
+  (glare in long sessions); Walnut and Forest selectable.
+- #6 confirmed real: instant AI replies were the issue; 550ms floor + 220ms slide.
+- #16 handled as label "Gambit Chess" + ASO advice; store listing is out of code's reach.
+- #1 Online/Puzzles: visible but "Coming soon" — roadmap without dead buttons.
