@@ -80,7 +80,7 @@ fun AppNav(app: Application) {
 
         is Screen.Game -> {
             val vm = remember(s.serial) {
-                buildGameViewModel(app, owner, s, settingsRepo, gameRepo)
+                buildGameViewModel(app, owner, s, settingsRepo, gameRepo, settings.useStockfish)
             }
             if (s.resumeId != null) {
                 androidx.compose.runtime.LaunchedEffect(s.resumeId) { vm.resume(s.resumeId) }
@@ -130,9 +130,9 @@ private fun buildGameViewModel(
     owner: ViewModelStoreOwner,
     game: Screen.Game,
     settingsRepo: SettingsRepository,
-    gameRepo: GameRepository
+    gameRepo: GameRepository,
+    useStockfish: Boolean
 ): ChessViewModel {
-    val useStockfish = settings.useStockfish
     val stockfishPath = com.chessapp.engine.stockfish.StockfishInstaller.path(app)
     val factory = object : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
