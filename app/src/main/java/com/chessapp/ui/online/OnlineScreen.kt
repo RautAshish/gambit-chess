@@ -22,6 +22,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +57,20 @@ fun OnlineScreen(
     onOpenSettings: () -> Unit
 ) {
     val s by vm.state.collectAsState()
+    // Cues only while visible: poll-adopted opponent moves stay silent in the
+    // background — the same rule the local game follows.
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_PAUSE -> vm.onAppPaused()
+                Lifecycle.Event.ON_RESUME -> vm.onAppResumed()
+                else -> {}
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
     Column(
         Modifier.fillMaxSize().background(BG).statusBarsPadding()
             .padding(16.dp).verticalScroll(rememberScrollState()),

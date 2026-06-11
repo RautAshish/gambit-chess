@@ -14,6 +14,7 @@ import com.chessapp.domain.model.Move
 import com.chessapp.domain.model.PieceType
 import com.chessapp.domain.model.Square
 import com.chessapp.ui.board.BoardUiState
+import com.chessapp.ui.sound.SoundManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -33,6 +34,9 @@ data class PuzzleUiState(
 class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
 
     private val prefs: SettingsRepository = SettingsRepository(app)
+    private val sound = SoundManager(app)
+    private var soundOn = true
+    private var hapticsOn = true
 
 
     private val bank = PuzzleBank.builtIn
@@ -47,6 +51,8 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
     init {
         viewModelScope.launch {
             prefs.settings.collect { s ->
+                soundOn = s.soundEnabled
+                hapticsOn = s.hapticsEnabled
                 val firstLoad = solvedIds.isEmpty() && s.solvedPuzzles.isNotEmpty()
                 solvedIds = s.solvedPuzzles
                 if (firstLoad) {
@@ -74,8 +80,15 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
                 val move = legal.firstOrNull { it.promotion == PieceType.QUEEN }
                     ?: legal.first()
                 selected = null
+                val wasCapture = board.pieceAt(sq) != null
                 when (val r = session.submit(move)) {
                     is PuzzleResult.Correct -> {
+                        sound.play(
+                            if (r.solved) SoundManager.Cue.GAME_END
+                            else if (wasCapture) SoundManager.Cue.CAPTURE
+                            else SoundManager.Cue.MOVE,
+                            soundOn, hapticsOn
+                        )
                         if (r.solved && puzzle().id !in solvedIds) {
                             viewModelScope.launch { prefs.markPuzzleSolved(puzzle().id) }
                         }

@@ -15,6 +15,7 @@ import com.chessapp.domain.model.Move
 import com.chessapp.domain.model.PieceType
 import com.chessapp.domain.model.Square
 import com.chessapp.ui.board.BoardUiState
+import com.chessapp.ui.sound.SoundManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,6 +42,11 @@ class OnlineViewModel(app: Application) : AndroidViewModel(app) {
     private val prefs: SettingsRepository = SettingsRepository(app)
 
 
+    private val sound = SoundManager(app)
+    private var soundOn = true
+    private var hapticsOn = true
+    private var inForeground = true
+    private var cfg = "" to ""
     private var repo: RestOnlineRepository? = null
     private var myUid: String = ""
     private var game: OnlineGame? = null
@@ -51,13 +57,27 @@ class OnlineViewModel(app: Application) : AndroidViewModel(app) {
     val state: StateFlow<OnlineUiState> = _state
 
     init {
+        // Live settings: saving Firebase config takes effect on returning to the
+        // lobby — no process restart. The repo only swaps while in the LOBBY so
+        // an active game never loses its transport mid-match.
         viewModelScope.launch {
-            val s = prefs.settings.first()
-            val configured = s.onlineProjectId.isNotBlank() && s.onlineApiKey.isNotBlank()
-            if (configured) repo = RestOnlineRepository(s.onlineProjectId, s.onlineApiKey, prefs)
-            _state.value = _state.value.copy(configured = configured)
+            prefs.settings.collect { s ->
+                soundOn = s.soundEnabled
+                hapticsOn = s.hapticsEnabled
+                val newCfg = s.onlineProjectId to s.onlineApiKey
+                val configured = newCfg.first.isNotBlank() && newCfg.second.isNotBlank()
+                if (newCfg != cfg && _state.value.phase == OnlineUiState.Phase.LOBBY) {
+                    cfg = newCfg
+                    repo = if (configured)
+                        RestOnlineRepository(newCfg.first, newCfg.second, prefs) else null
+                }
+                _state.value = _state.value.copy(configured = configured)
+            }
         }
     }
+
+    fun onAppResumed() { inForeground = true }
+    fun onAppPaused() { inForeground = false }
 
     fun createGame() = launchBusy {
         val r = repo ?: return@launchBusy
@@ -156,10 +176,37 @@ class OnlineViewModel(app: Application) : AndroidViewModel(app) {
     private fun adopt(g: OnlineGame) {
         val r = repo
         if (r != null && !r.historyIsValid(g)) {
-            fail("Game state failed validation — opponent client is not trustworthy"); return
+            fail("This game’s data is invalid and can’t be displayed safely."); return
         }
+        val prev = game
         game = g
+        maybeCue(prev, g)
         push()
+    }
+
+    /** Same felt feedback as the local game: thud per new ply (yours, or the
+     *  opponent's arriving via poll), check ping, end chime — foreground only. */
+    private fun maybeCue(prev: OnlineGame?, g: OnlineGame) {
+        if (!inForeground || prev == null) return
+        val live = listOf("ONGOING", "CHECK")
+        if (g.status !in live && prev.status in live) {
+            sound.play(SoundManager.Cue.GAME_END, soundOn, hapticsOn); return
+        }
+        if (g.moves.size > prev.moves.size) {
+            val cue = when {
+                g.status == "CHECK" -> SoundManager.Cue.CHECK
+                captureOnLastPly(g) -> SoundManager.Cue.CAPTURE
+                else -> SoundManager.Cue.MOVE
+            }
+            sound.play(cue, soundOn, hapticsOn)
+        }
+    }
+
+    private fun captureOnLastPly(g: OnlineGame): Boolean {
+        if (g.moves.isEmpty()) return false
+        val e = GameEngine()
+        for (u in g.moves.dropLast(1)) e.makeMove(Move.fromUci(u))
+        return e.board.pieceAt(Move.fromUci(g.moves.last()).to) != null
     }
 
     private fun engineFor(g: OnlineGame): GameEngine {
@@ -184,7 +231,13 @@ class OnlineViewModel(app: Application) : AndroidViewModel(app) {
         val resultLine = if (!over) "" else when (g.status) {
             "CHECKMATE" -> (if (g.winnerUid == myUid) "You win" else "You lose") + " \u00B7 checkmate"
             "RESIGNED" -> (if (g.winnerUid == myUid) "You win" else "You lose") + " \u00B7 resignation"
-            else -> "Draw \u00B7 " + g.status.lowercase().replace('_', ' ')
+            else -> "Draw \u00B7 " + when (g.status) {
+                "STALEMATE" -> "stalemate"
+                "DRAW_FIFTY_MOVE" -> "fifty-move rule"
+                "DRAW_REPETITION" -> "threefold repetition"
+                "DRAW_INSUFFICIENT_MATERIAL" -> "insufficient material"
+                else -> g.status.lowercase().replace('_', ' ')
+            }
         }
         val targets = selected?.let { s ->
             MoveGenerator.legalMoves(engine.board).filter { it.from == s }.map { it.to }.toSet()

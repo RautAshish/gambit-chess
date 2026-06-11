@@ -2,7 +2,7 @@
 
 A complete chess app built across five phases: a Perft-verified rules engine, a
 built-in Minimax AI, an optional Stockfish engine, local persistence, tactics
-puzzles, chess clocks, and server-authoritative online multiplayer. The domain
+puzzles, chess clocks, and room-code online multiplayer (free-tier Firestore REST; a server-authoritative Cloud Functions variant ships as reference). The domain
 layer is pure Kotlin (no Android deps), so it compiles and tests on the JVM and is
 reused verbatim on the multiplayer server.
 
@@ -20,7 +20,7 @@ engine/                                 Swappable engine abstraction
   ChessEnginePort.kt                    Common interface
   NativeEngine.kt                       Built-in Minimax adapter (offline default)
   stockfish/StockfishEngine.kt          UCI bridge to a native Stockfish binary
-  stockfish/StockfishInstaller.kt       Extracts the binary from assets
+  stockfish/StockfishInstaller.kt       Resolves the binary from nativeLibraryDir
 data/
   db/         ChessDatabase.kt          Room: saved games + puzzle progress
   prefs/      SettingsRepository.kt     DataStore preferences

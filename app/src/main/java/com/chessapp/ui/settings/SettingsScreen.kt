@@ -72,6 +72,16 @@ fun SettingsScreen(repo: SettingsRepository, onBack: () -> Unit) {
             modifier = Modifier.padding(horizontal = 20.dp)
         )
 
+        Section("Clock")
+        ClockPicker(settings.clockMinutes, settings.clockIncrementSeconds) { m, inc ->
+            scope.launch { repo.setClock(m, inc) }
+        }
+        Text(
+            clockDescription(settings.clockMinutes, settings.clockIncrementSeconds),
+            color = MUTED, fontSize = 12.sp,
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
+        )
+
         Section("Online play")
         var pid by remember(settings.onlineProjectId) { mutableStateOf(settings.onlineProjectId) }
         var key by remember(settings.onlineApiKey) { mutableStateOf(settings.onlineApiKey) }
@@ -95,15 +105,6 @@ fun SettingsScreen(repo: SettingsRepository, onBack: () -> Unit) {
             color = MUTED, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 20.dp)
         )
 
-        Section("Clock")
-        ClockPicker(settings.clockMinutes, settings.clockIncrementSeconds) { m, inc ->
-            scope.launch { repo.setClock(m, inc) }
-        }
-        Text(
-            clockDescription(settings.clockMinutes, settings.clockIncrementSeconds),
-            color = MUTED, fontSize = 12.sp,
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
-        )
         Spacer(Modifier.height(32.dp))
     }
 }

@@ -47,8 +47,12 @@ class FirestoreRest(
                 )
                 prefs.writeAuth(a); return@withContext a
             }
+            // Refresh failed but we HAVE an identity: never silently sign up as a
+            // new anonymous user — that would orphan the player out of their own
+            // games mid-match. Surface it as a connection problem instead.
+            throw IOException("Couldn't refresh your online session \u2014 check your connection and try again")
         }
-        // first run (or refresh failed): anonymous sign-up
+        // true first run: anonymous sign-up
         val r = post(
             "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=$apiKey",
             JSONObject().put("returnSecureToken", true).toString(), form = false, auth = null

@@ -496,3 +496,35 @@ CI iterations: 3 compile fixes (flow import, factory scope threading, malformed
 when-blocks — one script abort initially masked the third), then 2 E2E fixes
 (single-arg VM ctors for the default factory; obsolete hidden-toggle test
 flipped to the ships-now policy; puzzle wrong-move test made order-independent).
+
+## VETERAN 5-ROUND AUDIT (consolidated fix: this commit)
+
+Five independent lenses, no fixes between rounds, one consolidated fix, full regression.
+
+R1 static/packaging — INTERNET perm ✅, validator updatedAt bump ✅, status vocab ✅.
+  FIXED: [F1 Med] adaptive icon lacked <monochrome> (Android 13 themed icons) — white
+  silhouette layer added; [F2 Med] 3 Firebase SDK deps shipped for a dormant file —
+  deps removed, file relocated to docs/reference/CloudFunctionsOnlineRepository.kt;
+  [F4 Low] online draw line read "Draw · draw fifty move" — proper names now;
+  [F6 Low] version stamped 2/"1.1". NOTED: allowBackup w/o extraction rules kept
+  deliberately (anonymous identity continuity across reinstalls); i18n debt.
+R2 executable proofs — ALL CLEAN: 200-game encode/decode round-trips, winnerUid
+  null/"" symmetry, fool's-mate two-client sim, refusal paths, tamper detection
+  (org.json shim built to execute the Android-only layer on JVM).
+R3 UX walk — BackHandler ✅. FIXED: [F1 Low] "Online play" section now last (infra
+  below gameplay); [F2 Med] Puzzle + Online had NO sound/haptic cues — wired with
+  the same foreground gate as the local game (poll-adopted moves stay silent in
+  background). NOTED: waiting room has no cancel (delete forbidden by rules —
+  rules change scheduled with ranked mode); online draw offers = backlog.
+R4 adversarial traces — busy/poll/main-thread serialization ✅. FIXED: [F1 Low]
+  token-refresh failure silently signed up a NEW anonymous uid, orphaning the
+  player from their own games mid-match — now surfaces a connection error and
+  keeps identity; [F2 Med] online config was read once at VM birth (saving keys
+  in Settings required process restart) — settings now collected live, repo swaps
+  only in LOBBY. BONUS: found my own prior "message softening" edit had silently
+  no-opped (unasserted replace) — re-applied; all future edits assert anchors.
+R5 residual — google-services plugin correctly absent ✅, E2E suite healthy ✅.
+  FIXED: [F1 Low] README claimed assets-extraction installer and server-
+  authoritative online — both corrected.
+
+Regression: local unit suite + JVM online-stack suite + full CI (45 unit, 46 E2E).
