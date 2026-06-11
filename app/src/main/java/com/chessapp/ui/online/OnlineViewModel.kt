@@ -61,9 +61,10 @@ class OnlineViewModel(
 
     fun createGame() = launchBusy {
         val r = repo ?: return@launchBusy
-        when (val uid = r.myUid()) {
-            is Outcome.Err -> fail(uid.message); return@launchBusy
-            is Outcome.Ok -> myUid = uid.value
+        val uidOut = r.myUid()
+        when (uidOut) {
+            is Outcome.Err -> { fail(uidOut.message); return@launchBusy }
+            is Outcome.Ok -> myUid = uidOut.value
         }
         when (val out = r.createGame()) {
             is Outcome.Ok -> { adopt(out.value.game); startPolling() }
@@ -75,9 +76,10 @@ class OnlineViewModel(
         val r = repo ?: return@launchBusy
         val code = codeRaw.trim().uppercase()
         if (code.length != 6) { fail("Codes are 6 characters"); return@launchBusy }
-        when (val uid = r.myUid()) {
-            is Outcome.Err -> fail(uid.message); return@launchBusy
-            is Outcome.Ok -> myUid = uid.value
+        val uidOut = r.myUid()
+        when (uidOut) {
+            is Outcome.Err -> { fail(uidOut.message); return@launchBusy }
+            is Outcome.Ok -> myUid = uidOut.value
         }
         when (val out = r.joinGame(code)) {
             is Outcome.Ok -> { adopt(out.value.game); startPolling() }
