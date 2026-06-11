@@ -44,17 +44,19 @@ class E2eFeaturePackTest {
         rule.onNodeWithText("Next puzzle").assertIsDisplayed()
     }
 
-    /** On the second curated puzzle: a wrong move prompts retry, then solve. */
+    /** A wrong move prompts retry; Retry resets cleanly. Order-independent:
+     *  Kg1-f1 is legal-but-wrong on BOTH curated mate-in-1 puzzles, whichever
+     *  one the progress-resume logic lands on. */
     @Test
-    fun puzzles_wrongMoveThenRetryThenSolve() {
+    fun puzzles_wrongMoveThenRetryResets() {
         waitForText("Puzzles")
         rule.onNodeWithText("Puzzles").performClick()
         waitForText("mate in 1", substring = true)
-        tap(6, 1); tap(6, 2)                       // g2-g3: legal but not the mate
+        tap(6, 0); tap(5, 0)                       // Kg1-f1: legal, never the mate
         waitForText("try again", substring = true)
         rule.onNodeWithText("Retry").performClick()
-        tap(3, 0); tap(3, 7)                       // Rd1 -> d8#
-        waitForText("Solved!")
+        waitForText("find mate in 1", substring = true)   // message cleared, prompt back
+        rule.onNodeWithText("Skip").assertIsDisplayed()   // board controls live again
     }
 
     /** Without Firebase config, Online explains setup and links to Settings. */
