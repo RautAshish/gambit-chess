@@ -40,7 +40,6 @@ private val PANEL = UiColor(0xFF272B20)
 private val BONE = UiColor(0xFFEFE6D2)
 // Board themes (#3): CLASSIC reads as black-and-white without glare; WALNUT is
 // the tournament-wood look; FOREST is the original green.
-private val LIGHT_SQ = UiColor(0xFFD9CFB4)
 private val DARK_SQ = UiColor(0xFF6E7E55)
 data class BoardPalette(val light: UiColor, val dark: UiColor)
 fun paletteFor(theme: String): BoardPalette = when (theme) {

@@ -115,7 +115,16 @@ class ChessViewModel(
                     _state.value = snapshot()
                     if (playerColor == Color.BLACK) maybeTriggerAi()
                 } else {
-                    _state.value = snapshot()
+                    // Refresh derived state WITHOUT wiping live interaction state:
+                    // a settings write mid-think or mid-promotion must not reopen
+                    // the tap guard or destroy the promotion dialog.
+                    val cur = _state.value
+                    _state.value = snapshot(
+                        selected = cur.selected,
+                        targets = cur.legalTargets,
+                        thinking = cur.thinking,
+                        pending = cur.pendingPromotion
+                    )
                 }
             }
         }
@@ -185,8 +194,8 @@ class ChessViewModel(
             moveList = engine.pgnMoveText(),
             whiteClock = ChessClock.format(clock.remainingMillis(Color.WHITE)),
             blackClock = ChessClock.format(clock.remainingMillis(Color.BLACK)),
-            canUndo = engine.moveHistory().isNotEmpty(),
-            canRedo = engine.canRedo(),
+            canUndo = !over && engine.moveHistory().isNotEmpty(),
+            canRedo = !over && engine.canRedo(),
             capturedByWhite = Material.capturedOf(engine.board, Color.BLACK),
             capturedByBlack = Material.capturedOf(engine.board, Color.WHITE),
             materialBalance = Material.balance(engine.board, Color.WHITE),
@@ -345,7 +354,7 @@ class ChessViewModel(
     private fun currentTitle(): String = "Game vs $difficultyLabel"
 
     fun undo() {
-        if (_state.value.animating != null) return
+        if (_state.value.animating != null || _state.value.gameOver) return
         // Undo during the AI's think must invalidate that think, or the stale
         // reply lands on the rewound position (or never re-triggers).
         gameGeneration++
@@ -364,6 +373,7 @@ class ChessViewModel(
     }
 
     fun redo() {
+        if (_state.value.gameOver) return
         gameGeneration++
         aiJob?.cancel()
         if (engine.redo()) { _state.value = snapshot(last = engine.moveHistory().lastOrNull()); autoSave() }

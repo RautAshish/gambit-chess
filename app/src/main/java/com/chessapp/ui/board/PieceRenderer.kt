@@ -37,7 +37,6 @@ object PieceRenderer {
     ) {
         val fill = if (color == PieceColor.WHITE) Color(0xFFF7F3E8) else Color(0xFF2B2B28)
         val line = if (color == PieceColor.WHITE) Color(0xFF1A1A17) else Color(0xFFE8E2D2)
-        val scale = cell / VIEW
         // Inset slightly so pieces don't touch cell edges.
         val pad = cell * 0.07f
         val s = (cell - pad * 2) / VIEW
