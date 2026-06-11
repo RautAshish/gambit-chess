@@ -434,3 +434,33 @@ PRODUCT DECISIONS LOGGED:
 - #6 confirmed real: instant AI replies were the issue; 550ms floor + 220ms slide.
 - #16 handled as label "Gambit Chess" + ASO advice; store listing is out of code's reach.
 - #1 Online/Puzzles: visible but "Coming soon" — roadmap without dead buttons.
+
+## QA VERIFICATION MANDATE — 3 phases + 5 escalating rounds (final: 156e730)
+
+PHASE 1 — CLAIM AUDIT: all 21 review fixes verified present and wired in code.
+PHASE 2 — INTRODUCED-BUG HUNT: found and fixed
+  Bug A (introduced): settings write mid-think wiped thinking/promotion state.
+  Bug B (pre-existing): Undo/Redo usable after a decided game.
+ROUND 1 (static+unit): 41/41, dead code removed (LIGHT_SQ, unused scale).
+ROUND 2 (deep local fuzz): AI-vs-AI full games all 4 difficulties (every move
+  legality-checked); 30x200 undo/redo storm ops vs lockstep replay; 40 random
+  mid-game save/replays byte-identical; SAN uniqueness on 60 random positions.
+ROUND 3 (on-device feature coverage): FOUND 2 REAL SHIPPED BUGS —
+  (i) #9 was not actually fixed: rememberSaveable does not survive when-branch
+      navigation on device; replaced with DataStore persistence.
+  (ii) selection race: starting a game immediately after tapping a colour or
+       difficulty chip used the stale persisted value (DataStore round-trip);
+       fixed with local-immediate state + write-through persistence.
+  Plus suite hardening: difficulty persistence (#20, by design) leaked EXPERT
+  into later tests' 60s waits; AI-wait tests now pin Easy and restore.
+  Final: 34/34 green.
+ROUND 4 (adversarial): 40/40 first try — input storm during Expert think,
+  double-tap deselect, random tap storms, dead-game tap immunity, activity
+  recreation -> resumable from autosave, navigation thrash.
+ROUND 5 (closed-loop): 42/42 first try — test drives its own GameEngine mirror,
+  taps real squares, reads AI SANs back from the UI, matches each to exactly one
+  legal mirror move across 10 plies (desync-impossible-by-construction);
+  castling (O-O) and en passant (exd6) SAN-verified through the live UI.
+
+Net: 2 introduced bugs + 2 shipped bugs found and fixed by the mandate.
+Totals at HEAD: 41 unit + 42 instrumented, all green; lint clean.
