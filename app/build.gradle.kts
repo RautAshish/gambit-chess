@@ -16,7 +16,7 @@ android {
             // Provided by CI secrets (see RELEASE.md). Absent locally/on forks,
             // the release build falls back to debug signing so it stays runnable.
             val ks = System.getenv("GAMBIT_KEYSTORE_PATH")
-            if (ks != null) {
+            if (ks != null && file(ks).exists()) {
                 storeFile = file(ks)
                 storePassword = System.getenv("GAMBIT_KEYSTORE_PASSWORD")
                 keyAlias = System.getenv("GAMBIT_KEY_ALIAS")
@@ -39,15 +39,16 @@ android {
         applicationId = "com.chessapp"
         minSdk = 24
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 3
+        versionName = "1.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
             isMinifyEnabled = true
-            signingConfig = if (System.getenv("GAMBIT_KEYSTORE_PATH") != null)
+            val ks = System.getenv("GAMBIT_KEYSTORE_PATH")
+            signingConfig = if (ks != null && file(ks).exists())
                 signingConfigs.getByName("release") else signingConfigs.getByName("debug")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

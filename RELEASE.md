@@ -10,16 +10,21 @@ Signing, which is recommended at first upload — Play then holds the app key
 and your keystore becomes the upload key).
 
 ## One-time: give CI the key (4 repository secrets)
-Repo -> Settings -> Secrets and variables -> Actions:
-- GAMBIT_KEYSTORE_PATH      e.g. /home/runner/gambit-release.jks
+Repo -> Settings -> Secrets and variables -> Actions -> New repository secret:
+- GAMBIT_KEYSTORE_B64        the .jks file, base64-encoded (single line)
 - GAMBIT_KEYSTORE_PASSWORD
-- GAMBIT_KEY_ALIAS          gambit
+- GAMBIT_KEY_ALIAS           e.g. gambit
 - GAMBIT_KEY_PASSWORD
-Then add a checkout-adjacent step or commit the keystore ENCRYPTED — simplest
-robust route: base64 the .jks into a 5th secret GAMBIT_KEYSTORE_B64 and add
-`echo "$GAMBIT_KEYSTORE_B64" | base64 -d > $GAMBIT_KEYSTORE_PATH` before the
-release step. (Without secrets, CI still produces a DEBUG-SIGNED release build
-so R8 is exercised on every push.)
+
+To produce the base64 on a computer:  base64 -w0 gambit-release.jks
+No computer? Run the "generate-keystore" workflow (Actions tab) with your two
+passwords as inputs; download the keystore-b64 artifact it produces, open the
+file, and paste its single line into GAMBIT_KEYSTORE_B64. Keep a copy of the
+artifact somewhere safe — it IS your upload key.
+
+Every push then uploads a Play-ready signed .aab as the gambit-release-aab
+artifact. Enroll in Play App Signing at first upload (recommended): Google
+holds the real app key and this keystore is only your upload key.
 
 ## Every release
 1. Bump versionCode (+1 always) and versionName in app/build.gradle.kts.
