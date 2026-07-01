@@ -566,3 +566,11 @@ REPORT (engine/APK/AAB bytes) into the published log — prior engine-size line
 was never captured, so no size was ever verified: now it is, every build.
 Corrected record: local kotlinc did not survive container reset (earlier
 "stale jar" attribution was wrong); unit regression authority = CI JUnit run.
+
+## SIZE DECISION (owner call): option (a) — single full build, Stockfish bundled
+Rationale: professional positioning makes the engine the headline, not the
+size; 78MB APK / ~190MB on disk accepted for the target audience. Falsifier
+on file: if post-launch metrics show size-driven abandonment, retrofit Play
+on-demand delivery (option d). Follow-through: Stockfish now DEFAULT-ON where
+the binary exists (fresh installs; availability-gated as before), listing
+rewritten engine-first.

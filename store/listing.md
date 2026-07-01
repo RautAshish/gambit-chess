@@ -4,15 +4,18 @@
 Gambit Chess — Play & Learn
 
 ## Short description (80 chars max)
-Beautiful offline chess: strong engine, 137 verified puzzles, play friends.
+Stockfish 18 on your phone. Fully offline. 137 verified puzzles. No ads.
 
 ## Full description
 Gambit Chess is a fast, elegant chess app that respects you: no ads, no
 account, no tracking — it even plays entirely offline.
 
 FEATURES
-• Four difficulty levels powered by a built-in engine, or switch on the
-  legendary Stockfish 18 for a real challenge
+• The full-strength Stockfish 18 engine runs ON YOUR PHONE — analysis-grade
+  opposition with no server, no account, no internet (arm64 devices; others
+  use the capable built-in engine)
+• Four difficulty tiers, Easy to Expert, mapped to engine skill so beatable
+  stays beatable
 • 137 tactics puzzles, every single one machine-verified — mate in 1 and
   mate in 2, with hints and saved progress
 • Pass & Play on one phone, with chess clocks (Bullet to Rapid, Fischer

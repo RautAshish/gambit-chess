@@ -63,7 +63,9 @@ class SettingsRepository(private val context: Context) {
             showLegalMoves = p[Keys.SHOW_MOVES] ?: true,
             boardFlipped = p[Keys.FLIPPED] ?: false,
             darkBoard = p[Keys.DARK_BOARD] ?: false,
-            useStockfish = p[Keys.STOCKFISH] ?: false,
+            // Professional positioning: the strongest engine is the default on
+            // devices that carry it (arm64); others silently use the built-in.
+            useStockfish = p[Keys.STOCKFISH] ?: true,
             clockMinutes = p[Keys.CLOCK_MIN] ?: 10,
             clockIncrementSeconds = p[Keys.CLOCK_INC] ?: 5,
             boardTheme = p[Keys.BOARD_THEME] ?: "CLASSIC",
