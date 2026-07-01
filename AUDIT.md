@@ -551,3 +551,18 @@ SVG->Kotlin transpiler (svgpathtools sampling, style/group fill inheritance —
 two bugs caught pre-ship: hollow R/Q from group fills, hollow B from nested
 groups). Launcher/store art re-rastered from the genuine knight via cairosvg.
 App licensed GPLv3 for coherence with bundled GPL components.
+
+## POST-CBURNETT VERIFICATION SWEEP (evidence-first, per user mandate)
+Verified clean: all 12 piece renders proven pixel-level via local simulation of
+the exact renderer semantics (roles/pad/stroke) — no hollow bodies or winding
+defects; in-app URLs = 3 programmatic Google endpoints only (no clickable
+links); doc links: both GitHub URLs return 200 (gnu.org/stockfishchess.org
+syntactically valid, unverifiable from sandbox); shipped payload featherweight
+(res 336K, largest file 61KB wav); no stray assets.
+Found+fixed: Settings said "~15 min" for server setup vs "five minutes"
+everywhere else (introduced in field-fix round); isShrinkResources was absent
+(now on; release crash gate re-proves the shrunk build); CI now prints a SIZE
+REPORT (engine/APK/AAB bytes) into the published log — prior engine-size line
+was never captured, so no size was ever verified: now it is, every build.
+Corrected record: local kotlinc did not survive container reset (earlier
+"stale jar" attribution was wrong); unit regression authority = CI JUnit run.

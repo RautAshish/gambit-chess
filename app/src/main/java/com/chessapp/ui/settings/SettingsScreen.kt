@@ -102,7 +102,7 @@ fun SettingsScreen(repo: SettingsRepository, onBack: () -> Unit) {
         }
         Text(
             "Optional \u2014 leave blank to use this build's default server. " +
-            "To host your own free server instead (\u224815 min), see SERVER_SETUP.md in the source repo.",
+            "To host your own free server instead (\u22485 min), see SERVER_SETUP.md in the source repo.",
             color = MUTED, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 20.dp)
         )
 

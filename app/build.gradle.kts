@@ -55,6 +55,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
             val ks = System.getenv("GAMBIT_KEYSTORE_PATH")
             signingConfig = if (ks != null && file(ks).exists())
                 signingConfigs.getByName("release") else signingConfigs.getByName("debug")
