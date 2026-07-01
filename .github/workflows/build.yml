@@ -148,14 +148,34 @@ jobs:
       - name: Verify R8 release build launches (crash gate)
         if: success()
         run: |
-          ./gradlew assembleRelease 2>&1 | tail -2
-          adb uninstall com.chessapp || true
-          adb install -r app/build/outputs/apk/release/app-release.apk
-          adb logcat -c
-          adb shell am start -W -n com.chessapp/.MainActivity
-          sleep 8
-          adb shell pidof com.chessapp || { echo "RELEASE BUILD DIED"; adb logcat -d | grep -A20 "FATAL EXCEPTION" | head -40; exit 1; }
-          adb logcat -d | grep "FATAL EXCEPTION" && exit 1 || echo "Release launch: ALIVE, no fatals"
+          set +e
+          export PATH="$ANDROID_HOME/platform-tools:$PATH"
+          {
+            echo "=== RELEASE CRASH GATE ==="
+            ./gradlew assembleRelease --console=plain 2>&1 | tail -3
+            adb uninstall com.chessapp
+            adb install -r app/build/outputs/apk/release/app-release.apk
+            echo "install exit=$?"
+            adb logcat -c
+            adb shell am start -W -n com.chessapp/.MainActivity
+            sleep 8
+            PID=$(adb shell pidof com.chessapp | tr -d '\r')
+            echo "pid=[$PID]"
+            adb logcat -d > rel_logcat.txt
+            FATALS=$(grep -c "FATAL EXCEPTION" rel_logcat.txt)
+            echo "fatals=$FATALS"
+            if [ -z "$PID" ] || [ "$FATALS" != "0" ]; then
+              echo "RELEASE BUILD DIED"
+              grep -A25 "FATAL EXCEPTION" rel_logcat.txt | head -50
+              echo "GATE_EXIT=1"
+            else
+              echo "Release launch: ALIVE, no fatals"
+              echo "GATE_EXIT=0"
+            fi
+          } >> ui.log 2>&1
+          tail -40 ui.log
+          exit $(grep -o 'GATE_EXIT=[0-9]*' ui.log | tail -1 | cut -d= -f2)
+
       - name: Publish UI test log
         if: always()
         shell: bash
