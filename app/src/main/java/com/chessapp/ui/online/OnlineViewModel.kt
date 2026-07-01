@@ -64,7 +64,11 @@ class OnlineViewModel(app: Application) : AndroidViewModel(app) {
             prefs.settings.collect { s ->
                 soundOn = s.soundEnabled
                 hapticsOn = s.hapticsEnabled
-                val newCfg = s.onlineProjectId to s.onlineApiKey
+                // In-app values are an advanced override; the baked default
+                // (if this build has one) makes online work out of the box.
+                val newCfg =
+                    s.onlineProjectId.ifBlank { com.chessapp.BuildConfig.DEFAULT_ONLINE_PROJECT_ID } to
+                    s.onlineApiKey.ifBlank { com.chessapp.BuildConfig.DEFAULT_ONLINE_API_KEY }
                 val configured = newCfg.first.isNotBlank() && newCfg.second.isNotBlank()
                 if (newCfg != cfg && _state.value.phase == OnlineUiState.Phase.LOBBY) {
                     cfg = newCfg

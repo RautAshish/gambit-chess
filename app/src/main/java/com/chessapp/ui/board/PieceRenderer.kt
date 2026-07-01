@@ -69,7 +69,7 @@ object PieceRenderer {
             moveTo(19.5f, 15f); lineTo(25.5f, 15f)
         }
         PieceType.KNIGHT -> Path().apply { // eye
-            addOvalCompat(18.0f, 12.8f, 19.6f, 14.4f)
+            addOvalCompat(14.2f, 10.2f, 16.0f, 12.0f)
         }
         else -> null
     }
@@ -112,18 +112,21 @@ object PieceRenderer {
     }
 
     private fun knight(): Path = Path().apply {
-        moveTo(14f, 35.8f)
-        lineTo(14f, 33f)
-        cubicTo(14f, 28f, 16.5f, 25.5f, 20.5f, 23.5f)
-        cubicTo(17f, 23.5f, 13.5f, 22f, 13f, 18.5f)
-        lineTo(11f, 16f)
-        cubicTo(10.3f, 14.8f, 11.2f, 13.8f, 12.6f, 14.3f)
-        lineTo(14.6f, 15.3f)
-        cubicTo(14.6f, 12.6f, 16.2f, 10.2f, 18.6f, 8.8f)
-        lineTo(19.6f, 5.6f)
-        lineTo(21.8f, 8.6f)
-        cubicTo(27f, 8.2f, 31f, 12f, 32.2f, 17.5f)
-        cubicTo(33.4f, 23f, 33.2f, 29f, 32.2f, 35.8f)
+        // Staunton profile v5: deep blunt down-sloping muzzle, low brow, swept
+        // ear, smooth arched crest — tuned to read as a horse at 44 px.
+        moveTo(13.0f, 35.8f)
+        lineTo(13.0f, 33.5f)
+        cubicTo(13.0f, 28.0f, 16.0f, 25.0f, 20.5f, 22.5f)
+        cubicTo(16.5f, 22.0f, 12.6f, 20.2f, 11.6f, 17.2f)
+        lineTo(10.6f, 16.4f)
+        lineTo(6.8f, 15.6f)
+        cubicTo(5.4f, 15.2f, 5.3f, 12.6f, 6.8f, 12.3f)
+        lineTo(12.6f, 11.6f)
+        cubicTo(13.1f, 9.6f, 14.6f, 8.1f, 16.6f, 7.3f)
+        lineTo(17.2f, 3.2f)
+        lineTo(20.0f, 6.4f)
+        cubicTo(24.5f, 5.9f, 29.2f, 8.6f, 31.4f, 13.8f)
+        cubicTo(33.6f, 19.8f, 33.4f, 29.0f, 33.0f, 35.8f)
         close()
         base()
     }

@@ -528,3 +528,17 @@ R5 residual — google-services plugin correctly absent ✅, E2E suite healthy �
   authoritative online — both corrected.
 
 Regression: local unit suite + JVM online-stack suite + full CI (45 unit, 46 E2E).
+
+## USER FIELD-TEST ROUND (3 reports, all valid)
+1. Puzzle board rotated 180 on a correct answer — orientation tracked the LIVE
+   side-to-move instead of the solver's seat. Fixed: anchored to the starting
+   position's mover for the puzzle's lifetime.
+2. Online setup screen demanded Firebase knowledge + a repo file — hostile to
+   store users. Fixed: builds accept a baked default server via two CI secrets
+   (players get zero-setup online); Settings fields demoted to advanced
+   override; copy rewritten player-first; E2E made valid in both build modes.
+3. Knight logo read as a cat. Confirmed — and the home header shares
+   PieceRenderer, so the board knights had the same problem. Redesigned
+   (Staunton v5: deep blunt muzzle, low brow, smooth crest) after 3 rendered
+   iterations judged at 432/120/44 px; applied to renderer, all launcher
+   layers, and store art.

@@ -9,6 +9,11 @@ means you can never update the app again (unless you enroll in Play App
 Signing, which is recommended at first upload — Play then holds the app key
 and your keystore becomes the upload key).
 
+## One-time: switch on online play for store users
+Set repo secrets GAMBIT_ONLINE_PROJECT_ID and GAMBIT_ONLINE_API_KEY (see
+SERVER_SETUP.md, "Shipping to app-store users"). Skip this and the store build
+ships with online play showing a setup notice instead.
+
 ## One-time: give CI the key (4 repository secrets)
 Repo -> Settings -> Secrets and variables -> Actions -> New repository secret:
 - GAMBIT_KEYSTORE_B64        the .jks file, base64-encoded (single line)

@@ -59,14 +59,24 @@ class E2eFeaturePackTest {
         rule.onNodeWithText("Skip").assertIsDisplayed()   // board controls live again
     }
 
-    /** Without Firebase config, Online explains setup and links to Settings. */
+    /** Online entry must land somewhere sane in BOTH build modes: setup card
+     *  (no baked server) or the lobby (server baked in via CI secrets). */
     @Test
-    fun online_unconfiguredShowsSetupPath() {
+    fun online_entryShowsSetupOrLobby() {
         waitForText("Play Online")
         rule.onNodeWithText("Play Online").performClick()
-        waitForText("One-time setup needed")
-        rule.onNodeWithText("Open Settings").performClick()
-        waitForText("Sound effects")
+        rule.waitUntil(40_000) {
+            rule.onAllNodesWithText("One-time setup needed").fetchSemanticsNodes().isNotEmpty() ||
+            rule.onAllNodesWithText("Start a game with a friend").fetchSemanticsNodes().isNotEmpty()
+        }
+        val setup = rule.onAllNodesWithText("One-time setup needed")
+            .fetchSemanticsNodes().isNotEmpty()
+        if (setup) {
+            rule.onNodeWithText("Open Settings").performClick()
+            waitForText("Sound effects")
+        } else {
+            rule.onNodeWithText("Join with a code").assertIsDisplayed()
+        }
     }
 
     /** Engine section is present; on x86_64 emulators the placeholder .so must be

@@ -101,7 +101,8 @@ fun SettingsScreen(repo: SettingsRepository, onBack: () -> Unit) {
             Text("Save online settings", color = BRASS)
         }
         Text(
-            "Free 5-minute setup \u2014 see SERVER_SETUP.md in the source repo.",
+            "Optional \u2014 leave blank to use this build's default server. " +
+            "To host your own free server instead (\u224815 min), see SERVER_SETUP.md in the source repo.",
             color = MUTED, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 20.dp)
         )
 

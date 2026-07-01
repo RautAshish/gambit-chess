@@ -41,6 +41,14 @@ android {
         targetSdk = 35
         versionCode = 3
         versionName = "1.2"
+
+        // Optional baked-in online server so store users need ZERO setup: the
+        // developer sets two CI secrets and every build ships pre-configured.
+        // Blank values keep the in-app setup flow (self-hosters, forks).
+        buildConfigField("String", "DEFAULT_ONLINE_PROJECT_ID",
+            "\"${System.getenv("GAMBIT_ONLINE_PROJECT_ID") ?: ""}\"")
+        buildConfigField("String", "DEFAULT_ONLINE_API_KEY",
+            "\"${System.getenv("GAMBIT_ONLINE_API_KEY") ?: ""}\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

@@ -108,10 +108,10 @@ private fun SetupCard(onOpenSettings: () -> Unit) {
                 fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(8.dp))
             Text(
-                "Online play runs on your own free Firebase project, so your games " +
-                "stay yours. It takes about five minutes: create a project, enable " +
-                "Anonymous sign-in and Firestore, then paste the Project ID and Web " +
-                "API key into Settings. Full steps: SERVER_SETUP.md in the source repo.",
+                "This build doesn't include a game server yet, so online play is " +
+                "switched off. Built the app yourself? Adding a free server takes " +
+                "about five minutes \u2014 open Settings \u2192 Online play, and see " +
+                "SERVER_SETUP.md in the source repository for the walkthrough.",
                 color = MUTED, fontSize = 14.sp, lineHeight = 20.sp
             )
             Spacer(Modifier.height(14.dp))

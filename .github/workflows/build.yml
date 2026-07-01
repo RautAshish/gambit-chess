@@ -12,6 +12,9 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      GAMBIT_ONLINE_PROJECT_ID: ${{ secrets.GAMBIT_ONLINE_PROJECT_ID }}
+      GAMBIT_ONLINE_API_KEY: ${{ secrets.GAMBIT_ONLINE_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 17
@@ -88,6 +91,9 @@ jobs:
 
   ui-smoke:
     runs-on: ubuntu-latest
+    env:
+      GAMBIT_ONLINE_PROJECT_ID: ${{ secrets.GAMBIT_ONLINE_PROJECT_ID }}
+      GAMBIT_ONLINE_API_KEY: ${{ secrets.GAMBIT_ONLINE_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 17

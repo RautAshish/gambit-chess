@@ -138,7 +138,9 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
             ),
             index = index, total = bank.size,
             solvedCount = solvedIds.count { id -> bank.any { it.id == id } },
-            sideToMove = b.sideToMove,
+            // The board must NOT rotate when the turn passes mid-puzzle: the
+            // solver's seat is fixed by the STARTING position, not the live board.
+            sideToMove = com.chessapp.domain.model.Board.fromFen(puzzle().fen).sideToMove,
             message = message ?: _state.value.message,
             solved = session.isSolved,
             wrong = wrong,
