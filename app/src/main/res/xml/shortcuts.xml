@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut android:shortcutId="new_game" android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_new_game">
+        <intent android:action="android.intent.action.VIEW"
+            android:targetPackage="com.chessapp"
+            android:targetClass="com.chessapp.MainActivity">
+            <extra android:name="dest" android:value="new_game"/>
+        </intent>
+    </shortcut>
+    <shortcut android:shortcutId="puzzles" android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_puzzles">
+        <intent android:action="android.intent.action.VIEW"
+            android:targetPackage="com.chessapp"
+            android:targetClass="com.chessapp.MainActivity">
+            <extra android:name="dest" android:value="puzzles"/>
+        </intent>
+    </shortcut>
+</shortcuts>

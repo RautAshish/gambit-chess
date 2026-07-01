@@ -47,6 +47,7 @@ fun HomeScreen(
     onPlayAi: (ChessAI.Difficulty, Color) -> Unit,
     onPlayLocal: () -> Unit,
     onPuzzles: () -> Unit,
+    puzzlesSolved: Int = 0,
     onSavedGames: () -> Unit,
     onSettings: () -> Unit,
     onPlayOnline: () -> Unit
@@ -90,7 +91,9 @@ fun HomeScreen(
 
         SecondaryTile("Pass & Play") { onPlayLocal() }
         SecondaryTile("Play Online") { onPlayOnline() }
-        SecondaryTile("Puzzles") { onPuzzles() }
+        SecondaryTile("Puzzles",
+            subtitle = if (puzzlesSolved > 0) "$puzzlesSolved solved" else null
+        ) { onPuzzles() }
         SecondaryTile("Saved Games") { onSavedGames() }
         SecondaryTile("Settings") { onSettings() }
     }
@@ -152,7 +155,7 @@ private fun DifficultySelector(selected: ChessAI.Difficulty, onSelect: (ChessAI.
 }
 
 @Composable
-private fun SecondaryTile(title: String, comingSoon: Boolean = false, onClick: () -> Unit) {
+private fun SecondaryTile(title: String, comingSoon: Boolean = false, subtitle: String? = null, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
         enabled = !comingSoon,
@@ -162,6 +165,10 @@ private fun SecondaryTile(title: String, comingSoon: Boolean = false, onClick: (
     ) {
         Row(Modifier.padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(title, color = if (comingSoon) MUTED else BONE, fontSize = 17.sp)
+            if (subtitle != null) {
+                Spacer(Modifier.weight(1f))
+                Text(subtitle, color = BRASS, fontSize = 12.sp)
+            }
             Spacer(Modifier.weight(1f))
             if (comingSoon) Text("Coming soon", color = MUTED, fontSize = 11.sp)
             else Text("\u203A", color = MUTED, fontSize = 17.sp)

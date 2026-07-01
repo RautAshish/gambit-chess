@@ -20,6 +20,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -325,7 +327,8 @@ fun BoardCanvas(state: BoardUiState, flipped: Boolean, pal: BoardPalette, onTap:
     BoxWithConstraints {
         val side = maxWidth
         Canvas(
-            Modifier.size(side).testTag("board").clip(RoundedCornerShape(6.dp)).pointerInput(flipped) {
+            Modifier.size(side).testTag("board")
+                .semantics { this.contentDescription = "Chess board" }.clip(RoundedCornerShape(6.dp)).pointerInput(flipped) {
                 detectTapGestures { offset ->
                     val cell = size.width / 8f
                     val col = (offset.x / cell).toInt().coerceIn(0, 7)

@@ -41,6 +41,23 @@ jobs:
           ./gradlew :app:lintDebug --console=plain 2>&1 | tee -a build.log || echo "LINT FOUND ISSUES (see report)" | tee -a build.log
           { echo "===== LINT SUMMARY ====="; grep -E "Warning:|Error:" app/build/reports/lint-results-debug.txt 2>/dev/null | head -60; } >> build.log || true
 
+      - name: Release build (R8) — AAB + APK, signed if secrets present
+        env:
+          GAMBIT_KEYSTORE_PATH: ${{ secrets.GAMBIT_KEYSTORE_PATH }}
+          GAMBIT_KEYSTORE_PASSWORD: ${{ secrets.GAMBIT_KEYSTORE_PASSWORD }}
+          GAMBIT_KEY_ALIAS: ${{ secrets.GAMBIT_KEY_ALIAS }}
+          GAMBIT_KEY_PASSWORD: ${{ secrets.GAMBIT_KEY_PASSWORD }}
+        run: ./gradlew bundleRelease assembleRelease --stacktrace 2>&1 | tail -5
+      - name: Upload release bundle (Play Store artifact)
+        uses: actions/upload-artifact@v4
+        with:
+          name: gambit-release-aab
+          path: app/build/outputs/bundle/release/app-release.aab
+      - name: Upload release APK (sideload-testable)
+        uses: actions/upload-artifact@v4
+        with:
+          name: gambit-release-apk
+          path: app/build/outputs/apk/release/app-release.apk
       - name: Upload APK
         if: success()
         uses: actions/upload-artifact@v4
@@ -128,6 +145,17 @@ jobs:
           tail -50 ui.log
           exit ${RC:-1}
 
+      - name: Verify R8 release build launches (crash gate)
+        if: success()
+        run: |
+          ./gradlew assembleRelease 2>&1 | tail -2
+          adb uninstall com.chessapp || true
+          adb install -r app/build/outputs/apk/release/app-release.apk
+          adb logcat -c
+          adb shell am start -W -n com.chessapp/.MainActivity
+          sleep 8
+          adb shell pidof com.chessapp || { echo "RELEASE BUILD DIED"; adb logcat -d | grep -A20 "FATAL EXCEPTION" | head -40; exit 1; }
+          adb logcat -d | grep "FATAL EXCEPTION" && exit 1 || echo "Release launch: ALIVE, no fatals"
       - name: Publish UI test log
         if: always()
         shell: bash

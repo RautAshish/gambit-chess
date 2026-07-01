@@ -2,6 +2,7 @@ package com.chessapp.ui.nav
 
 import android.app.Application
 import androidx.compose.runtime.Composable
+import kotlinx.coroutines.flow.first
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.collectAsState
@@ -43,7 +44,7 @@ sealed interface Screen {
 }
 
 @Composable
-fun AppNav(app: Application) {
+fun AppNav(app: Application, initialDest: String? = null) {
     var screen by remember { mutableStateOf<Screen>(Screen.Home) }
     var gameSerial by remember { mutableStateOf(0) }
     val settingsRepo = remember { SettingsRepository(app) }
@@ -53,6 +54,21 @@ fun AppNav(app: Application) {
     val settings by settingsRepo.settings.collectAsState(initial = com.chessapp.data.prefs.Settings())
 
     // System back returns to Home from any sub-screen instead of exiting the app.
+    // App-shortcut destinations ("New game" / "Puzzles" from launcher long-press).
+    androidx.compose.runtime.LaunchedEffect(initialDest) {
+        when (initialDest) {
+            "puzzles" -> screen = Screen.Puzzles
+            "new_game" -> {
+                val s = settingsRepo.settings.first()
+                screen = Screen.Game(
+                    difficulty = s.difficulty,
+                    playerColor = if (s.playAsBlack) Color.BLACK else Color.WHITE,
+                    serial = -1
+                )
+            }
+        }
+    }
+
     androidx.activity.compose.BackHandler(enabled = screen != Screen.Home) {
         screen = Screen.Home
     }
@@ -73,6 +89,7 @@ fun AppNav(app: Application) {
                 screen = Screen.Game(settings.difficulty, Color.WHITE, passAndPlay = true, serial = gameSerial)
             },
             onPuzzles = { screen = Screen.Puzzles },
+            puzzlesSolved = settings.solvedPuzzles.size,
             onSavedGames = { screen = Screen.SavedGames },
             onSettings = { screen = Screen.Settings },
             onPlayOnline = { screen = Screen.Online }

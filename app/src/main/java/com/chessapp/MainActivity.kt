@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
                     surface = Color(0xFF272B20)
                 )
             ) {
-                AppNav(application)
+                AppNav(application, intent?.getStringExtra("dest"))
             }
         }
     }

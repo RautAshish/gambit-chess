@@ -8,6 +8,22 @@ plugins {
 }
 
 android {
+    buildFeatures {
+        buildConfig = true
+    }
+    signingConfigs {
+        create("release") {
+            // Provided by CI secrets (see RELEASE.md). Absent locally/on forks,
+            // the release build falls back to debug signing so it stays runnable.
+            val ks = System.getenv("GAMBIT_KEYSTORE_PATH")
+            if (ks != null) {
+                storeFile = file(ks)
+                storePassword = System.getenv("GAMBIT_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("GAMBIT_KEY_ALIAS")
+                keyPassword = System.getenv("GAMBIT_KEY_PASSWORD")
+            }
+        }
+    }
     packaging {
         jniLibs {
             // Stockfish ships as jniLibs/<abi>/libstockfish.so and must be
@@ -31,6 +47,8 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
+            signingConfig = if (System.getenv("GAMBIT_KEYSTORE_PATH") != null)
+                signingConfigs.getByName("release") else signingConfigs.getByName("debug")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
