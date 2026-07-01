@@ -175,3 +175,7 @@ firebase deploy --only functions,firestore:rules
   (replay/analysis). Save after every move for crash-safe resume.
 - **Engine abstraction** (`ChessEnginePort`) means the AI is a runtime choice;
   difficulty maps to search depth (native) or skill/Elo limit (Stockfish).
+
+## License
+GPLv3 (see LICENSE). Bundles the Stockfish engine (GPLv3) and Colin M.L.
+Burnett's chess piece artwork (GPLv2+) — see THIRD_PARTY_LICENSES.md.

@@ -542,3 +542,12 @@ Regression: local unit suite + JVM online-stack suite + full CI (45 unit, 46 E2E
    (Staunton v5: deep blunt muzzle, low brow, smooth crest) after 3 rendered
    iterations judged at 432/120/44 px; applied to renderer, all launcher
    layers, and store art.
+
+## ICON/PIECES ROUND 2 (user pushback: "refer to sources, don't build from scratch")
+Correct call. Hand-rolled v5 read as a dolphin at 512px. Replaced ALL SIX piece
+designs with the canonical Cburnett set (Wikipedia/Lichess pieces, GPLv2+,
+fetched from the lichess repo — 45x45 grid, drop-in for our renderer). Built an
+SVG->Kotlin transpiler (svgpathtools sampling, style/group fill inheritance —
+two bugs caught pre-ship: hollow R/Q from group fills, hollow B from nested
+groups). Launcher/store art re-rastered from the genuine knight via cairosvg.
+App licensed GPLv3 for coherence with bundled GPL components.
