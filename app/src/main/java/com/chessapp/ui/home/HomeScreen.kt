@@ -30,7 +30,7 @@ import com.chessapp.ui.board.PieceRenderer
 private val BG = UiColor(0xFF1C1F17)
 private val PANEL = UiColor(0xFF272B20)
 private val BONE = UiColor(0xFFEFE6D2)
-private val BRASS = UiColor(0xFFC9A227)
+private val BRASS = UiColor(0xFFE4B02A)
 private val MUTED = UiColor(0xFF8A8B7E)
 
 /**

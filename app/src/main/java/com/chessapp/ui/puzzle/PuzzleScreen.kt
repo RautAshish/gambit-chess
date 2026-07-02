@@ -33,7 +33,7 @@ import com.chessapp.ui.board.paletteFor
 
 private val BG = UiColor(0xFF14140F)
 private val BONE = UiColor(0xFFEFE6D2)
-private val BRASS = UiColor(0xFFC9A227)
+private val BRASS = UiColor(0xFFE4B02A)
 private val MUTED = UiColor(0xFF8A8F7E)
 private val GOOD = UiColor(0xFF7FA869)
 private val BAD = UiColor(0xFFB46A55)

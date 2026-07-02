@@ -685,3 +685,8 @@ Second deleteAll timeout in ~25 runs -> promoted from 'flake' to fragile test:
 it never pinned seat/difficulty while DataStore persists across tests, so a
 stray playAsBlack=true flips the board under its coordinate taps. Now
 self-pins White+Easy (same order-independence class as the puzzle-test fix).
+Theme decision (owner asked for honest take): interior stays flat/matte by
+design — gloss belongs to marketing surfaces, not gameplay chrome; the board's
+readability rule is load-bearing. One alignment taken from the hero art: all
+in-app accent gold unified from brass C9A227 to the logo's E4B02A. Board
+palettes untouched (gameplay-tuned).

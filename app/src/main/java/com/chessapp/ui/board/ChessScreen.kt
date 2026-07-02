@@ -49,7 +49,7 @@ fun paletteFor(theme: String): BoardPalette = when (theme) {
     "FOREST" -> BoardPalette(UiColor(0xFFD9CFB4), UiColor(0xFF6E7E55))
     else -> BoardPalette(UiColor(0xFFEDEAE2), UiColor(0xFF5A5A54))   // CLASSIC
 }
-private val BRASS = UiColor(0xFFC9A227)
+private val BRASS = UiColor(0xFFE4B02A)
 private val MUTED = UiColor(0xFF8A8F7E)
 private val SELECT = UiColor(0x803C8C5F)
 private val TARGET = UiColor(0x55201C16)
