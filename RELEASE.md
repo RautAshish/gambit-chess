@@ -19,7 +19,7 @@ Repo -> Settings -> Secrets and variables -> Actions -> New repository secret:
 - GAMBIT_KEYSTORE_B64        the .jks file, base64-encoded (single line)
 - GAMBIT_KEYSTORE_PASSWORD
 - GAMBIT_KEY_ALIAS           e.g. gambit
-- GAMBIT_KEY_PASSWORD
+- GAMBIT_KEY_PASSWORD       (PKCS12: SAME value as the keystore password)
 
 To produce the base64 on a computer:  base64 -w0 gambit-release.jks
 No computer? Run the "generate-keystore" workflow (Actions tab) with your two
