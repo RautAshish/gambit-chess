@@ -588,3 +588,8 @@ the gate now enforces the assumption. Residual: delete the SECOND keystore run
 after confirming signing, BEFORE any future flip back to public (artifacts
 ride along with runs). Signing is now verified per-build in the published log
 via keytool -printcert (CN=Gambit Chess vs CN=Android Debug).
+Signing incident epilogue: first keystore-loaded build failed at packageRelease
+("final block not properly padded"); verifier chain convicted GAMBIT_KEY_PASSWORD
+specifically (store password + alias proven OK). Owner re-pasted the one secret;
+this commit triggers the verification run expected to print the first
+CN=Gambit Chess release certificate.
