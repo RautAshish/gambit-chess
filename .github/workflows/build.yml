@@ -57,15 +57,13 @@ jobs:
             if keytool -list -keystore /home/runner/gambit-release.jks \
                  -storepass "$GAMBIT_KEYSTORE_PASSWORD" -alias "$GAMBIT_KEY_ALIAS" >/dev/null 2>&1; then
               echo "KEYSTORE VERIFY: OK (store password + alias match)" | tee -a build.log
-              if keytool -importkeystore -srckeystore /home/runner/gambit-release.jks \
-                   -srcstorepass "$GAMBIT_KEYSTORE_PASSWORD" -srcalias "$GAMBIT_KEY_ALIAS" \
-                   -srckeypass "$GAMBIT_KEY_PASSWORD" -destkeystore /tmp/kpcheck.p12 \
-                   -deststoretype PKCS12 -deststorepass checkonly123 >/dev/null 2>&1; then
-                echo "KEY-PASSWORD VERIFY: OK" | tee -a build.log
+              # PKCS12 keystores have ONE password; importkeystore ignores a
+              # wrong srckeypass, so the honest check is env equality.
+              if [ "$GAMBIT_KEY_PASSWORD" = "$GAMBIT_KEYSTORE_PASSWORD" ]; then
+                echo "KEY-PASSWORD VERIFY: OK (equals store password — PKCS12)" | tee -a build.log
               else
-                echo "KEY-PASSWORD VERIFY: FAILED — GAMBIT_KEY_PASSWORD secret is wrong; re-paste that one line" | tee -a build.log
+                echo "KEY-PASSWORD VERIFY: FAILED — for this PKCS12 keystore, set GAMBIT_KEY_PASSWORD to the SAME value as GAMBIT_KEYSTORE_PASSWORD" | tee -a build.log
               fi
-              rm -f /tmp/kpcheck.p12
             else
               echo "KEYSTORE VERIFY: FAILED — GAMBIT_KEYSTORE_B64 or GAMBIT_KEYSTORE_PASSWORD or GAMBIT_KEY_ALIAS is wrong; re-paste from SECRETS_TO_ADD.txt" | tee -a build.log
             fi
