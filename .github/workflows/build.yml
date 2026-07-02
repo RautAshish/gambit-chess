@@ -198,13 +198,13 @@ jobs:
           {
             echo "=== RELEASE CRASH GATE ==="
             ./gradlew assembleRelease --console=plain 2>&1 | tail -3
-            adb uninstall com.chessapp
+            adb uninstall io.github.emersionplay.gambit
             adb install -r app/build/outputs/apk/release/app-release.apk
             echo "install exit=$?"
             adb logcat -c
-            adb shell am start -W -n com.chessapp/.MainActivity
+            adb shell am start -W -n io.github.emersionplay.gambit/com.chessapp.MainActivity
             sleep 8
-            PID=$(adb shell pidof com.chessapp | tr -d '\r')
+            PID=$(adb shell pidof io.github.emersionplay.gambit | tr -d '\r')
             echo "pid=[$PID]"
             adb logcat -d > rel_logcat.txt
             FATALS=$(grep -c "FATAL EXCEPTION" rel_logcat.txt)

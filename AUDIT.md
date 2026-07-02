@@ -599,3 +599,11 @@ GAMBIT_KEY_PASSWORD never matched the key's true password (== store password).
 The 'verifier' passed vacuously (importkeystore ignores srckeypass on PKCS12).
 Fixed: generator forces -storetype PKCS12 with one password; verifier now
 asserts the equality that PKCS12 requires. Misdiagnosis owned.
+
+## PERMANENT IDENTITY: applicationId = io.github.emersionplay.gambit
+Chosen pre-first-upload (immutable after). Neutral org namespace (owner
+privacy), GitHub-org convention, availability verified (github 404; no web
+collisions — nearest: Emersion Systems billing platform, unrelated). Code
+namespace remains com.chessapp (internal-only). Six refs renamed: gradle id,
+2x shortcuts targetPackage, gate uninstall/launch/pidof; launch component now
+explicit (relative .MainActivity would mis-resolve under the new package).

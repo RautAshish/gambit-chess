@@ -36,7 +36,9 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.chessapp"
+        // Permanent Play Store identity (namespace above stays com.chessapp:
+        // internal code packages, invisible outside the build).
+        applicationId = "io.github.emersionplay.gambit"
         minSdk = 24
         targetSdk = 35
         versionCode = 3
