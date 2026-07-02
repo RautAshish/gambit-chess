@@ -607,3 +607,11 @@ collisions — nearest: Emersion Systems billing platform, unrelated). Code
 namespace remains com.chessapp (internal-only). Six refs renamed: gradle id,
 2x shortcuts targetPackage, gate uninstall/launch/pidof; launch component now
 explicit (relative .MainActivity would mis-resolve under the new package).
+
+## IDENTITY: applicationId finalized pre-Play = io.github.emersionplay.gambit
+Owner-chosen neutral org namespace ("emersionplay": GitHub 404-free, zero web
+collisions on the exact compound). Code namespace remains com.chessapp (AGP
+split, zero source churn); shortcuts targetPackage + all CI adb refs updated
+(am start now fully-qualified since class package != appId). Old sideloaded
+com.chessapp installs are a different app: uninstall manually; local saves
+don't carry (free moment: never published).
