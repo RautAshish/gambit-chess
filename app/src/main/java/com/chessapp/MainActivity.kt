@@ -14,7 +14,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MaterialTheme(
                 colorScheme = darkColorScheme(
-                    primary = Color(0xFFC9A227),
+                    primary = Color(0xFFE4B02A),
                     background = Color(0xFF1C1F17),
                     surface = Color(0xFF272B20)
                 )
