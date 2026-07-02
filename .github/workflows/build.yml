@@ -50,9 +50,9 @@ jobs:
         run: |
           if [ -n "$KS_B64" ]; then
             echo "$KS_B64" | base64 -d > /home/runner/gambit-release.jks
-            echo "keystore materialized — release will be PLAY-SIGNED"
+            echo "keystore materialized — release will be PLAY-SIGNED" | tee -a build.log
           else
-            echo "no GAMBIT_KEYSTORE_B64 secret — release falls back to debug signing"
+            echo "no GAMBIT_KEYSTORE_B64 secret — release falls back to debug signing" | tee -a build.log
           fi
       - name: Release build (R8) — AAB + APK, signed if secrets present
         env:
@@ -68,6 +68,8 @@ jobs:
             ls -l app/build/outputs/apk/debug/*.apk
             ls -l app/build/outputs/apk/release/*.apk
             ls -l app/build/outputs/bundle/release/*.aab
+            echo "== RELEASE SIGNER =="
+            keytool -printcert -jarfile app/build/outputs/apk/release/app-release.apk | head -4
           } >> build.log
       - name: Upload release bundle (Play Store artifact)
         uses: actions/upload-artifact@v4

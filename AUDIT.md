@@ -574,3 +574,17 @@ on file: if post-launch metrics show size-driven abandonment, retrofit Play
 on-demand delivery (option d). Follow-through: Stockfish now DEFAULT-ON where
 the binary exists (fresh installs; availability-gated as before), listing
 rewritten engine-first.
+
+## SECURITY INCIDENT: keystore generated on a then-PUBLIC repo (contained)
+The first generate-keystore run took passwords as workflow inputs; repo was
+public, so the run page/log exposed both passwords and the artifact (the
+keystore) was world-downloadable. Containment: run deleted by owner (my API
+delete was 403 — the PAT deliberately lacks actions-write); repo made private;
+workflow redesigned: hard-gates on repo privacy, generates random credentials
+in-runner (no inputs, nothing logged), artifact carries ready-to-paste secret
+lines. Owner regenerated cleanly and installed the 4 signing secrets. Root
+cause was mine: the original design assumed a private repo without verifying;
+the gate now enforces the assumption. Residual: delete the SECOND keystore run
+after confirming signing, BEFORE any future flip back to public (artifacts
+ride along with runs). Signing is now verified per-build in the published log
+via keytool -printcert (CN=Gambit Chess vs CN=Android Debug).
