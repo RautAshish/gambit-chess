@@ -1,6 +1,6 @@
-# Gambit Chess — Privacy Policy
+# Emersion Chess — Privacy Policy
 
-Gambit Chess is built to work offline and to collect nothing.
+Emersion Chess is built to work offline and to collect nothing.
 
 - No ads, no analytics, no trackers, no third-party SDKs phoning home.
 - Games, puzzles progress, and settings are stored only on your device.

@@ -1,6 +1,6 @@
 # Online play — 5-minute free setup
 
-Gambit's online mode runs on YOUR free Firebase project (Spark tier, no card).
+Emersion's online mode runs on YOUR free Firebase project (Spark tier, no card).
 
 1. Go to console.firebase.google.com → **Add project** (any name, Analytics off).
 2. **Build → Authentication → Get started → Anonymous → Enable.**

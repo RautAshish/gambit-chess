@@ -36,8 +36,8 @@ class GambitUiTest {
 
     @Test
     fun homeScreenRenders() {
-        waitForText("GAMBIT")
-        rule.onNodeWithText("GAMBIT").assertIsDisplayed()
+        waitForText("EMERSION")
+        rule.onNodeWithText("EMERSION").assertIsDisplayed()
         rule.onNodeWithText("Play vs Computer").assertIsDisplayed()
         rule.onNodeWithText("Pass & Play").assertIsDisplayed()
         rule.onNodeWithText("Settings").assertIsDisplayed()
@@ -80,8 +80,8 @@ class GambitUiTest {
         rule.onNodeWithText("Play vs Computer").performClick()
         waitForText("White to move")
         rule.onNodeWithText("\u2039 Home").performClick()
-        waitForText("GAMBIT")
-        rule.onNodeWithText("GAMBIT").assertIsDisplayed()
+        waitForText("EMERSION")
+        rule.onNodeWithText("EMERSION").assertIsDisplayed()
     }
 
     @Test
@@ -90,6 +90,6 @@ class GambitUiTest {
         rule.onNodeWithText("Settings").performClick()
         waitForText("Sound effects")
         rule.onNodeWithText("\u2039 Home").performClick()
-        waitForText("GAMBIT")
+        waitForText("EMERSION")
     }
 }

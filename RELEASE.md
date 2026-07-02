@@ -1,4 +1,4 @@
-# Releasing Gambit Chess to Google Play
+# Releasing Emersion Chess to Google Play
 
 ## One-time: create your signing key (KEEP IT FOREVER)
 On any machine with Java:

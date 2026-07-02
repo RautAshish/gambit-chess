@@ -635,3 +635,16 @@ Renderer daemon-crash fixed via constant-pool string geometry. E2E fallout of
 the label change: my sweep grep had been truncated with head -4, so SmokeTest
 and Round4 still tapped the removed "Back" — completed untruncated; lesson
 logged (never head-limit a sweep you act on).
+
+## REBRAND (pre-launch, owner-approved): Gambit Chess -> Emersion Chess
+Driver: "Gambit" became contested in-category (live "Gambit: Chess Club" on
+Play with near-identical pitch; Chess.com's new "Gambit" using Play-and-Learn
+phrasing; gambit.ai). ASO: navigational capture ~100% vs leaked; title
+"Emersion Chess: Stockfish" (25c) spends the freed chars on the highest-intent
+pro keyword; exact-compound verified collision-free (only Steam's dormant
+"Immersion Chess" VR title, absent from Play — fuzzy search bridges the
+spelling both ways). appId leaf aligned while still free:
+io.github.emersionplay.chess. Retained internal tokens by design: Theme.Gambit,
+GambitUiTest, GAMBIT_* secret names, gambit-* CI artifact names, and the
+existing signing cert's CN=Gambit Chess (immutable without a new key; invisible
+to users). Repo transfer target: emersionplay/emersion-chess.

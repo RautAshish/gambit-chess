@@ -201,7 +201,7 @@ class E2eScenariosTest {
         move(4, 1, 4, 3, "1. e4")
         waitAiReplied()                                  // ensure autosave has 2 plies
         rule.onNodeWithText("\u2039 Home").performClick()
-        waitForText("GAMBIT")
+        waitForText("EMERSION")
         rule.onNodeWithText("Saved Games").performClick()
         rule.waitUntil(15_000) {
             rule.onAllNodesWithTag("savedRow").fetchSemanticsNodes().isNotEmpty()
@@ -215,13 +215,13 @@ class E2eScenariosTest {
     fun allDifficultiesSelectable_andStartGame() {
         // Chips SELECT a difficulty (persisted); the primary card starts the game.
         for (d in listOf("Easy", "Medium", "Hard", "Expert")) {
-            waitForText("GAMBIT")
+            waitForText("EMERSION")
             rule.onNodeWithText(d).performClick()
             rule.onNodeWithText("Play vs Computer").performClick()
             waitForText("White to move")
             rule.onNodeWithText("\u2039 Home").performClick()
         }
-        waitForText("GAMBIT")
+        waitForText("EMERSION")
     }
 
     @Test
@@ -235,6 +235,6 @@ class E2eScenariosTest {
             rule.onAllNodesWithText(label, substring = true).onFirst().assertExists()
         }
         rule.onNodeWithText("\u2039 Home").performClick()
-        waitForText("GAMBIT")
+        waitForText("EMERSION")
     }
 }

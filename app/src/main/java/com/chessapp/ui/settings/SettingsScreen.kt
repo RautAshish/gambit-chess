@@ -103,7 +103,7 @@ fun SettingsScreen(repo: SettingsRepository, onBack: () -> Unit) {
 
         Section("About")
         Text(
-            "Gambit Chess v${com.chessapp.BuildConfig.VERSION_NAME}\nBuilt-in engine + optional Stockfish 18 (\u00A9 the Stockfish team, GPLv3).\nSource & licenses: github.com/emersionplay/gambit-chess",
+            "Emersion Chess v${com.chessapp.BuildConfig.VERSION_NAME}\nBuilt-in engine + optional Stockfish 18 (\u00A9 the Stockfish team, GPLv3).\nSource & licenses: github.com/emersionplay/emersion-chess",
             color = MUTED, fontSize = 12.sp, lineHeight = 18.sp,
             modifier = Modifier.padding(horizontal = 20.dp)
         )

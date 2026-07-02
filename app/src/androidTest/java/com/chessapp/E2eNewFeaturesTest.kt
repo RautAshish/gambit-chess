@@ -80,7 +80,7 @@ class E2eNewFeaturesTest {
         tapSquare(4, 1); tapSquare(4, 3)
         waitForText("1. e4", timeoutMs = 60_000, substring = true)
         rule.onNodeWithText("\u2039 Home").performClick()
-        waitForText("GAMBIT")
+        waitForText("EMERSION")
         rule.onNodeWithText("Saved Games").performClick()
         rule.waitUntil(15_000) {
             rule.onAllNodesWithTag("savedRow").fetchSemanticsNodes().isNotEmpty()

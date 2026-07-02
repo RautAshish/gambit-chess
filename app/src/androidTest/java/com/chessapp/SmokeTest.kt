@@ -24,7 +24,7 @@ class SmokeTest {
 
     @Test
     fun homeScreenRendersBrand() {
-        rule.onNodeWithText("GAMBIT").assertIsDisplayed()
+        rule.onNodeWithText("EMERSION").assertIsDisplayed()
         rule.onNodeWithText("Play vs Computer").assertIsDisplayed()
     }
 
@@ -33,7 +33,7 @@ class SmokeTest {
         rule.onNodeWithText("Settings").performClick()
         rule.onNodeWithText("Sound effects").assertIsDisplayed()
         rule.onNodeWithText("\u2039 Home").performClick()
-        rule.onNodeWithText("GAMBIT").assertIsDisplayed()
+        rule.onNodeWithText("EMERSION").assertIsDisplayed()
     }
 
     @Test

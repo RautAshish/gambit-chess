@@ -131,7 +131,7 @@ class E2eRound4Test {
         rule.activityRule.scenario.recreate()
         // Current design: nav state is in-memory, so recreation lands on Home —
         // the autosaved game must be one tap away.
-        waitForText("GAMBIT")
+        waitForText("EMERSION")
         rule.onNodeWithText("Saved Games").performClick()
         rule.waitUntil(15_000) {
             rule.onAllNodesWithTag("savedRow").fetchSemanticsNodes().isNotEmpty()
@@ -161,7 +161,7 @@ class E2eRound4Test {
             waitForText("White to move")
             rule.onNodeWithText("\u2039 Home").performClick()
         }
-        waitForText("GAMBIT")
+        waitForText("EMERSION")
         rule.onNodeWithText("Play as").assertIsDisplayed()
     }
 }

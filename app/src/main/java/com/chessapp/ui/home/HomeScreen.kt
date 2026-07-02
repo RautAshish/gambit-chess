@@ -61,7 +61,7 @@ fun HomeScreen(
         Canvas(Modifier.size(72.dp)) {
             PieceRenderer.draw(this, PieceType.KNIGHT, Color.WHITE, Offset.Zero, size.minDimension)
         }
-        Text("GAMBIT", color = BONE, fontSize = 34.sp, fontWeight = FontWeight.Bold,
+        Text("EMERSION", color = BONE, fontSize = 34.sp, fontWeight = FontWeight.Bold,
             letterSpacing = 8.sp)
         Text("play. learn. repeat.", color = MUTED, fontSize = 13.sp, letterSpacing = 2.sp)
         Spacer(Modifier.height(20.dp))
