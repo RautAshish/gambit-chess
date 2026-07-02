@@ -102,7 +102,7 @@ class E2eRound3Test {
         rule.onNodeWithText("Settings").performClick()
         waitForText("Walnut")
         rule.onNodeWithText("Walnut").performClick()
-        rule.onNodeWithText("Back").performClick()
+        rule.onNodeWithText("\u2039 Home").performClick()
         waitForText("Play vs Computer")
         rule.onNodeWithText("Play vs Computer").performClick()
         waitForText("White to move")

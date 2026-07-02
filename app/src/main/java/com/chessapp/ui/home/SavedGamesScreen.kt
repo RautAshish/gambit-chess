@@ -41,7 +41,7 @@ fun SavedGamesScreen(
         var confirmDeleteAll by remember { mutableStateOf(false) }
         val headerScope = rememberCoroutineScope()
         Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            TextButton(onClick = onBack) { Text("Back", color = BRASS) }
+            TextButton(onClick = onBack) { Text("\u2039 Home", color = BRASS) }
             Spacer(Modifier.width(8.dp))
             Text("Saved Games", color = BONE, fontSize = 22.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.weight(1f))

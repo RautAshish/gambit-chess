@@ -615,3 +615,19 @@ split, zero source churn); shortcuts targetPackage + all CI adb refs updated
 (am start now fully-qualified since class package != appId). Old sideloaded
 com.chessapp installs are a different app: uninstall manually; local saves
 don't carry (free moment: never published).
+
+## FIELD OBSERVATIONS ROUND 2 (5 reports)
+1 VALID: About screen shipped the personal-name repo URL — now the org URL
+  (github.com/emersionplay/gambit-chess; resolves after the pre-launch
+  transfer, old URL auto-redirects meanwhile). Docs had no other refs.
+3 VALID: black pieces used white-geometry-only; on dark squares bodies melted
+  into the background, making identical knights look different. Fixed with the
+  authentic Cburnett BLACK set (per-color part lists; absent-fill=black and
+  <circle> elements handled in the transpiler) — 24-render proof on CLASSIC +
+  WALNUT worst cases.
+4 VALID: Settings/SavedGames said bare "Back" while game/puzzle said "Home".
+  Rule adopted: destination-fixed screens name the destination ("‹ Home");
+  Online keeps "‹ Back" (dynamic: lobby vs game). 4 E2E taps updated.
+5 VALID: Settings "Difficulty" was a duplicate writer of the same preference
+  as the Home selector — removed; Home is the single source of truth.
+2 (question, not code): Firebase needs any Google account; no GitHub linkage.

@@ -51,11 +51,6 @@ fun SettingsScreen(repo: SettingsRepository, onBack: () -> Unit) {
             scope.launch { repo.setHaptics(it) }
         }
 
-        Section("Difficulty")
-        DifficultyPicker(settings.difficulty) {
-            scope.launch { repo.setDifficulty(it) }
-        }
-
         Section("Engine")
         val sfAvailable = com.chessapp.engine.stockfish.StockfishInstaller
             .available(androidx.compose.ui.platform.LocalContext.current)
@@ -108,7 +103,7 @@ fun SettingsScreen(repo: SettingsRepository, onBack: () -> Unit) {
 
         Section("About")
         Text(
-            "Gambit Chess v${com.chessapp.BuildConfig.VERSION_NAME}\nBuilt-in engine + optional Stockfish 18 (\u00A9 the Stockfish team, GPLv3).\nSource & licenses: github.com/RautAshish/gambit-chess",
+            "Gambit Chess v${com.chessapp.BuildConfig.VERSION_NAME}\nBuilt-in engine + optional Stockfish 18 (\u00A9 the Stockfish team, GPLv3).\nSource & licenses: github.com/emersionplay/gambit-chess",
             color = MUTED, fontSize = 12.sp, lineHeight = 18.sp,
             modifier = Modifier.padding(horizontal = 20.dp)
         )
@@ -123,7 +118,7 @@ private fun TopRow(title: String, onBack: () -> Unit) {
         Modifier.fillMaxWidth().padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        TextButton(onClick = onBack) { Text("Back", color = BRASS) }
+        TextButton(onClick = onBack) { Text("\u2039 Home", color = BRASS) }
         Spacer(Modifier.width(8.dp))
         Text(title, color = BONE, fontSize = 22.sp, fontWeight = FontWeight.Bold)
     }
@@ -153,24 +148,6 @@ private fun ToggleRow(label: String, checked: Boolean, onChange: (Boolean) -> Un
     }
 }
 
-@Composable
-private fun DifficultyPicker(current: ChessAI.Difficulty, onPick: (ChessAI.Difficulty) -> Unit) {
-    Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        for (d in ChessAI.Difficulty.entries) {
-            val sel = d == current
-            Button(
-                onClick = { onPick(d) },
-                modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(vertical = 8.dp, horizontal = 2.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (sel) BRASS else PANEL,
-                    contentColor = if (sel) BG else BONE
-                )
-            ) { Text(d.name.lowercase().replaceFirstChar { it.uppercase() }, fontSize = 11.sp) }
-        }
-    }
-}
 
 @Composable
 private fun ClockPicker(minutes: Int, inc: Int, onPick: (Int, Int) -> Unit) {

@@ -89,7 +89,7 @@ class GambitUiTest {
         waitForText("Settings")
         rule.onNodeWithText("Settings").performClick()
         waitForText("Sound effects")
-        rule.onNodeWithText("Back").performClick()
+        rule.onNodeWithText("\u2039 Home").performClick()
         waitForText("GAMBIT")
     }
 }

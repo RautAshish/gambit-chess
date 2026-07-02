@@ -66,7 +66,7 @@ class E2eReviewFixesTest {
         rule.onNodeWithText("Settings").performClick()
         waitForText("Flip board for black")
         rule.onAllNodes(isToggleable())[1].performClick()    // row order: legal, flip, sound, haptics
-        rule.onNodeWithText("Back").performClick()
+        rule.onNodeWithText("\u2039 Home").performClick()
         waitForText("Play as")
         rule.onNodeWithText("Easy").performClick()       // pin fast AI: suite-order independent
         rule.onNodeWithText("Black").performClick()

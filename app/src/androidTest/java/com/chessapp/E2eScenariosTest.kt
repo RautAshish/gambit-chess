@@ -234,7 +234,7 @@ class E2eScenariosTest {
         )) {
             rule.onAllNodesWithText(label, substring = true).onFirst().assertExists()
         }
-        rule.onNodeWithText("Back").performClick()
+        rule.onNodeWithText("\u2039 Home").performClick()
         waitForText("GAMBIT")
     }
 }
