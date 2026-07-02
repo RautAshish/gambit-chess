@@ -654,3 +654,12 @@ use alias 'emersion'. The EXISTING keystore's alias remains baked as 'gambit'
 (immutable without regeneration) — so the migrated EMERSION_KEY_ALIAS secret's
 VALUE stays the string 'gambit'. Owner migration: add 4 EMERSION_* secrets
 (same values), delete 4 GAMBIT_*; verifier chain self-certifies next push.
+
+## IDENTITY FINAL (owner-delegated decision, closed): applicationId =
+io.github.emersionplay.chess. Org segment carries the brand; leaf names the
+product (com.spotify.music pattern). Gate-proven on-device pre-stamp.
+## SECRET NAMING (supersedes earlier 'retained' note): all secret/env names
+migrated GAMBIT_* -> EMERSION_* per owner. Signing key alias VALUE remains
+"gambit" — baked inside the existing keystore, invisible everywhere, and
+changing it would mean a new keystore for zero benefit. Owner migration: add
+4 EMERSION_* signing secrets with existing values, delete GAMBIT_*.
