@@ -147,13 +147,13 @@ class E2eRound4Test {
             waitForText("Settings")
             rule.onNodeWithText("Settings").performClick()
             waitForText("Sound effects")
-            rule.onNodeWithText("Back").performClick()
+            rule.onNodeWithText("\u2039 Home").performClick()
         }
         repeat(3) {
             waitForText("Saved Games")
             rule.onNodeWithText("Saved Games").performClick()
             waitForText("Saved Games")
-            rule.onNodeWithText("Back").performClick()
+            rule.onNodeWithText("\u2039 Home").performClick()
         }
         repeat(2) {
             waitForText("Play vs Computer")

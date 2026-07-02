@@ -631,3 +631,7 @@ don't carry (free moment: never published).
 5 VALID: Settings "Difficulty" was a duplicate writer of the same preference
   as the Home selector — removed; Home is the single source of truth.
 2 (question, not code): Firebase needs any Google account; no GitHub linkage.
+Renderer daemon-crash fixed via constant-pool string geometry. E2E fallout of
+the label change: my sweep grep had been truncated with head -4, so SmokeTest
+and Round4 still tapped the removed "Back" — completed untruncated; lesson
+logged (never head-limit a sweep you act on).

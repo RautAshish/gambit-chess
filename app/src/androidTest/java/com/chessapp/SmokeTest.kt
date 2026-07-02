@@ -32,7 +32,7 @@ class SmokeTest {
     fun settingsNavigationWorks() {
         rule.onNodeWithText("Settings").performClick()
         rule.onNodeWithText("Sound effects").assertIsDisplayed()
-        rule.onNodeWithText("Back").performClick()
+        rule.onNodeWithText("\u2039 Home").performClick()
         rule.onNodeWithText("GAMBIT").assertIsDisplayed()
     }
 
