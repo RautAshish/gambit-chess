@@ -670,3 +670,10 @@ Handover note: repository transfer to the emersionplay org severs the
 personal fine-grained PAT by design (resource-owner scoping) — the built-in
 revocation moment. Post-transfer verification is owner-run (Re-run latest
 workflow; expect 'ONLINE DEFAULTS: baked (<project-id>)' and PLAY-SIGNED).
+Launcher art upgraded to owner-supplied glossy hero render (Cburnett-derived
+knight — GPL attribution already covers derivation; owner to confirm generator
+usage rights before Play upload). Baked bezel stripped programmatically
+(launchers/Play apply their own masks); art ships as the adaptive BACKGROUND
+with transparent foreground; feathered margin keeps the knight in the 66dp
+safe zone; monochrome themed-icon layer unchanged; legacy + Play-512 rebuilt.
+Old flat foreground PNGs retained on disk (unreferenced) as fallback.
