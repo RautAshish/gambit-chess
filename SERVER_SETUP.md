@@ -3,8 +3,13 @@
 Emersion's online mode runs on YOUR free Firebase project (Spark tier, no card).
 
 1. Go to console.firebase.google.com → **Add project** (any name, Analytics off).
-2. **Build → Authentication → Get started → Anonymous → Enable.**
-3. **Build → Firestore Database → Create database** (production mode, any region).
+2. **Security → Authentication → Get started → Sign-in method → Anonymous →
+   Enable.** (Older console layout: Build → Authentication. Doing this first
+   also provisions the Web API key.)
+3. **Databases and storage → Firestore Database → Create database**
+   (Standard edition if asked, production mode, any region).
+   (Older layout: Build → Firestore Database.) Skip "Add app" and all Gemini
+   cards — this integration registers no app and needs no google-services.json.
 4. Firestore → **Rules** tab → replace contents with `firebase/firestore.rules`
    from this repo → Publish.
 5. **Project settings (gear) → General**: copy **Project ID** and **Web API Key**.
