@@ -20,7 +20,7 @@ For a public/ranked mode, deploy the server-authoritative Cloud Functions in
 
 ## Shipping to app-store users (zero setup for them)
 Do the steps above once yourself, then put the two values into repo secrets
-GAMBIT_ONLINE_PROJECT_ID and GAMBIT_ONLINE_API_KEY. CI bakes them into every
+EMERSION_ONLINE_PROJECT_ID and EMERSION_ONLINE_API_KEY. CI bakes them into every
 build as the default server: players just tap Play Online. (These values are
 public identifiers by design — security lives in firestore.rules — the secrets
 are for convenience, not confidentiality.) The in-app Settings fields remain

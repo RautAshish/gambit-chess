@@ -13,8 +13,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      GAMBIT_ONLINE_PROJECT_ID: ${{ secrets.GAMBIT_ONLINE_PROJECT_ID }}
-      GAMBIT_ONLINE_API_KEY: ${{ secrets.GAMBIT_ONLINE_API_KEY }}
+      EMERSION_ONLINE_PROJECT_ID: ${{ secrets.EMERSION_ONLINE_PROJECT_ID }}
+      EMERSION_ONLINE_API_KEY: ${{ secrets.EMERSION_ONLINE_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 17
@@ -46,36 +46,36 @@ jobs:
 
       - name: Materialize release keystore (when the secret exists)
         env:
-          KS_B64: ${{ secrets.GAMBIT_KEYSTORE_B64 }}
-          GAMBIT_KEYSTORE_PASSWORD: ${{ secrets.GAMBIT_KEYSTORE_PASSWORD }}
-          GAMBIT_KEY_ALIAS: ${{ secrets.GAMBIT_KEY_ALIAS }}
-          GAMBIT_KEY_PASSWORD: ${{ secrets.GAMBIT_KEY_PASSWORD }}
+          KS_B64: ${{ secrets.EMERSION_KEYSTORE_B64 }}
+          EMERSION_KEYSTORE_PASSWORD: ${{ secrets.EMERSION_KEYSTORE_PASSWORD }}
+          EMERSION_KEY_ALIAS: ${{ secrets.EMERSION_KEY_ALIAS }}
+          EMERSION_KEY_PASSWORD: ${{ secrets.EMERSION_KEY_PASSWORD }}
         run: |
           if [ -n "$KS_B64" ]; then
-            echo "$KS_B64" | base64 -d > /home/runner/gambit-release.jks
+            echo "$KS_B64" | base64 -d > /home/runner/emersion-release.jks
             echo "keystore materialized — release will be PLAY-SIGNED" | tee -a build.log
-            if keytool -list -keystore /home/runner/gambit-release.jks \
-                 -storepass "$GAMBIT_KEYSTORE_PASSWORD" -alias "$GAMBIT_KEY_ALIAS" >/dev/null 2>&1; then
+            if keytool -list -keystore /home/runner/emersion-release.jks \
+                 -storepass "$EMERSION_KEYSTORE_PASSWORD" -alias "$EMERSION_KEY_ALIAS" >/dev/null 2>&1; then
               echo "KEYSTORE VERIFY: OK (store password + alias match)" | tee -a build.log
               # PKCS12 keystores have ONE password; importkeystore ignores a
               # wrong srckeypass, so the honest check is env equality.
-              if [ "$GAMBIT_KEY_PASSWORD" = "$GAMBIT_KEYSTORE_PASSWORD" ]; then
+              if [ "$EMERSION_KEY_PASSWORD" = "$EMERSION_KEYSTORE_PASSWORD" ]; then
                 echo "KEY-PASSWORD VERIFY: OK (equals store password — PKCS12)" | tee -a build.log
               else
-                echo "KEY-PASSWORD VERIFY: FAILED — for this PKCS12 keystore, set GAMBIT_KEY_PASSWORD to the SAME value as GAMBIT_KEYSTORE_PASSWORD" | tee -a build.log
+                echo "KEY-PASSWORD VERIFY: FAILED — for this PKCS12 keystore, set EMERSION_KEY_PASSWORD to the SAME value as EMERSION_KEYSTORE_PASSWORD" | tee -a build.log
               fi
             else
-              echo "KEYSTORE VERIFY: FAILED — GAMBIT_KEYSTORE_B64 or GAMBIT_KEYSTORE_PASSWORD or GAMBIT_KEY_ALIAS is wrong; re-paste from SECRETS_TO_ADD.txt" | tee -a build.log
+              echo "KEYSTORE VERIFY: FAILED — EMERSION_KEYSTORE_B64 or EMERSION_KEYSTORE_PASSWORD or EMERSION_KEY_ALIAS is wrong; re-paste from SECRETS_TO_ADD.txt" | tee -a build.log
             fi
           else
-            echo "no GAMBIT_KEYSTORE_B64 secret — release falls back to debug signing" | tee -a build.log
+            echo "no EMERSION_KEYSTORE_B64 secret — release falls back to debug signing" | tee -a build.log
           fi
       - name: Release build (R8) — AAB + APK, signed if secrets present
         env:
-          GAMBIT_KEYSTORE_PATH: /home/runner/gambit-release.jks
-          GAMBIT_KEYSTORE_PASSWORD: ${{ secrets.GAMBIT_KEYSTORE_PASSWORD }}
-          GAMBIT_KEY_ALIAS: ${{ secrets.GAMBIT_KEY_ALIAS }}
-          GAMBIT_KEY_PASSWORD: ${{ secrets.GAMBIT_KEY_PASSWORD }}
+          EMERSION_KEYSTORE_PATH: /home/runner/emersion-release.jks
+          EMERSION_KEYSTORE_PASSWORD: ${{ secrets.EMERSION_KEYSTORE_PASSWORD }}
+          EMERSION_KEY_ALIAS: ${{ secrets.EMERSION_KEY_ALIAS }}
+          EMERSION_KEY_PASSWORD: ${{ secrets.EMERSION_KEY_PASSWORD }}
         run: |
           ./gradlew bundleRelease assembleRelease --console=plain 2>&1 | tee -a build.log | tail -8
           (
@@ -121,8 +121,8 @@ jobs:
   ui-smoke:
     runs-on: ubuntu-latest
     env:
-      GAMBIT_ONLINE_PROJECT_ID: ${{ secrets.GAMBIT_ONLINE_PROJECT_ID }}
-      GAMBIT_ONLINE_API_KEY: ${{ secrets.GAMBIT_ONLINE_API_KEY }}
+      EMERSION_ONLINE_PROJECT_ID: ${{ secrets.EMERSION_ONLINE_PROJECT_ID }}
+      EMERSION_ONLINE_API_KEY: ${{ secrets.EMERSION_ONLINE_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 17

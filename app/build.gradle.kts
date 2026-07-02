@@ -15,12 +15,12 @@ android {
         create("release") {
             // Provided by CI secrets (see RELEASE.md). Absent locally/on forks,
             // the release build falls back to debug signing so it stays runnable.
-            val ks = System.getenv("GAMBIT_KEYSTORE_PATH")
+            val ks = System.getenv("EMERSION_KEYSTORE_PATH")
             if (ks != null && file(ks).exists()) {
                 storeFile = file(ks)
-                storePassword = System.getenv("GAMBIT_KEYSTORE_PASSWORD")
-                keyAlias = System.getenv("GAMBIT_KEY_ALIAS")
-                keyPassword = System.getenv("GAMBIT_KEY_PASSWORD")
+                storePassword = System.getenv("EMERSION_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("EMERSION_KEY_ALIAS")
+                keyPassword = System.getenv("EMERSION_KEY_PASSWORD")
             }
         }
     }
@@ -48,9 +48,9 @@ android {
         // developer sets two CI secrets and every build ships pre-configured.
         // Blank values keep the in-app setup flow (self-hosters, forks).
         buildConfigField("String", "DEFAULT_ONLINE_PROJECT_ID",
-            "\"${System.getenv("GAMBIT_ONLINE_PROJECT_ID") ?: ""}\"")
+            "\"${System.getenv("EMERSION_ONLINE_PROJECT_ID") ?: ""}\"")
         buildConfigField("String", "DEFAULT_ONLINE_API_KEY",
-            "\"${System.getenv("GAMBIT_ONLINE_API_KEY") ?: ""}\"")
+            "\"${System.getenv("EMERSION_ONLINE_API_KEY") ?: ""}\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -58,7 +58,7 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            val ks = System.getenv("GAMBIT_KEYSTORE_PATH")
+            val ks = System.getenv("EMERSION_KEYSTORE_PATH")
             signingConfig = if (ks != null && file(ks).exists())
                 signingConfigs.getByName("release") else signingConfigs.getByName("debug")
             proguardFiles(

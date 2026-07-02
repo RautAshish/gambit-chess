@@ -648,3 +648,9 @@ io.github.emersionplay.chess. Retained internal tokens by design: Theme.Gambit,
 GambitUiTest, GAMBIT_* secret names, gambit-* CI artifact names, and the
 existing signing cert's CN=Gambit Chess (immutable without a new key; invisible
 to users). Repo transfer target: emersionplay/emersion-chess.
+Supersedes earlier 'retain GAMBIT_* tokens' call (owner request): ALL secret
+names, env vars, and keystore paths now EMERSION_*; future-generated keystores
+use alias 'emersion'. The EXISTING keystore's alias remains baked as 'gambit'
+(immutable without regeneration) — so the migrated EMERSION_KEY_ALIAS secret's
+VALUE stays the string 'gambit'. Owner migration: add 4 EMERSION_* secrets
+(same values), delete 4 GAMBIT_*; verifier chain self-certifies next push.
