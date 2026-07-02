@@ -677,3 +677,7 @@ usage rights before Play upload). Baked bezel stripped programmatically
 with transparent foreground; feathered margin keeps the knight in the 66dp
 safe zone; monochrome themed-icon layer unchanged; legacy + Play-512 rebuilt.
 Old flat foreground PNGs retained on disk (unreferenced) as fallback.
+Hero-icon provenance confirmed: AI-rendered by owner from our knight as a
+locked reference (rights: owner's generation; derivation: covered by existing
+Cburnett GPL attribution). Brand spec + platform corrections banked in
+store/BRAND.md; feature graphic unified onto the hero art.
