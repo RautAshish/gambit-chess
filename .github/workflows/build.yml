@@ -47,10 +47,18 @@ jobs:
       - name: Materialize release keystore (when the secret exists)
         env:
           KS_B64: ${{ secrets.GAMBIT_KEYSTORE_B64 }}
+          GAMBIT_KEYSTORE_PASSWORD: ${{ secrets.GAMBIT_KEYSTORE_PASSWORD }}
+          GAMBIT_KEY_ALIAS: ${{ secrets.GAMBIT_KEY_ALIAS }}
         run: |
           if [ -n "$KS_B64" ]; then
             echo "$KS_B64" | base64 -d > /home/runner/gambit-release.jks
             echo "keystore materialized — release will be PLAY-SIGNED" | tee -a build.log
+            if keytool -list -keystore /home/runner/gambit-release.jks \
+                 -storepass "$GAMBIT_KEYSTORE_PASSWORD" -alias "$GAMBIT_KEY_ALIAS" >/dev/null 2>&1; then
+              echo "KEYSTORE VERIFY: OK (store password + alias match)" | tee -a build.log
+            else
+              echo "KEYSTORE VERIFY: FAILED — GAMBIT_KEYSTORE_B64 or GAMBIT_KEYSTORE_PASSWORD or GAMBIT_KEY_ALIAS is wrong; re-paste from SECRETS_TO_ADD.txt" | tee -a build.log
+            fi
           else
             echo "no GAMBIT_KEYSTORE_B64 secret — release falls back to debug signing" | tee -a build.log
           fi
@@ -61,16 +69,17 @@ jobs:
           GAMBIT_KEY_ALIAS: ${{ secrets.GAMBIT_KEY_ALIAS }}
           GAMBIT_KEY_PASSWORD: ${{ secrets.GAMBIT_KEY_PASSWORD }}
         run: |
-          ./gradlew bundleRelease assembleRelease --stacktrace 2>&1 | tail -5
-          {
+          ./gradlew bundleRelease assembleRelease --console=plain 2>&1 | tee -a build.log | tail -8
+          (
+            set +e
             echo "== SIZE REPORT =="
             ls -l app/src/main/jniLibs/arm64-v8a/libstockfish.so
             ls -l app/build/outputs/apk/debug/*.apk
             ls -l app/build/outputs/apk/release/*.apk
             ls -l app/build/outputs/bundle/release/*.aab
             echo "== RELEASE SIGNER =="
-            keytool -printcert -jarfile app/build/outputs/apk/release/app-release.apk | head -4
-          } >> build.log
+            keytool -printcert -jarfile app/build/outputs/apk/release/app-release.apk 2>&1 | head -4
+          ) >> build.log
       - name: Upload release bundle (Play Store artifact)
         uses: actions/upload-artifact@v4
         with:
