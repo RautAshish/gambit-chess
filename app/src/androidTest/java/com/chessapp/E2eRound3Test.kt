@@ -120,8 +120,13 @@ class E2eRound3Test {
     /** #21: Delete all (with confirm) empties the list. */
     @Test
     fun deleteAll_clearsSavedGames() {
-        // Ensure at least one save exists.
+        // Ensure at least one save exists. Pin seat + difficulty first:
+        // settings persist ACROSS tests, so an earlier test leaving Black
+        // selected flips the board and the coordinate taps below hit air
+        // (root cause of this test's intermittent 60s timeout).
         waitForText("Play vs Computer")
+        rule.onNodeWithText("White").performClick()
+        rule.onNodeWithText("Easy").performClick()
         rule.onNodeWithText("Play vs Computer").performClick()
         waitForText("White to move")
         tap(4, 1); tap(4, 3)

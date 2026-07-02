@@ -681,3 +681,7 @@ Hero-icon provenance confirmed: AI-rendered by owner from our knight as a
 locked reference (rights: owner's generation; derivation: covered by existing
 Cburnett GPL attribution). Brand spec + platform corrections banked in
 store/BRAND.md; feature graphic unified onto the hero art.
+Second deleteAll timeout in ~25 runs -> promoted from 'flake' to fragile test:
+it never pinned seat/difficulty while DataStore persists across tests, so a
+stray playAsBlack=true flips the board under its coordinate taps. Now
+self-pins White+Easy (same order-independence class as the puzzle-test fix).
