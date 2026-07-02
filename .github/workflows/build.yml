@@ -54,6 +54,11 @@ jobs:
           if [ -n "$KS_B64" ]; then
             echo "$KS_B64" | base64 -d > /home/runner/emersion-release.jks
             echo "keystore materialized — release will be PLAY-SIGNED" | tee -a build.log
+            if [ -n "$EMERSION_ONLINE_PROJECT_ID" ]; then
+              echo "ONLINE DEFAULTS: baked ($EMERSION_ONLINE_PROJECT_ID) — store users get zero-setup multiplayer" | tee -a build.log
+            else
+              echo "ONLINE DEFAULTS: none — builds show the setup card" | tee -a build.log
+            fi
             if keytool -list -keystore /home/runner/emersion-release.jks \
                  -storepass "$EMERSION_KEYSTORE_PASSWORD" -alias "$EMERSION_KEY_ALIAS" >/dev/null 2>&1; then
               echo "KEYSTORE VERIFY: OK (store password + alias match)" | tee -a build.log
