@@ -55,7 +55,10 @@ jobs:
             echo "$KS_B64" | base64 -d > /home/runner/emersion-release.jks
             echo "keystore materialized — release will be PLAY-SIGNED" | tee -a build.log
             if [ -n "$EMERSION_ONLINE_PROJECT_ID" ]; then
-              echo "ONLINE DEFAULTS: baked ($EMERSION_ONLINE_PROJECT_ID) — store users get zero-setup multiplayer" | tee -a build.log
+              case "$EMERSION_ONLINE_PROJECT_ID" in
+                AIza*) echo "ONLINE DEFAULTS: MISCONFIGURED — the two EMERSION_ONLINE_ secret values are SWAPPED (project id must not start with AIza; the AIza string is the API key)" | tee -a build.log ;;
+                *) echo "ONLINE DEFAULTS: baked ($EMERSION_ONLINE_PROJECT_ID) — store users get zero-setup multiplayer" | tee -a build.log ;;
+              esac
             else
               echo "ONLINE DEFAULTS: none — builds show the setup card" | tee -a build.log
             fi

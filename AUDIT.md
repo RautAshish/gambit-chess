@@ -663,3 +663,10 @@ migrated GAMBIT_* -> EMERSION_* per owner. Signing key alias VALUE remains
 "gambit" — baked inside the existing keystore, invisible everywhere, and
 changing it would mean a new keystore for zero benefit. Owner migration: add
 4 EMERSION_* signing secrets with existing values, delete GAMBIT_*.
+Verification run 035478f: signing chain fully green (cert 36c4673f...). The
+defaults proof-line caught the two EMERSION_ONLINE_ secret VALUES swapped
+(printed an AIza string as project id) — guard now names it automatically.
+Handover note: repository transfer to the emersionplay org severs the
+personal fine-grained PAT by design (resource-owner scoping) — the built-in
+revocation moment. Post-transfer verification is owner-run (Re-run latest
+workflow; expect 'ONLINE DEFAULTS: baked (<project-id>)' and PLAY-SIGNED).
