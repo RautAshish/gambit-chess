@@ -86,7 +86,9 @@ jobs:
             ls -l app/build/outputs/apk/release/*.apk
             ls -l app/build/outputs/bundle/release/*.aab
             echo "== RELEASE SIGNER =="
-            keytool -printcert -jarfile app/build/outputs/apk/release/app-release.apk 2>&1 | head -4
+            # v2/v3 APK signatures are invisible to keytool; apksigner is the tool
+            APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner 2>/dev/null | tail -1)
+            "$APKSIGNER" verify --print-certs app/build/outputs/apk/release/app-release.apk 2>&1 | head -5
           ) >> build.log
       - name: Upload release bundle (Play Store artifact)
         uses: actions/upload-artifact@v4
