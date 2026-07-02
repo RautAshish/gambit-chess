@@ -12,7 +12,13 @@ Emersion's online mode runs on YOUR free Firebase project (Spark tier, no card).
    cards — this integration registers no app and needs no google-services.json.
 4. Firestore → **Rules** tab → replace contents with `firebase/firestore.rules`
    from this repo → Publish.
-5. **Project settings (gear) → General**: copy **Project ID** and **Web API Key**.
+5. **Project settings (gear) → General**: copy **Project ID** and **Web API
+   Key** (an `AIzaSy…` string) from the "Your project" card — on phones the
+   card truncates, so scroll within it or toggle Desktop site. If the key is
+   blank, Authentication hasn't finished provisioning: confirm Anonymous shows
+   Enabled, wait ~30s, refresh. Guaranteed fallback: console.cloud.google.com
+   → same project → APIs & Services → Credentials → "Browser key (auto created
+   by Firebase)" — that IS the Web API key.
 6. In the app: **Settings → Online play** → paste both → Save.
 
 Both players do steps 5–6 with the SAME project values (share them with your
