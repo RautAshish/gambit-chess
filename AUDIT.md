@@ -720,6 +720,9 @@ mass. Went fully verbatim like the references: #000 fill, #fff inner details,
 Puzzle void: content column was top-packed AND scrollable so it could never
 claim the screen; scroll dropped (content fits by construction), header
 pinned, board group weights+centers in remaining height.
-Round 4/5 completion: TopRow (Settings) was the one header the interrupted
-pass missed — now the same Box overlay as Online/Saved. All titled headers
-share one geometry: title at true screen center, edge controls floating.
+Round 4/5 record CORRECTION: the interrupted pass had in fact completed ALL
+five pieces (fb5dc27) including TopRow — my post-compaction verification
+misread it because a grep -A2 window stopped short of a Box pushed down by a
+2-line comment. The prior AUDIT note claiming a missed header was false and
+the accompanying commit was audit-only. Lesson stacked on the truncation
+scar: verification windows must exceed plausible drift.
