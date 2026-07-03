@@ -726,3 +726,11 @@ misread it because a grep -A2 window stopped short of a Box pushed down by a
 2-line comment. The prior AUDIT note claiming a missed header was false and
 the accompanying commit was audit-only. Lesson stacked on the truncation
 scar: verification windows must exceed plausible drift.
+
+## PROMOTE DIALOG (theme mismatch report)
+Screenshot was a FOREST game; the "green" was the board scrim + board-relative
+promo tiles (pal.dark/light), which made BLACK promotion pieces near-invisible
+on WALNUT/FOREST. Container was already PANEL (not the fossil). Fix: promo
+tiles pinned to fixed bone EDEAE2 so pieces of either color pop on every
+theme; pixel-proof rendered across CLASSIC/WALNUT/FOREST/BLUE. Dead pal param
+removed from PromotionDialog.

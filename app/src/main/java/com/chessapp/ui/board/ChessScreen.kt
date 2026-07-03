@@ -42,7 +42,6 @@ private val PANEL = UiColor(0xFF272B20)
 private val BONE = UiColor(0xFFEFE6D2)
 // Board themes (#3): CLASSIC reads as black-and-white without glare; WALNUT is
 // the tournament-wood look; FOREST is the original green.
-private val DARK_SQ = UiColor(0xFF6E7E55)
 data class BoardPalette(val light: UiColor, val dark: UiColor)
 fun paletteFor(theme: String): BoardPalette = when (theme) {
     "WALNUT" -> BoardPalette(UiColor(0xFFE3C9A2), UiColor(0xFF8B5E3C))
@@ -106,7 +105,7 @@ fun ChessScreen(vm: ChessViewModel, flipped: Boolean = false, onBack: () -> Unit
         }
 
         if (state.pendingPromotion != null) {
-            PromotionDialog(state.board.sideToMove, { vm.choosePromotion(it) }, { vm.cancelPromotion() })
+            PromotionDialog(state.board.sideToMove, paletteFor(boardTheme), { vm.choosePromotion(it) }, { vm.cancelPromotion() })
         }
         if (state.drawOfferPending) {
             DrawOfferDialog(onAccept = { vm.acceptDraw() }, onDecline = { vm.declineDraw() })
@@ -276,10 +275,12 @@ private fun PromotionDialog(color: Color, onPick: (PieceType) -> Unit, onDismiss
         title = { Text("Promote to", color = BONE) },
         text = {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                for (t in listOf(PieceType.QUEEN, PieceType.ROOK, PieceType.BISHOP, PieceType.KNIGHT)) {
+                val squares = listOf(PieceType.QUEEN, PieceType.ROOK, PieceType.BISHOP, PieceType.KNIGHT)
+                squares.forEachIndexed { i, t ->
                     Box(
-                        Modifier.size(56.dp).clip(RoundedCornerShape(8.dp)).background(DARK_SQ)
-                            .testTag("promote-${t.name}")
+                        Modifier.size(56.dp).clip(RoundedCornerShape(8.dp))
+                            .background(UiColor(0xFFEDEAE2))  // fixed light tile:
+                            .testTag("promote-${t.name}")     // promo pieces must pop on any theme
                             .pointerInput(t) { detectTapGestures { onPick(t) } }
                     ) {
                         Canvas(Modifier.fillMaxSize()) {
