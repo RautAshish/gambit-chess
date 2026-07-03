@@ -740,3 +740,9 @@ board-relative (pal.dark/pal.light), making black promotion pieces mud on
 moss/walnut. Tiles now fixed bone (EDEAE2); rendered proof across all four
 themes shows the worst case (black knight) crisp everywhere. testTags
 untouched.
+Promotion dialog "theme mismatch" (owner report, FOREST game): container was
+already PANEL — the green was the ACTIVE FOREST palette itself, faithfully
+mirrored by board-relative tiles, plus scrim bleed. Real defect: black
+promotion pieces on dark board-relative tiles went muddy (worst on WALNUT/
+FOREST — proven in an 8-render comparison). Fix: tiles pinned to fixed bone
+EDEAE2 so promotion pieces pop identically on every theme; testTags untouched.
