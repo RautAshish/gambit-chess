@@ -131,14 +131,14 @@ fun SettingsScreen(repo: SettingsRepository, onBack: () -> Unit) {
 
 @Composable
 private fun TopRow(title: String, onBack: () -> Unit) {
-    Row(
-        Modifier.fillMaxWidth().padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        TextButton(onClick = onBack) { Text("\u2039 Home", color = BRASS) }
-        Spacer(Modifier.weight(1f))
-        Text(title, color = BONE, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-        Spacer(Modifier.weight(1f))
+    // Overlay header: title anchored to the SCREEN center, immune to edge
+    // buttons appearing or vanishing.
+    Box(Modifier.fillMaxWidth().padding(16.dp)) {
+        TextButton(onClick = onBack, modifier = Modifier.align(Alignment.CenterStart)) {
+            Text("\u2039 Home", color = BRASS)
+        }
+        Text(title, color = BONE, fontSize = 22.sp, fontWeight = FontWeight.Bold,
+            modifier = Modifier.align(Alignment.Center))
     }
 }
 

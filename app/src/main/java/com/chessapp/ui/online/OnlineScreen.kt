@@ -2,6 +2,7 @@ package com.chessapp.ui.online
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -76,13 +77,14 @@ fun OnlineScreen(
             .padding(16.dp).verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Box(Modifier.fillMaxWidth()) {
             TextButton(onClick = {
                 if (s.phase == OnlineUiState.Phase.LOBBY) onBack() else vm.backToLobby()
-            }) { Text("\u2039 Back", color = BRASS) }
-            Spacer(Modifier.weight(1f))
-            Text("Play Online", color = BONE, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.weight(1f))
+            }, modifier = Modifier.align(Alignment.CenterStart)) {
+                Text("\u2039 Back", color = BRASS)
+            }
+            Text("Play Online", color = BONE, fontSize = 18.sp, fontWeight = FontWeight.Bold,
+                modifier = Modifier.align(Alignment.Center))
         }
 
         if (!s.configured) { SetupCard(onOpenSettings); return }

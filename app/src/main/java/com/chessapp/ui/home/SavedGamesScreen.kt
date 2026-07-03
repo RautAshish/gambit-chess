@@ -40,13 +40,17 @@ fun SavedGamesScreen(
     Column(Modifier.fillMaxSize().background(BG).statusBarsPadding()) {
         var confirmDeleteAll by remember { mutableStateOf(false) }
         val headerScope = rememberCoroutineScope()
-        Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            TextButton(onClick = onBack) { Text("\u2039 Home", color = BRASS) }
-            Spacer(Modifier.weight(1f))
-            Text("Saved Games", color = BONE, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.weight(1f))
+        Box(Modifier.fillMaxWidth().padding(16.dp)) {
+            TextButton(onClick = onBack, modifier = Modifier.align(Alignment.CenterStart)) {
+                Text("\u2039 Home", color = BRASS)
+            }
+            Text("Saved Games", color = BONE, fontSize = 22.sp, fontWeight = FontWeight.Bold,
+                modifier = Modifier.align(Alignment.Center))
             if (games.isNotEmpty()) {
-                TextButton(onClick = { confirmDeleteAll = true }) { Text("Delete all", color = BRASS) }
+                TextButton(onClick = { confirmDeleteAll = true },
+                    modifier = Modifier.align(Alignment.CenterEnd)) {
+                    Text("Delete all", color = BRASS)
+                }
             }
         }
         if (confirmDeleteAll) {

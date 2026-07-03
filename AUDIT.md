@@ -706,3 +706,17 @@ palettes untouched (gameplay-tuned).
 5 Header audit: Settings/Saved titles centered (nav pages) while play
   surfaces stay functional strips; Delete-all gold (page's primary action);
   Mute stays quiet by design; Online's dynamic "Back" stands.
+
+## FIELD ROUNDS 4+5 (owner screenshots)
+Headers (Online/Settings/Saved incl. the Delete-all shift report): my weight-
+spacer 'centering' was the three-slot fallacy — it centers in LEFTOVER space,
+so titles sat right of true center and moved when edge buttons changed. All
+three rebuilt as overlay headers (Box): title pinned to SCREEN center,
+back/action floating at CenterStart/CenterEnd, mutually immune.
+Black pieces ('extra dark, bulky, different'): the softened tokens muted the
+set's designed internal contrast, and the half-stroke rim added real dark
+mass. Went fully verbatim like the references: #000 fill, #fff inner details,
+#000 body stroke — Lichess-exact; white side untouched.
+Puzzle void: content column was top-packed AND scrollable so it could never
+claim the screen; scroll dropped (content fits by construction), header
+pinned, board group weights+centers in remaining height.

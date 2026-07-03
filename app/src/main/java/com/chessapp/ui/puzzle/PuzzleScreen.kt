@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
@@ -43,7 +41,7 @@ fun PuzzleScreen(vm: PuzzleViewModel, boardTheme: String, onBack: () -> Unit) {
     val s by vm.state.collectAsState()
     Column(
         Modifier.fillMaxSize().background(BG).statusBarsPadding()
-            .padding(16.dp).verticalScroll(rememberScrollState()),
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -54,6 +52,13 @@ fun PuzzleScreen(vm: PuzzleViewModel, boardTheme: String, onBack: () -> Unit) {
             Text("Solved ${s.solvedCount}", color = BRASS, fontSize = 13.sp,
                 fontWeight = FontWeight.Bold)
         }
+        // Header stays pinned; the puzzle group owns the remaining screen and
+        // centers in it instead of leaving a void below the buttons.
+        Column(
+            Modifier.weight(1f).fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
         Spacer(Modifier.height(4.dp))
         val sideName = if (s.sideToMove == Color.WHITE) "White" else "Black"
         val goal = when {
@@ -88,6 +93,7 @@ fun PuzzleScreen(vm: PuzzleViewModel, boardTheme: String, onBack: () -> Unit) {
                 onClick = { vm.next() },
                 colors = ButtonDefaults.buttonColors(containerColor = BRASS, contentColor = BG)
             ) { Text(if (s.solved) "Next puzzle" else "Skip") }
+        }
         }
     }
 }
