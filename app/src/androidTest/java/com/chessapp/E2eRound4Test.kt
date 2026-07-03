@@ -123,6 +123,11 @@ class E2eRound4Test {
     @Test
     fun activityRecreation_gameRecoverableFromSaves() {
         waitForText("Play vs Computer")
+        // Suite rule: coordinate-tapping tests self-pin seat+difficulty —
+        // settings persist across tests, and a stray Black flips the board
+        // under the taps (the deleteAll lesson, applied family-wide).
+        rule.onNodeWithText("White").performClick()
+        rule.onNodeWithText("Easy").performClick()
         rule.onNodeWithText("Play vs Computer").performClick()
         waitForText("White to move")
         tap(4, 1); tap(4, 3)

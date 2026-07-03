@@ -746,3 +746,7 @@ mirrored by board-relative tiles, plus scrim bleed. Real defect: black
 promotion pieces on dark board-relative tiles went muddy (worst on WALNUT/
 FOREST — proven in an 8-render comparison). Fix: tiles pinned to fixed bone
 EDEAE2 so promotion pieces pop identically on every theme; testTags untouched.
+Recreation-test timeout at a9e43d1 was NOT the tile change: same disease as
+deleteAll (unpinned coordinate taps vs persisted seat). Cure promoted to a
+suite rule and applied family-wide: startVsAi helper + 5 direct sites now
+self-pin (deliberate-Black tests untouched).

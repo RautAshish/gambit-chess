@@ -57,6 +57,7 @@ class E2eRound5Test {
     @Test
     fun closedLoop_fivePliesEach_mirrorNeverDesyncs() {
         waitForText("Play as")
+        rule.onNodeWithText("White").performClick()
         rule.onNodeWithText("Easy").performClick()
         rule.onNodeWithText("Play vs Computer").performClick()
         waitForText("White to move")
