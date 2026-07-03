@@ -43,6 +43,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
     private var session = PuzzleSession(bank[0])
     private var index = 0
     private var solvedIds: Set<String> = emptySet()
+    private var initialized = false
     private var selected: Square? = null
 
     private val _state = MutableStateFlow(PuzzleUiState())
@@ -53,9 +54,13 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
             prefs.settings.collect { s ->
                 soundOn = s.soundEnabled
                 hapticsOn = s.hapticsEnabled
-                val firstLoad = solvedIds.isEmpty() && s.solvedPuzzles.isNotEmpty()
+                // Resume-at-first-unsolved must run ONCE at startup; the old
+                // empty->nonempty heuristic also fired on the user's FIRST-EVER
+                // solve, yanking them to the next puzzle with a stale header.
+                val firstLoad = !initialized
+                initialized = true
                 solvedIds = s.solvedPuzzles
-                if (firstLoad) {
+                if (firstLoad && s.solvedPuzzles.isNotEmpty()) {
                     // resume at the first unsolved puzzle
                     index = bank.indexOfFirst { it.id !in solvedIds }.coerceAtLeast(0)
                     session = PuzzleSession(bank[index])

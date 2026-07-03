@@ -690,3 +690,19 @@ design — gloss belongs to marketing surfaces, not gameplay chrome; the board's
 readability rule is load-bearing. One alignment taken from the hero art: all
 in-app accent gold unified from brass C9A227 to the logo's E4B02A. Board
 palettes untouched (gameplay-tuned).
+
+## FIELD ROUND 3 (5 concerns, org era)
+1 Black-piece inconsistency: crop-zoom evidence showed bone outline vanishing
+  on light squares (bone~cream). Resolution per owner directive — do it like
+  the reference apps, verbatim: black pieces now carry the set's DARK body
+  outline (light = inner details only), and CLASSIC's dark square lifted
+  5A5A54->75756B into the reference-board contrast gamut.
+2 Online settings now hide behind "Use a custom server (advanced)" when the
+  build ships a baked server — players see "Multiplayer is ready."
+3 Home header knight renders in the hero gold gradient (flat geometry, brand
+  palette) — the brand lockup zone is the one sanctioned gloss exception.
+4 First-ever puzzle solve no longer jumps to the next puzzle with a stale
+  Solved header (init heuristic replaced by explicit flag).
+5 Header audit: Settings/Saved titles centered (nav pages) while play
+  surfaces stay functional strips; Delete-all gold (page's primary action);
+  Mute stays quiet by design; Online's dynamic "Back" stands.

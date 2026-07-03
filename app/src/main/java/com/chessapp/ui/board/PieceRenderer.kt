@@ -45,10 +45,17 @@ object PieceRenderer {
         type: PieceType,
         color: PieceColor,
         topLeft: Offset,
-        cell: Float
+        cell: Float,
+        fillBrush: androidx.compose.ui.graphics.Brush? = null,
+        lineOverride: Color? = null
     ) {
         val fill = if (color == PieceColor.WHITE) Color(0xFFF7F3E8) else Color(0xFF2B2B28)
-        val line = if (color == PieceColor.WHITE) Color(0xFF1A1A17) else Color(0xFFE8E2D2)
+        val line = lineOverride ?: if (color == PieceColor.WHITE) Color(0xFF1A1A17) else Color(0xFFE8E2D2)
+        // VERBATIM cburnett: black pieces carry a DARK body outline; their light
+        // elements are INNER details only. This is exactly why the reference
+        // apps' black pieces read identically on light and dark squares.
+        val bodyLine = if (color == PieceColor.WHITE) line
+                       else (lineOverride ?: Color(0xFF1A1A17))
         val pad = cell * 0.06f
         val s = (cell - pad * 2) / VIEW
         val stroke = Stroke(width = 1.5f * s, cap = StrokeCap.Round, join = StrokeJoin.Round)
@@ -63,7 +70,11 @@ object PieceRenderer {
                     if (part.closed) close()
                 }
                 when (part.role) {
-                    0 -> { drawPath(path, fill, style = Fill); drawPath(path, line, style = stroke) }
+                    0 -> {
+                        if (fillBrush != null) drawPath(path, fillBrush, style = Fill)
+                        else drawPath(path, fill, style = Fill)
+                        drawPath(path, bodyLine, style = stroke)
+                    }
                     1 -> drawPath(path, line, style = stroke)
                     2 -> drawPath(path, line, style = Fill)
                 }

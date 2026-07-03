@@ -59,7 +59,17 @@ fun HomeScreen(
     ) {
         Spacer(Modifier.height(12.dp))
         Canvas(Modifier.size(72.dp)) {
-            PieceRenderer.draw(this, PieceType.KNIGHT, Color.WHITE, Offset.Zero, size.minDimension)
+            PieceRenderer.draw(
+                this, PieceType.KNIGHT, Color.WHITE, Offset.Zero, size.minDimension,
+                fillBrush = androidx.compose.ui.graphics.Brush.verticalGradient(
+                    listOf(
+                        androidx.compose.ui.graphics.Color(0xFFFFD86A),
+                        androidx.compose.ui.graphics.Color(0xFFE4B02A),
+                        androidx.compose.ui.graphics.Color(0xFFB98508)
+                    )
+                ),
+                lineOverride = androidx.compose.ui.graphics.Color(0xFFEFE6D2)
+            )
         }
         Text("EMERSION", color = BONE, fontSize = 34.sp, fontWeight = FontWeight.Bold,
             letterSpacing = 8.sp)

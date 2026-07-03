@@ -47,7 +47,7 @@ data class BoardPalette(val light: UiColor, val dark: UiColor)
 fun paletteFor(theme: String): BoardPalette = when (theme) {
     "WALNUT" -> BoardPalette(UiColor(0xFFE3C9A2), UiColor(0xFF8B5E3C))
     "FOREST" -> BoardPalette(UiColor(0xFFD9CFB4), UiColor(0xFF6E7E55))
-    else -> BoardPalette(UiColor(0xFFEDEAE2), UiColor(0xFF5A5A54))   // CLASSIC
+    else -> BoardPalette(UiColor(0xFFEDEAE2), UiColor(0xFF75756B))   // CLASSIC
 }
 private val BRASS = UiColor(0xFFE4B02A)
 private val MUTED = UiColor(0xFF8A8F7E)
