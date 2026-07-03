@@ -734,3 +734,9 @@ on WALNUT/FOREST. Container was already PANEL (not the fossil). Fix: promo
 tiles pinned to fixed bone EDEAE2 so pieces of either color pop on every
 theme; pixel-proof rendered across CLASSIC/WALNUT/FOREST/BLUE. Dead pal param
 removed from PromotionDialog.
+Promotion dialog audit (user: "theme mismatch"): container was already PANEL —
+the green in the screenshot was FOREST's own board colors: tiles were
+board-relative (pal.dark/pal.light), making black promotion pieces mud on
+moss/walnut. Tiles now fixed bone (EDEAE2); rendered proof across all four
+themes shows the worst case (black knight) crisp everywhere. testTags
+untouched.
