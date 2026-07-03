@@ -78,6 +78,22 @@ fun SettingsScreen(repo: SettingsRepository, onBack: () -> Unit) {
         )
 
         Section("Online play")
+        // Store builds ship a baked server: hide the plumbing behind an
+        // explicit advanced disclosure so players never wonder whether setup
+        // is required (it isn't).
+        val hasBuiltInServer = com.chessapp.BuildConfig.DEFAULT_ONLINE_PROJECT_ID.isNotBlank()
+        var showCustomServer by remember { mutableStateOf(false) }
+        if (hasBuiltInServer && !showCustomServer) {
+            Text(
+                "Multiplayer is ready \u2014 this build includes the Emersion server. Nothing to set up.",
+                color = MUTED, fontSize = 12.sp,
+                modifier = Modifier.padding(horizontal = 20.dp)
+            )
+            TextButton(onClick = { showCustomServer = true },
+                modifier = Modifier.padding(horizontal = 10.dp)) {
+                Text("Use a custom server (advanced)", color = BRASS)
+            }
+        } else {
         var pid by remember(settings.onlineProjectId) { mutableStateOf(settings.onlineProjectId) }
         var key by remember(settings.onlineApiKey) { mutableStateOf(settings.onlineApiKey) }
         OutlinedTextField(
@@ -100,6 +116,7 @@ fun SettingsScreen(repo: SettingsRepository, onBack: () -> Unit) {
             "To host your own free server instead (\u22485 min), see SERVER_SETUP.md in the source repo.",
             color = MUTED, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 20.dp)
         )
+        }
 
         Section("About")
         Text(
@@ -119,8 +136,9 @@ private fun TopRow(title: String, onBack: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         TextButton(onClick = onBack) { Text("\u2039 Home", color = BRASS) }
-        Spacer(Modifier.width(8.dp))
+        Spacer(Modifier.weight(1f))
         Text(title, color = BONE, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.weight(1f))
     }
 }
 
