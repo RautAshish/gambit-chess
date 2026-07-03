@@ -105,7 +105,7 @@ fun ChessScreen(vm: ChessViewModel, flipped: Boolean = false, onBack: () -> Unit
         }
 
         if (state.pendingPromotion != null) {
-            PromotionDialog(state.board.sideToMove, paletteFor(boardTheme), { vm.choosePromotion(it) }, { vm.cancelPromotion() })
+            PromotionDialog(state.board.sideToMove, { vm.choosePromotion(it) }, { vm.cancelPromotion() })
         }
         if (state.drawOfferPending) {
             DrawOfferDialog(onAccept = { vm.acceptDraw() }, onDecline = { vm.declineDraw() })
