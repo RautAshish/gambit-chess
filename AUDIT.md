@@ -750,3 +750,18 @@ Recreation-test timeout at a9e43d1 was NOT the tile change: same disease as
 deleteAll (unpinned coordinate taps vs persisted seat). Cure promoted to a
 suite rule and applied family-wide: startVsAi helper + 5 direct sites now
 self-pin (deliberate-Black tests untouched).
+
+## EXTERNAL REVIEW TRIAGE (GPT, AAB+screenshots predating recent rounds)
+Verified every claim against HEAD. ACCEPTED+FIXED: (A) auth tokens rode
+Auto Backup — added backup_rules/data_extraction_rules; NOTE corrected mid-fix:
+tokens live in the shared 'settings' datastore not a separate file, so device-
+transfer exclusion is the honest scope; per-token isolation needs a separate
+store (BACKLOG). (B) Stockfish ELF built for API29 but installer lacked SDK
+gate — added SDK_INT>=29 (arm64 API24-28 now correctly falls back). (C)
+kotlinx-coroutines-play-services declared+unused — removed. (D) settings could
+clip bottom row — added navigationBarsPadding. (E) captured-piece tray rendered
+verbatim-black on near-black page — now on fixed light chip (same class as the
+promo-tile fix). ACCEPTED AS BLOCKER, NOT YET FIXED: Firestore 'playing' rule
+lets a seated client forge status/winnerUid and append multi-moves — needs
+explicit-transition rewrite (large; next work item). Data-safety/privacy items
+are owner Play-Console tasks. REJECTED/ALREADY-DONE items tracked in the reply.

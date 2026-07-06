@@ -29,7 +29,7 @@ fun SettingsScreen(repo: SettingsRepository, onBack: () -> Unit) {
     val settings by repo.settings.collectAsState(initial = Settings())
     val scope = rememberCoroutineScope()
 
-    Column(Modifier.fillMaxSize().background(BG).verticalScroll(rememberScrollState()).statusBarsPadding()) {
+    Column(Modifier.fillMaxSize().background(BG).verticalScroll(rememberScrollState()).statusBarsPadding().navigationBarsPadding()) {
         TopRow("Settings", onBack)
 
         Section("Board theme")

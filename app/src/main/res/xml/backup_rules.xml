@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Legacy Auto Backup (API <31). The settings store also holds the online
+     auth identity; excluding it from device-to-device TRANSFER prevents
+     transplanting a live room identity to another device. -->
+<full-backup-content>
+    <exclude domain="file" path="datastore/settings.preferences_pb"/>
+</full-backup-content>

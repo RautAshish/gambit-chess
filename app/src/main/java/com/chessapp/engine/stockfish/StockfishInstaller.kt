@@ -19,9 +19,13 @@ import java.io.File
 object StockfishInstaller {
 
     fun path(context: Context): String? {
+        // The bundled ELF is built for API 29 (Android 10). On arm64 devices
+        // running API 24-28 it could exec and then fail in the loader, so we
+        // gate here and fall back to the built-in engine below API 29.
+        if (android.os.Build.VERSION.SDK_INT < 29) return null
         val f = File(context.applicationInfo.nativeLibraryDir, "libstockfish.so")
-        // Empty placeholder .so files exist for non-arm64 ABIs purely so the APK
-        // installs everywhere; a real engine is megabytes, a placeholder is 0 bytes.
+        // Non-arm64 ABIs carry a 0-byte placeholder; the >1MB guard treats it as
+        // absent so the loader never touches an empty file.
         return if (f.exists() && f.canExecute() && f.length() > 1_000_000) f.absolutePath else null
     }
 

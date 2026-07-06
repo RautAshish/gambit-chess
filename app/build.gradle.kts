@@ -94,7 +94,6 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
     // Multiplayer (optional — requires google-services.json + uncommenting the plugin)
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")

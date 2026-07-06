@@ -5,6 +5,9 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -156,10 +159,17 @@ private fun CapturedTray(captured: List<Piece>, label: String, balance: Int) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (captured.isNotEmpty()) {
-            Canvas(Modifier.height(20.dp).width((captured.size * 16).dp)) {
-                val s = 20.dp.toPx()
-                captured.forEachIndexed { i, p ->
-                    PieceRenderer.draw(this, p.type, p.color, Offset(i * s * 0.8f, 0f), s)
+            // Fixed light chip behind the row: verbatim-black captured pieces
+            // were invisible on the near-black page (same lesson as promo tiles).
+            Box(
+                Modifier.height(22.dp).width((captured.size * 16 + 8).dp)
+                    .background(UiColor(0xFFEDEAE2), RoundedCornerShape(4.dp))
+            ) {
+                Canvas(Modifier.fillMaxHeight().fillMaxWidth().padding(horizontal = 4.dp)) {
+                    val s = 20.dp.toPx()
+                    captured.forEachIndexed { i, p ->
+                        PieceRenderer.draw(this, p.type, p.color, Offset(i * s * 0.8f, 0f), s)
+                    }
                 }
             }
         }
