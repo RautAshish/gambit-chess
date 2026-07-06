@@ -291,6 +291,7 @@ private fun PromotionDialog(color: Color, onPick: (PieceType) -> Unit, onDismiss
                         Modifier.size(56.dp).clip(RoundedCornerShape(8.dp))
                             .background(UiColor(0xFFEDEAE2))  // fixed light tile:
                             .testTag("promote-${t.name}")     // promo pieces must pop on any theme
+                            .semantics { contentDescription = "Promote to ${t.name.lowercase()}" }
                             .pointerInput(t) { detectTapGestures { onPick(t) } }
                     ) {
                         Canvas(Modifier.fillMaxSize()) {

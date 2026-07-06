@@ -89,10 +89,16 @@ fun PuzzleScreen(vm: PuzzleViewModel, boardTheme: String, onBack: () -> Unit) {
                 Text("Hint", color = if (s.solved) MUTED else BONE)
             }
             OutlinedButton(onClick = { vm.retry() }) { Text("Retry", color = BONE) }
-            Button(
-                onClick = { vm.next() },
-                colors = ButtonDefaults.buttonColors(containerColor = BRASS, contentColor = BG)
-            ) { Text(if (s.solved) "Next puzzle" else "Skip") }
+            // Skip must not look primary in a LEARNING app: outlined until the
+            // puzzle is solved, filled gold only for the earned "Next puzzle".
+            if (s.solved) {
+                Button(
+                    onClick = { vm.next() },
+                    colors = ButtonDefaults.buttonColors(containerColor = BRASS, contentColor = BG)
+                ) { Text("Next puzzle") }
+            } else {
+                OutlinedButton(onClick = { vm.next() }) { Text("Skip", color = MUTED) }
+            }
         }
         }
     }

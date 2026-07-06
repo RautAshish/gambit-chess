@@ -765,3 +765,17 @@ promo-tile fix). ACCEPTED AS BLOCKER, NOT YET FIXED: Firestore 'playing' rule
 lets a seated client forge status/winnerUid and append multi-moves — needs
 explicit-transition rewrite (large; next work item). Data-safety/privacy items
 are owner Play-Console tasks. REJECTED/ALREADY-DONE items tracked in the reply.
+
+## REVIEW TRIAGE — SELF-AUDIT (re-checked my own rejections vs evidence)
+Two rejections OVERTURNED on re-inspection: (R1) promotion OPTIONS had only
+testTags, zero TalkBack labels — my "mostly rejected" was wrong; added
+contentDescription per piece (LOW). (R4) the gold puzzle button reads "Skip"
+before solve = lone filled CTA on an unsolved puzzle exactly as GPT said;
+made Skip outlined until solved, gold reserved for earned "Next puzzle" (MED).
+(R3) About confirmed a single non-tappable Text; added tappable Privacy Policy
++ Source rows (LocalUriHandler). R2 rejection stands (GPT cited stale AUDIT)
+but our live-settings/clock coverage is thinner than my first reply implied —
+logged honestly. UI-image recommendations triaged: contrast/labels/inset =
+accepted+shipped; move-list scroll, material label, saved-row Resume, waiting-
+room Copy/Share/Cancel, touch-target 48dp, font-scale audit = BACKLOG (sound,
+non-blocking). Firestore rewrite remains the one launch-blocker.

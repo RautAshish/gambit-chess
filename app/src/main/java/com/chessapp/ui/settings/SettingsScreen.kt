@@ -3,6 +3,7 @@ package com.chessapp.ui.settings
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -120,10 +121,17 @@ fun SettingsScreen(repo: SettingsRepository, onBack: () -> Unit) {
 
         Section("About")
         Text(
-            "Emersion Chess v${com.chessapp.BuildConfig.VERSION_NAME}\nBuilt-in engine + optional Stockfish 18 (\u00A9 the Stockfish team, GPLv3).\nSource & licenses: github.com/emersionplay/emersion-chess",
+            "Emersion Chess v${com.chessapp.BuildConfig.VERSION_NAME}\nBuilt-in engine + optional Stockfish 18 (\u00A9 the Stockfish team, GPLv3).",
             color = MUTED, fontSize = 12.sp, lineHeight = 18.sp,
             modifier = Modifier.padding(horizontal = 20.dp)
         )
+        val uriHandler = LocalUriHandler.current
+        TextButton(onClick = {
+            uriHandler.openUri("https://github.com/emersionplay/emersion-chess/blob/main/PRIVACY.md")
+        }) { Text("Privacy Policy", color = BRASS) }
+        TextButton(onClick = {
+            uriHandler.openUri("https://github.com/emersionplay/emersion-chess")
+        }) { Text("Source code & licenses", color = BRASS) }
 
         Spacer(Modifier.height(32.dp))
     }
