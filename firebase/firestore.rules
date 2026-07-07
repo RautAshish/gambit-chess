@@ -1,37 +1,110 @@
 rules_version = '2';
-// Room-code friendly games (REST client, free tier). Writers are restricted to
-// the two participants; structure is shape-checked. Full chess-legality is
-// enforced client-side by both players' identical validators (see
-// RestOnlineRepository.kt) — adequate for invite-by-code casual play. A future
-// ranked mode should switch to the Cloud-Functions authority in functions/.
+// ============================================================================
+// Emersion Chess — game rules v2 (explicit transitions)
+//
+// TRUST MODEL, stated plainly: these rules referee STRUCTURE — who may write,
+// on whose turn, which fields, which state transitions. They do not referee
+// chess: move legality, the fen snapshot, and mate/stalemate truth are
+// validated by BOTH clients' identical engines (see OnlineGameValidator).
+// A tampered client can therefore still write a chess-invalid move on its own
+// turn — the honest opponent's client detects it and refuses the game — but it
+// can no longer: act out of turn, steal a seat, forge status/winnerUid without
+// the matching transition, rewrite terminal games, or bloat documents.
+// Ranked play must graduate to the Cloud-Functions authority in functions/.
+//
+// Wire contract these rules are built against (RestOnlineRepository):
+//   create: full doc {whiteUid, blackUid:"", moves:[], fen:START, status:"ONGOING", winnerUid:"", updatedAt}
+//   join:   mask [blackUid, updatedAt]
+//   move:   mask [moves, fen, status, winnerUid, updatedAt]
+//   resign: mask [status, winnerUid, updatedAt]
+// Live statuses: ONGOING, CHECK. Terminal via move: CHECKMATE, STALEMATE,
+// DRAW_FIFTY_MOVES, DRAW_REPETITION, DRAW_INSUFFICIENT. Terminal via resign: RESIGNED.
+// ============================================================================
 service cloud.firestore {
   match /databases/{database}/documents {
     match /games/{code} {
-      allow get: if request.auth != null;
+
+      function signedIn() { return request.auth != null; }
+      function old() { return resource.data; }
+      function neu() { return request.resource.data; }
+      function seats() { return [old().whiteUid, old().blackUid]; }
+      function isParticipant() { return request.auth.uid in seats(); }
+      function changedOnly(keys) {
+        return neu().diff(old()).affectedKeys().hasOnly(keys.toSet());
+      }
+      function liveStatus(s) { return s in ['ONGOING', 'CHECK']; }
+      function moveTerminal(s) {
+        return s in ['CHECKMATE', 'STALEMATE',
+                     'DRAW_FIFTY_MOVES', 'DRAW_REPETITION', 'DRAW_INSUFFICIENT'];
+      }
+      // Whose turn, from the move count BEFORE this write.
+      function turnUid() {
+        return old().moves.size() % 2 == 0 ? old().whiteUid : old().blackUid;
+      }
+
+      // Reads: participants always; anyone signed-in only while the Black
+      // seat is empty (the join flow must fetch by code). Filled games are
+      // invisible to non-players. Enumeration stays off.
+      allow get: if signedIn()
+        && (old().blackUid == '' || isParticipant());
       allow list: if false;
-
-      allow create: if request.auth != null
-        && request.resource.data.whiteUid == request.auth.uid
-        && request.resource.data.blackUid == ""
-        && request.resource.data.moves.size() == 0
-        && request.resource.data.status == "ONGOING";
-
-      allow update: if request.auth != null && (
-        // joining: the single transition blackUid "" -> me, nothing else moves
-        (resource.data.blackUid == ""
-          && request.resource.data.blackUid == request.auth.uid
-          && request.resource.data.whiteUid == resource.data.whiteUid
-          && request.resource.data.moves == resource.data.moves
-          && request.resource.data.status == resource.data.status)
-        ||
-        // playing: participants only; seats immutable; history append-only
-        (request.auth.uid in [resource.data.whiteUid, resource.data.blackUid]
-          && request.resource.data.whiteUid == resource.data.whiteUid
-          && request.resource.data.blackUid == resource.data.blackUid
-          && request.resource.data.moves.size() >= resource.data.moves.size())
-      );
-
       allow delete: if false;
+
+      // CREATE — creator seats as White over a pristine board.
+      allow create: if signedIn()
+        && neu().keys().hasOnly(['whiteUid','blackUid','moves','fen','status','winnerUid','updatedAt'])
+        && neu().whiteUid == request.auth.uid
+        && neu().blackUid == ''
+        && neu().moves is list && neu().moves.size() == 0
+        && neu().fen == 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+        && neu().status == 'ONGOING'
+        && neu().winnerUid == ''
+        && neu().updatedAt is int;
+
+      allow update: if signedIn() && (isJoin() || isMove() || isResign());
+
+      // JOIN — the single transition blackUid '' -> me. Nothing else moves.
+      function isJoin() {
+        return old().blackUid == ''
+          && request.auth.uid != old().whiteUid
+          && neu().blackUid == request.auth.uid
+          && old().status == 'ONGOING'
+          && changedOnly(['blackUid','updatedAt'])
+          && neu().updatedAt is int;
+      }
+
+      // MOVE — exactly one ply, by the player whose turn it is, with a
+      // consistent outcome claim. (Chess truth of the ply/fen: client-refereed.)
+      function isMove() {
+        return isParticipant()
+          && request.auth.uid == turnUid()
+          && liveStatus(old().status)
+          && old().moves.size() < 600
+          && neu().moves.size() == old().moves.size() + 1
+          && neu().moves[old().moves.size()] is string
+          && neu().moves[old().moves.size()].size() >= 4
+          && neu().moves[old().moves.size()].size() <= 6
+          && neu().fen is string && neu().fen.size() < 120
+          && changedOnly(['moves','fen','status','winnerUid','updatedAt'])
+          && neu().updatedAt is int
+          && (
+               (liveStatus(neu().status) && neu().winnerUid == '')
+            || (neu().status == 'CHECKMATE' && neu().winnerUid == request.auth.uid)
+            || (moveTerminal(neu().status) && neu().status != 'CHECKMATE'
+                && neu().winnerUid == '')
+          );
+      }
+
+      // RESIGN — a live game only; the actor loses, the other seat wins.
+      function isResign() {
+        return isParticipant()
+          && liveStatus(old().status)
+          && neu().status == 'RESIGNED'
+          && neu().winnerUid ==
+               (request.auth.uid == old().whiteUid ? old().blackUid : old().whiteUid)
+          && changedOnly(['status','winnerUid','updatedAt'])
+          && neu().updatedAt is int;
+      }
     }
   }
 }

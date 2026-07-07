@@ -779,3 +779,15 @@ logged honestly. UI-image recommendations triaged: contrast/labels/inset =
 accepted+shipped; move-list scroll, material label, saved-row Resume, waiting-
 room Copy/Share/Cancel, touch-target 48dp, font-scale audit = BACKLOG (sound,
 non-blocking). Firestore rewrite remains the one launch-blocker.
+
+## BLOCKER RESOLVED (rules v2): explicit-transition Firestore rules
+Rewrote against the recon'd wire contract (masks per op; fen field; live
+status CHECK; enum vocabulary from GameStatus). Enforced now: seat integrity,
+turn-by-parity, exactly-one-ply appends with per-move size bounds, outcome
+consistency, terminal immutability, doc-shape lock on create, filled-game
+read privacy, 600-ply cap. Explicit trust ceiling documented in-file: chess
+TRUTH (legality/fen/mate) remains dual-client-validated — a tampered client
+can still grief its own turn with an invalid ply that the honest client
+rejects, but can no longer forge results or act out of turn. Ranked = the
+functions/ authority. DEPLOY: owner must re-publish rules (SERVER_SETUP v2
+section). Residual documented: list-prefix equality unenforceable in rules.

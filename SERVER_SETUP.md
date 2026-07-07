@@ -38,3 +38,14 @@ are for convenience, not confidentiality.) The in-app Settings fields remain
 as an advanced override for self-hosters. Free-tier headroom: polling costs
 roughly 1.5K reads per player-hour against the 50K/day Spark quota — fine for
 a small community; upgrade to Blaze (pennies) if it ever grows past that.
+
+## Rules v2 (REQUIRED re-publish)
+The original rules let a seated player forge status/winnerUid and write
+multi-move updates (found in external review). Rules v2 rewrites updates as
+explicit transitions (join / one-move / resign) diff-locked to the client's
+exact field masks, adds turn enforcement by ply parity, outcome-consistency
+(CHECKMATE winner = mover; draws/stalemate = no winner; RESIGNED = other
+seat), size caps, and hides filled games from non-participants. Re-publish:
+Firestore -> Rules -> replace all -> Publish. Then smoke: create a game on
+one device, join by code on another, play a few moves, resign — all should
+behave exactly as before; only forged writes are newly rejected.
