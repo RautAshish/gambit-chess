@@ -12,6 +12,16 @@ android {
         buildConfig = true
     }
     signingConfigs {
+        // Committed debug keystore (standard non-secret creds): CI runners
+        // otherwise mint a fresh random debug key EVERY run, so sideloaded
+        // "updates" were silently rejected by Android's signature check —
+        // testers kept seeing the old build. One stable key ends that class.
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
         create("release") {
             // Provided by CI secrets (see RELEASE.md). Absent locally/on forks,
             // the release build falls back to debug signing so it stays runnable.
@@ -42,7 +52,9 @@ android {
         minSdk = 24
         targetSdk = 35
         versionCode = 3
-        versionName = "1.2"
+        // Short SHA in the version makes "which build is on my phone?"
+        // answerable from Settings -> About in two taps.
+        versionName = "1.2" + (System.getenv("GITHUB_SHA")?.take(7)?.let { "-$it" } ?: "-local")
 
         // Optional baked-in online server so store users need ZERO setup: the
         // developer sets two CI secrets and every build ships pre-configured.
