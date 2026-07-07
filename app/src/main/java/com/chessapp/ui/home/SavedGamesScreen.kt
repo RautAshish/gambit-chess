@@ -115,7 +115,7 @@ private fun SavedRow(g: SavedGame, onResume: (SavedGame) -> Unit, onDelete: () -
 @Composable
 private fun ResultBadge(result: String) {
     val label = when (result) {
-        "1-0" -> "1\u20130"; "0-1" -> "0\u20131"; "1/2-1/2" -> "\u00BD\u2013\u00BD"; else -> "live"
+        "1-0" -> "1\u20130"; "0-1" -> "0\u20131"; "1/2-1/2" -> "\u00BD\u2013\u00BD"; else -> "Resume"
     }
     val color = if (result == "*") BRASS else MUTED
     Text(label, color = color, fontSize = 14.sp, fontWeight = FontWeight.Bold)

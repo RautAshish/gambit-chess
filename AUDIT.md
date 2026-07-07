@@ -791,3 +791,11 @@ can still grief its own turn with an invalid ply that the honest client
 rejects, but can no longer forge results or act out of turn. Ranked = the
 functions/ authority. DEPLOY: owner must re-publish rules (SERVER_SETUP v2
 section). Residual documented: list-prefix equality unenforceable in rules.
+
+## TIER-1 UX (owner-approved from external review): first-friend-match path
+Waiting room gains Copy (clipboard) + Share (system sheet with ready message)
+and an honest caption ('Back leaves; code stays active; anyone with the code
+can take Black') instead of a lying Cancel (rules forbid delete). Join input
+now mirrors the generator alphabet — pasted spaces/hyphens/ambiguous chars
+strip automatically. Move list capped+scrollable with tail-follow. Material
+reads 'White +N'; saved badge 'live' -> 'Resume'. Tier-2 remains backlogged.

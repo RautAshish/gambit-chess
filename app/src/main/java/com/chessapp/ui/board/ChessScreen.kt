@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -174,7 +175,7 @@ private fun CapturedTray(captured: List<Piece>, label: String, balance: Int) {
             }
         }
         Spacer(Modifier.weight(1f))
-        if (balance > 0) Text("+$balance", color = BRASS, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+        if (balance > 0) Text("${label.split(" ")[0]} +$balance", color = BRASS, fontSize = 13.sp, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -269,10 +270,16 @@ private fun DrawOfferDialog(onAccept: () -> Unit, onDecline: () -> Unit) {
 @Composable
 private fun MoveList(pgn: String) {
     if (pgn.isBlank()) return
+    // Long games overflow a single block: cap the height, scroll, and keep the
+    // latest moves in view (tail-follow) as the game grows.
+    val moveScroll = rememberScrollState()
+    LaunchedEffect(pgn) { moveScroll.animateScrollTo(moveScroll.maxValue) }
     Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(PANEL).padding(12.dp)) {
         Text("Moves", color = BRASS, fontSize = 13.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(4.dp))
-        Text(pgn, color = BONE, fontSize = 14.sp)
+        Column(Modifier.heightIn(max = 96.dp).verticalScroll(moveScroll)) {
+            Text(pgn, color = BONE, fontSize = 14.sp)
+        }
     }
 }
 

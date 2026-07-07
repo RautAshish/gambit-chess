@@ -32,6 +32,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color as UiColor
@@ -147,7 +150,14 @@ private fun Lobby(s: OnlineUiState, vm: OnlineViewModel) {
             Text("Join with a code", color = BONE, fontSize = 16.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(10.dp))
             OutlinedTextField(
-                value = code, onValueChange = { code = it.uppercase().take(6) },
+                value = code,
+                // Mirror the generator alphabet: pasted spaces/hyphens and the
+                // ambiguous 0/O/1/I/L are stripped automatically.
+                onValueChange = { raw ->
+                    code = raw.uppercase()
+                        .filter { it in "ABCDEFGHJKMNPQRSTUVWXYZ23456789" }
+                        .take(6)
+                },
                 label = { Text("Game code", color = MUTED) },
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters),
                 singleLine = true, modifier = Modifier.fillMaxWidth()
@@ -170,6 +180,34 @@ private fun Waiting(s: OnlineUiState) {
     Text(s.statusLine, color = BONE, fontSize = 15.sp)
     Spacer(Modifier.height(6.dp))
     Text("Your friend taps Play Online \u2192 Join with a code.", color = MUTED, fontSize = 13.sp)
+    Spacer(Modifier.height(18.dp))
+    val clipboard = LocalClipboardManager.current
+    val ctx = LocalContext.current
+    Row {
+        OutlinedButton(onClick = { clipboard.setText(AnnotatedString(s.code)) }) {
+            Text("Copy code", color = BONE)
+        }
+        Spacer(Modifier.width(12.dp))
+        Button(
+            onClick = {
+                val send = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(
+                        android.content.Intent.EXTRA_TEXT,
+                        "Play me in Emersion Chess \u2014 code ${s.code}: open Play Online \u2192 Join with a code."
+                    )
+                }
+                ctx.startActivity(android.content.Intent.createChooser(send, "Share game code"))
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = BRASS, contentColor = BG)
+        ) { Text("Share") }
+    }
+    Spacer(Modifier.height(14.dp))
+    Text(
+        "\u2039 Back leaves this screen \u2014 the code stays active until a friend " +
+        "joins. Anyone you give the code can take the Black seat.",
+        color = MUTED, fontSize = 12.sp
+    )
 }
 
 @Composable
