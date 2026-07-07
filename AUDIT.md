@@ -804,3 +804,6 @@ Pre-listing closeout: PRIVACY.md rewritten truthful for the baked-server era
 the developer-operated project; now discloses anonymous ID, codes, moves,
 retention + deletion path, and the custom-server alternative). CI now
 preserves R8 mapping.txt per release for Play crash deobfuscation.
+Rules v2 deployed by owner. Token recipe amended: fine-grained PATs need
+Workflows R/W (not just Contents) to push .github/workflows changes — proven
+by verbatim rejection. Rules-logic simulator (below) run pre-verification.

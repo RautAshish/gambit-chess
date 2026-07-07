@@ -103,6 +103,11 @@ jobs:
         with:
           name: gambit-release-aab
           path: app/build/outputs/bundle/release/app-release.aab
+      - name: Upload R8 mapping (deobfuscates Play crash reports)
+        uses: actions/upload-artifact@v4
+        with:
+          name: emersion-mapping
+          path: app/build/outputs/mapping/release/mapping.txt
       - name: Upload release APK (sideload-testable)
         uses: actions/upload-artifact@v4
         with:
