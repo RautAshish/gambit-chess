@@ -18,7 +18,7 @@ rules_version = '2';
 //   move:   mask [moves, fen, status, winnerUid, updatedAt]
 //   resign: mask [status, winnerUid, updatedAt]
 // Live statuses: ONGOING, CHECK. Terminal via move: CHECKMATE, STALEMATE,
-// DRAW_FIFTY_MOVES, DRAW_REPETITION, DRAW_INSUFFICIENT. Terminal via resign: RESIGNED.
+// DRAW_FIFTY_MOVE, DRAW_REPETITION, DRAW_INSUFFICIENT_MATERIAL. Terminal via resign: RESIGNED.
 // ============================================================================
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -35,7 +35,7 @@ service cloud.firestore {
       function liveStatus(s) { return s in ['ONGOING', 'CHECK']; }
       function moveTerminal(s) {
         return s in ['CHECKMATE', 'STALEMATE',
-                     'DRAW_FIFTY_MOVES', 'DRAW_REPETITION', 'DRAW_INSUFFICIENT'];
+                     'DRAW_FIFTY_MOVE', 'DRAW_REPETITION', 'DRAW_INSUFFICIENT_MATERIAL'];
       }
       // Whose turn, from the move count BEFORE this write.
       function turnUid() {
