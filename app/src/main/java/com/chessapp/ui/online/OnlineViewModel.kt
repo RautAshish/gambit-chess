@@ -259,8 +259,25 @@ class OnlineViewModel(app: Application) : AndroidViewModel(app) {
         )
     }
 
+    /** Errors reach the VM as strings (repo stringifies exceptions), so the
+     *  friendly mapping lives at the single sink and covers every path. */
+    private fun friendly(msg: String): String = when {
+        msg.contains("Unable to resolve host", true) ||
+        msg.contains("UnknownHost", true) ->
+            "Can't reach the game server \u2014 your network couldn't look up " +
+            "Google's servers (DNS). Switch Wi\u2011Fi \u2194 mobile data, or " +
+            "disable any VPN / private-DNS filter, then retry."
+        msg.contains("timed out", true) || msg.contains("timeout", true) ->
+            "The game server took too long to respond \u2014 check your " +
+            "connection and try again."
+        msg.contains("Failed to connect", true) ->
+            "Couldn't connect to the game server \u2014 check your internet " +
+            "connection and try again."
+        else -> msg
+    }
+
     private fun fail(msg: String) {
-        _state.value = _state.value.copy(error = msg, busy = false)
+        _state.value = _state.value.copy(error = friendly(msg), busy = false)
     }
 
     private fun launchBusy(block: suspend () -> Unit) {
