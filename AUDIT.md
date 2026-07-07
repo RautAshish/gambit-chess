@@ -799,3 +799,8 @@ can take Black') instead of a lying Cancel (rules forbid delete). Join input
 now mirrors the generator alphabet — pasted spaces/hyphens/ambiguous chars
 strip automatically. Move list capped+scrollable with tail-follow. Material
 reads 'White +N'; saved badge 'live' -> 'Resume'. Tier-2 remains backlogged.
+Pre-listing closeout: PRIVACY.md rewritten truthful for the baked-server era
+(old text claimed developer receives no data — false since online defaults to
+the developer-operated project; now discloses anonymous ID, codes, moves,
+retention + deletion path, and the custom-server alternative). CI now
+preserves R8 mapping.txt per release for Play crash deobfuscation.
