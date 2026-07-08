@@ -813,3 +813,12 @@ the scroll). Family audit: HomeScreen carried the same latent order bug —
 both fixed (statusBarsPadding moved outside verticalScroll); Chess/Online/
 Puzzle/Saved verified healthy. Bonus from the same set: advanced-server
 disclosure could open but not close — added Hide affordance.
+Fossil-hunt round (README-lesson applied repo-wide): RELEASE.md still taught
+the pre-incident keystore workflow + stale checklist/Pages plan (fixed, +
+mapping-upload step); SERVER_SETUP framed self-hosting as primary (reframed:
+baked server primary, custom = advanced path matching the in-app disclosure);
+gradle carried commented google-services ghosts of the never-shipped
+architecture (removed). Verified clean: manifest permissions == privacy claim
+exactly; shortcut chain end-to-end under new appId; XML brass-free; proguard
+minimal-sane; listing claims all backed; all five rule-based endings have
+correct user copy.
