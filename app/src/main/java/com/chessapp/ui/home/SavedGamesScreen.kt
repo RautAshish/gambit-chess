@@ -73,7 +73,8 @@ fun SavedGamesScreen(
         if (games.isEmpty()) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text("No saved games yet.\nFinish or pause a game and it'll appear here.",
-                    color = MUTED, fontSize = 15.sp)
+                    color = MUTED, fontSize = 15.sp,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center)
             }
         } else {
             val scope = rememberCoroutineScope()
