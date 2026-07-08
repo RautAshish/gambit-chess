@@ -6,7 +6,7 @@ authors are competent; skip praise and generic advice. Every finding must
 carry: severity (BLOCKER / HIGH / MED / LOW), the concrete risk, and a
 specific fix. Cite exact files/paths when you can read them.
 
-**Honesty rule: the repository below may be private at review time. If you
+**Honesty rule: the repository below is public. If you
 cannot fetch it, SAY SO and review strictly from the facts in this document —
 do not invent repository contents.** Key facts, rules, and design decisions
 are embedded below precisely so a paper review is still substantive.

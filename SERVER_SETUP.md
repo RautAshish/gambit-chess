@@ -1,6 +1,10 @@
-# Online play — 5-minute free setup
+# Online play — server guide
 
-Emersion's online mode runs on YOUR free Firebase project (Spark tier, no card).
+**Players need none of this.** Store builds ship with the Emersion server baked
+in — tap Play Online and it works. This guide serves two audiences: the
+**developer** provisioning that baked server (steps 1–5 once, then "Shipping
+to app-store users"), and **advanced self-hosters** who want their games on
+their own free Firebase project (Spark tier, no card).
 
 1. Go to console.firebase.google.com → **Add project** (any name, Analytics off).
 2. **Security → Authentication → Get started → Sign-in method → Anonymous →
@@ -19,10 +23,9 @@ Emersion's online mode runs on YOUR free Firebase project (Spark tier, no card).
    Enabled, wait ~30s, refresh. Guaranteed fallback: console.cloud.google.com
    → same project → APIs & Services → Credentials → "Browser key (auto created
    by Firebase)" — that IS the Web API key.
-6. In the app: **Settings → Online play** → paste both → Save.
-
-Both players do steps 5–6 with the SAME project values (share them with your
-friend). Then: Play Online → Create game → share the 6-letter code.
+6. Self-hosters: in the app, **Settings → Online play → Use a custom server
+   (advanced)** → paste both → Save. Both players must use the SAME values;
+   then Play Online → Create game → share the code.
 
 Trust model: games are private friendly matches. Both clients validate every
 move with the same engine; Firestore rules restrict writes to the two players.

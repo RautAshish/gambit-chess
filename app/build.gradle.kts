@@ -3,8 +3,6 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.devtools.ksp")
-    // Apply only if you wire up multiplayer; needs google-services.json.
-    // id("com.google.gms.google-services")
 }
 
 android {
@@ -105,7 +103,6 @@ dependencies {
     ksp("androidx.room:room-compiler:2.6.1")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
-    // Multiplayer (optional — requires google-services.json + uncommenting the plugin)
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
