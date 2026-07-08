@@ -54,7 +54,7 @@ fun HomeScreen(
 ) {
     Column(
         Modifier.fillMaxSize().background(BG)
-            .verticalScroll(rememberScrollState()).statusBarsPadding().padding(24.dp),
+            .statusBarsPadding().verticalScroll(rememberScrollState()).padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.height(12.dp))

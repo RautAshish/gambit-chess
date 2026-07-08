@@ -30,7 +30,7 @@ fun SettingsScreen(repo: SettingsRepository, onBack: () -> Unit) {
     val settings by repo.settings.collectAsState(initial = Settings())
     val scope = rememberCoroutineScope()
 
-    Column(Modifier.fillMaxSize().background(BG).verticalScroll(rememberScrollState()).statusBarsPadding().navigationBarsPadding()) {
+    Column(Modifier.fillMaxSize().background(BG).statusBarsPadding().verticalScroll(rememberScrollState()).navigationBarsPadding()) {
         TopRow("Settings", onBack)
 
         Section("Board theme")
@@ -84,6 +84,12 @@ fun SettingsScreen(repo: SettingsRepository, onBack: () -> Unit) {
         // is required (it isn't).
         val hasBuiltInServer = com.chessapp.BuildConfig.DEFAULT_ONLINE_PROJECT_ID.isNotBlank()
         var showCustomServer by remember { mutableStateOf(false) }
+        if (hasBuiltInServer && showCustomServer) {
+            TextButton(onClick = { showCustomServer = false },
+                modifier = Modifier.padding(horizontal = 10.dp)) {
+                Text("Hide custom server", color = MUTED)
+            }
+        }
         if (hasBuiltInServer && !showCustomServer) {
             Text(
                 "Multiplayer is ready \u2014 this build includes the Emersion server. Nothing to set up.",

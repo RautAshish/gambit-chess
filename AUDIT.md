@@ -807,3 +807,9 @@ preserves R8 mapping.txt per release for Play crash deobfuscation.
 Rules v2 deployed by owner. Token recipe amended: fine-grained PATs need
 Workflows R/W (not just Contents) to push .github/workflows changes — proven
 by verbatim rejection. Rules-logic simulator (below) run pre-verification.
+Owner spot-the-bug round (18 screenshots, v1.2-810292d confirmed on-device):
+found = Settings content scrolling UNDER the status bar (inset applied inside
+the scroll). Family audit: HomeScreen carried the same latent order bug —
+both fixed (statusBarsPadding moved outside verticalScroll); Chess/Online/
+Puzzle/Saved verified healthy. Bonus from the same set: advanced-server
+disclosure could open but not close — added Hide affordance.
