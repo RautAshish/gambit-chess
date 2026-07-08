@@ -23,3 +23,7 @@ app/src/main/java/com/chessapp/ui/board/PieceRenderer.kt; colors are adapted to
 this app's palette. To keep licensing coherent (this artwork + the bundled
 Stockfish engine), the application as a whole is distributed under GPLv3 — see
 LICENSE.
+
+## Platform libraries
+AndroidX, Jetpack Compose, Kotlin, and kotlinx-coroutines are used under the
+Apache License 2.0 (https://www.apache.org/licenses/LICENSE-2.0).

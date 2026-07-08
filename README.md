@@ -1,181 +1,96 @@
-# ChessApp — Android Chess (Kotlin + Jetpack Compose)
+<p align="center">
+  <img src="store/feature_graphic.png" alt="Emersion Chess" width="640"/>
+</p>
 
-A complete chess app built across five phases: a Perft-verified rules engine, a
-built-in Minimax AI, an optional Stockfish engine, local persistence, tactics
-puzzles, chess clocks, and room-code online multiplayer (free-tier Firestore REST; a server-authoritative Cloud Functions variant ships as reference). The domain
-layer is pure Kotlin (no Android deps), so it compiles and tests on the JVM and is
-reused verbatim on the multiplayer server.
+<h1 align="center">Emersion Chess</h1>
+<p align="center"><i>play. learn. repeat.</i></p>
 
-## Module map
+**Emersion Chess** is a premium, offline-first chess app for Android: the
+full-strength **Stockfish 18** engine on your phone, **137 machine-verified
+tactics puzzles**, and **room-code online play** with friends — no ads, no
+tracking, no account, ever.
 
-```
-domain/
-  model/      Model.kt, Board.kt        Pieces, immutable board, FEN
-  engine/     MoveGenerator.kt          Legal move generation + attack detection
-              GameEngine.kt             Status, history, undo/redo, PGN
-              Notation.kt               SAN + PGN movetext
-              ChessClock.kt             Fischer-increment two-sided clock
-  ai/         Evaluator.kt, ChessAI.kt  Minimax + alpha-beta, piece-square eval
-engine/                                 Swappable engine abstraction
-  ChessEnginePort.kt                    Common interface
-  NativeEngine.kt                       Built-in Minimax adapter (offline default)
-  stockfish/StockfishEngine.kt          UCI bridge to a native Stockfish binary
-  stockfish/StockfishInstaller.kt       Resolves the binary from nativeLibraryDir
-data/
-  db/         ChessDatabase.kt          Room: saved games + puzzle progress
-  prefs/      SettingsRepository.kt     DataStore preferences
-  puzzle/     Puzzle.kt                 Tactics puzzle model + session validator
-  online/     OnlineGame.kt             Multiplayer model + move validator
-              OnlineRepository.kt       Firestore matchmaking + live sync
-ui/board/     ChessViewModel.kt         State, promotion, clock, undo/redo,
-                                        sound cues, captured pieces, animation, autosave
-              ChessScreen.kt            Compose Canvas board + controls + dialogs
-              PieceRenderer.kt          Vector chess pieces (no Unicode glyphs)
-ui/home/      HomeScreen.kt             Landing screen + mode/difficulty selection
-              SavedGamesScreen.kt       Resume-a-game list backed by Room
-ui/settings/  SettingsScreen.kt         Toggles + difficulty/clock presets (DataStore)
-ui/sound/     SoundManager.kt           SoundPool cues + haptics
-ui/nav/       AppNav.kt                 Screen graph + ViewModel factory
-data/db/      GameRepository.kt         Save/restore games (FEN + PGN + UCI replay)
-res/raw/      move/capture/check/game_end.wav   Bundled sound cues
-firebase/     firestore.rules           Security rules (games read-only to clients)
-              firebase.json             Deploy config
-functions/    src/board.ts              TS engine port (board + FEN)
-              src/movegen.ts            TS move generation
-              src/engine.ts             TS game status + move validator
-              src/index.ts              Cloud Functions: submitMove/findMatch/resign
-              test/equivalence.test.ts  Perft + validator parity tests
-```
+It was also built in an unusual way: **entirely from a phone.** GitHub Actions
+is the project's only computer — every feature, fix, and release in this
+repository was written, tested, and shipped without a development machine.
+The engineering history, including every bug and incident, is preserved
+honestly in [AUDIT.md](AUDIT.md).
 
-## Correctness — everything below was executed and verified on the JVM
+## Features
 
-**Move generator (Perft).** Leaf-node counts matched the chess-programming
-reference values exactly, which proves castling, en passant, promotion, pins, and
-check evasion are all correct:
+- **Stockfish 18 on-device** (arm64, Android 10+) — analysis-grade opposition,
+  fully offline; other devices automatically use the capable built-in engine
+- **Four difficulty tiers** (Easy→Expert) mapped to engine skill
+- **137 tactics puzzles**, every one machine-verified by the engine itself:
+  each mate-in-1 mates, each mate-in-2 forces mate against *all* defenses
+- **Play a friend**: pass-and-play on one phone, or online by 6-letter room
+  code — the server is baked in, nothing to set up
+- Fischer clocks with increment, autosave & resume, undo/redo, live PGN,
+  three board themes, the classic **Cburnett** piece set, sounds & haptics
+- **Private by design**: no ads, analytics, trackers, or accounts
+  ([privacy policy](PRIVACY.md)); online play uses anonymous identifiers only
 
-| Position            | Depth | Nodes      | Result |
-|---------------------|-------|------------|--------|
-| Starting position   | 5     | 4,865,609  | PASS   |
-| Kiwipete            | 4     | 4,085,603  | PASS   |
-| Position 3 (EP)     | 5     | 674,624    | PASS   |
-| Position 4 (castle) | 4     | 422,333    | PASS   |
+## Get it
 
-**Notation.** Scholar's Mate renders as `1. e4 e5 2. Bc4 Nc6 3. Qh5 Nf6 4. Qxf7#`
-with correct disambiguation, castling (`O-O`), and check/mate suffixes.
+- **Google Play** — coming soon
+- **Direct APK** — every green CI run publishes a signed `gambit-release-apk`
+  artifact under [Actions](../../actions); testers can grab `gambit-debug-apk`
 
-**Clock.** Tick, Fischer increment, side switching, flag-on-zero, and `m:ss`
-formatting all verified.
+## How it's built (and proven)
 
-**Built-in AI.** Finds a forced mate (Qh4#) unaided, and played a full legal
-28-ply self-play game terminating correctly by repetition.
+Every push runs the full pipeline on GitHub Actions:
 
-**Stockfish bridge.** Tested against a real Stockfish 16 binary over UCI: full
-handshake, FEN positioning, opening move (e2e4), mate-in-1 (e1e8), and capturing a
-hanging queen (e4d5) — the exact Kotlin code that runs on Android.
+1. **45 JVM unit tests** + lint — perft-verified move generation (reference
+   node counts at depth 4–5 across four standard positions), SAN/PGN, clocks,
+   results, material, the online validator, and a full re-proof of all 137
+   puzzles
+2. A **signed release APK + AAB** with a self-verifying log chain: keystore &
+   key-password verification, the release certificate printed via `apksigner`,
+   a byte-exact size report, and confirmation the online defaults are baked
+3. **46 instrumented E2E tests** on an emulator, plus a **release crash gate**
+   that cold-boots the actual R8-minified build and monkey-tests it
 
-**Online validator.** Server-authoritative checks reject out-of-turn,
-non-participant, illegal, and post-game moves, and assign the correct winner on
-checkmate.
+Logs publish to the `ci-logs` / `ci-logs-ui` branches; R8 mappings ship as
+artifacts for crash deobfuscation. Debug builds use a committed conventional
+keystore so sideloaded updates always install cleanly.
 
-**Cross-engine parity.** The TypeScript Cloud Function engine was cross-checked
-against the Kotlin engine on **14,997 unique positions** drawn from random
-playouts: legal-move sets and FEN matched on every single one, with zero
-mismatches. The server cannot diverge from the client.
+## Architecture
 
-**Puzzles.** Built-in puzzles verified to deliver real checkmates; the session
-accepts correct moves and rejects wrong ones.
+- **Pure-Kotlin domain** (`domain/`) — immutable board, legal move generation,
+  status/draw rules, SAN, clocks. No Android dependencies; unit-tested on the
+  JVM.
+- **Swappable engines** (`engine/`) — a built-in minimax+alpha-beta opponent
+  (the offline default and CI's sparring partner) and a UCI bridge to the
+  bundled Stockfish binary (`jniLibs`, size-guarded, gated to API 29+, with
+  silent fallback).
+- **Online** (`data/online/`) — Firestore **REST** + anonymous auth (no
+  Firebase SDK, no Play Services). Both clients validate every move with the
+  identical rules engine; the deployed
+  [security rules](firebase/firestore.rules) enforce seats, turn order,
+  one-ply appends, and outcome consistency as explicit transitions.
+  `functions/` contains a server-authoritative TypeScript reference (engine
+  cross-checked against Kotlin on 14,997 positions with zero divergence) for
+  a future ranked mode — it is not required or deployed for friend play.
+- **UI** (`ui/`) — Jetpack Compose throughout; pieces are the Cburnett SVGs
+  transpiled to Compose paths and rendered verbatim.
 
-Run the whole suite in Android Studio:
+## Building from source
+
+**Android Studio:** open the project, sync, run. minSdk 24, compileSdk 35.
+
+**The authentic way (no computer):** fork it — Actions builds everything.
+Without secrets you get debug-signed builds and the in-app online setup flow;
+add the `EMERSION_*` secrets described in [RELEASE.md](RELEASE.md) and
+[SERVER_SETUP.md](SERVER_SETUP.md) for Play-signed releases with zero-setup
+multiplayer baked in.
 
 ```bash
-./gradlew :app:testDebugUnitTest
+./gradlew :app:testDebugUnitTest      # 45 JVM tests
+./gradlew :app:connectedDebugAndroidTest   # 46 E2E (device/emulator)
 ```
-
-(`PerftTest`, `NotationTest`, `ClockTest`, `ResultTest`, `MaterialTest`,
-`OnlineValidatorTest`, `PuzzleTest` — 24 tests in total, all passing.)
-
-## Build & run
-
-1. Open the folder in Android Studio (Giraffe or newer). minSdk 24, compileSdk 35.
-2. Gradle sync. Run on an emulator or device.
-3. The app opens on a Home screen: pick a difficulty to play the built-in engine,
-   or choose pass-and-play, saved games, or settings. In-game you get vector pieces,
-   move animation, sound + haptics, a clock, captured-piece trays with a material
-   badge, board coordinates, undo/redo, a live PGN list, a promotion picker, and a
-   game-over dialog. Games auto-save after every move and resume from Saved Games.
-
-## UX layer — verification status (read before shipping)
-
-The rules engine and both validators are executed-and-verified (see above). The
-**presentation layer added on top was not compiled in this environment** — no
-Android SDK was available here, so the Compose/Android files (screens, ViewModel,
-PieceRenderer, SoundManager, navigation) were written and statically reviewed but
-need a real Gradle build to confirm. What *was* verified independently:
-
-- The **vector piece geometry** was prototyped and visually iterated (the king and
-  knight were redesigned after the first render) so the silhouettes read correctly
-  at both full-board and captured-tray sizes.
-- The **`Material` module** (captured pieces + balance) is pure Kotlin and unit
-  tested (`MaterialTest`), passing on the JVM.
-- The **timestamp clock** (`ChessClock`) and **result model** (`ResultEvaluator`,
-  covering resignation, draw agreement, and loss on time) are pure Kotlin and unit
-  tested (`ClockTest`, `ResultTest`). The clock self-heals across app backgrounding
-  and survives process death via snapshot/restore — verified deterministically with
-  an injectable time source.
-- Full **Perft regression** was re-run after all changes: the engine core is
-  unchanged and still correct.
-
-The resign/draw buttons, draw-offer dialog, and the Compose lifecycle observer that
-pauses the clock on background were written and reviewed but, like the rest of the
-UI, need a real Gradle build to confirm.
-
-Expect to fix minor Compose issues on first build (import nits, etc.); the logic
-underneath is sound, but treat the UI as "needs a compile pass."
-
-## Enabling the optional pieces
-
-**Stockfish.** Compile Stockfish for each ABI and drop the binaries at
-`app/src/main/assets/stockfish/<abi>/stockfish`. Then in `MainActivity`:
-
-```kotlin
-val path = StockfishInstaller.ensure(this)
-ChessViewModel(opponent = StockfishEngine(path))
-```
-
-Stockfish is GPLv3 — distributing it obliges you to comply with the GPL. The
-built-in `NativeEngine` is the default precisely so the base app carries no such
-obligation.
-
-**Multiplayer.** Add `google-services.json`, uncomment the `google-services`
-plugin lines in the two Gradle files, deploy the Cloud Functions, and deploy
-`firebase/firestore.rules`. The architecture is server-authoritative:
-
-- `/games` is **read-only** to clients in the security rules. All mutations go
-  through Cloud Functions (`submitMove`, `findMatch`, `resign`) running with admin
-  privileges. A tampered client cannot write an illegal or out-of-turn move because
-  it cannot write the game document at all.
-- The function in `functions/src/` is a TypeScript port of the Kotlin engine. It
-  was verified **byte-identical to the Kotlin engine across 14,997 positions**
-  (legal moves + FEN), so the server's verdict always matches the client's.
-- The client keeps the Kotlin `OnlineGameValidator` only for optimistic UI: apply
-  locally for instant feedback, then reconcile when the server's update streams back.
-
-Deploy:
-
-```bash
-cd functions && npm install && npm run build && npm test   # runs the equivalence suite
-firebase deploy --only functions,firestore:rules
-```
-
-## Design notes
-
-- **Board** is an immutable 64-square mailbox: clear and correct. The `Board` API
-  hides the representation, so swapping in bitboards later changes nothing else.
-- **Persistence** stores final FEN (instant resume) plus PGN and the UCI move list
-  (replay/analysis). Save after every move for crash-safe resume.
-- **Engine abstraction** (`ChessEnginePort`) means the AI is a runtime choice;
-  difficulty maps to search depth (native) or skill/Elo limit (Stockfish).
 
 ## License
-GPLv3 (see LICENSE). Bundles the Stockfish engine (GPLv3) and Colin M.L.
-Burnett's chess piece artwork (GPLv2+) — see THIRD_PARTY_LICENSES.md.
+
+**GPLv3** (see [LICENSE](LICENSE)). Bundles the **Stockfish** engine (GPLv3)
+and **Colin M.L. Burnett's** chess piece artwork (GPLv2+) — full attributions
+in [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
