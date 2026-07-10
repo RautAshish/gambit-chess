@@ -844,3 +844,11 @@ a custom thin-line set would qualify, post-launch at most). PRIVACY.md:
 +Last-updated date, +per-level records in on-device list, +children's note.
 Reference app's policy NOT adopted: its length reflects ad/analytics
 practices we don't have — brevity is our accuracy.
+Field report: "Level 1 still not easy" (Stockfish path). Root cause was in
+the adapter's own comment: skill<10 switched on UCI_LimitStrength with
+elo=1350+skill*70 — Stockfish's Elo FLOOR (~1320) is club strength, so
+Level 1 literally played 1350 with 300ms/move. Cure: LimitStrength removed
+(raw low Skill + starved clock is weaker than any Elo SF accepts); think
+budget now 30ms→2000ms across the ladder; adapter-level blunder rate
+35/22/12/6% on rungs 1-4/5-8 (skill-scale), mirroring NativeEngine's
+philosophy. MIN_AI_REPLY_MS=550 keeps perceived pacing.

@@ -1,5 +1,6 @@
 package com.chessapp.engine.stockfish
 
+import com.chessapp.domain.engine.MoveGenerator
 import com.chessapp.domain.model.Board
 import com.chessapp.domain.model.Move
 import com.chessapp.engine.ChessEnginePort
@@ -33,6 +34,7 @@ class StockfishEngine(enginePath: String) : ChessEnginePort {
 
     private var skillLevel = 10
     private var moveTimeMillis = 1000L
+    private var blunderPct = 0
 
     init {
         send("uci")
@@ -55,27 +57,39 @@ class StockfishEngine(enginePath: String) : ChessEnginePort {
     }
 
     private fun applySkill() {
-        // Stockfish "Skill Level" is 0..20. We also cap search via UCI_LimitStrength
-        // for the lowest tiers so weak settings actually feel weak.
+        // Skill Level 0..20 is the ONLY strength knob we use. UCI_LimitStrength
+        // is deliberately OFF: its Elo floor is ~1320-1350 — a club player — which
+        // made "Level 1" crush beginners (field-reported). Raw low Skill plus a
+        // starved clock is genuinely weaker than any UCI_Elo Stockfish accepts.
         send("setoption name Skill Level value $skillLevel")
-        if (skillLevel < 10) {
-            send("setoption name UCI_LimitStrength value true")
-            // Rough Elo mapping: skill 0->1350, 9->~2000.
-            val elo = 1350 + skillLevel * 70
-            send("setoption name UCI_Elo value $elo")
-        } else {
-            send("setoption name UCI_LimitStrength value false")
-        }
+        send("setoption name UCI_LimitStrength value false")
     }
 
     override fun setSkill(level: Int) {
         skillLevel = level.coerceIn(0, 20)
-        // More thinking time at higher levels.
-        moveTimeMillis = (300L + skillLevel * 120L)
+        // Think-budget curve: the bottom rungs get MILLISECONDS — at 30ms even
+        // Skill 0 wobbles like a human — scaling to real thinking at the top.
+        moveTimeMillis = when {
+            skillLevel <= 1 -> 30L;  skillLevel <= 3 -> 50L
+            skillLevel <= 5 -> 80L;  skillLevel <= 8 -> 150L
+            skillLevel <= 10 -> 250L; skillLevel <= 12 -> 400L
+            skillLevel <= 14 -> 600L; skillLevel <= 16 -> 900L
+            skillLevel <= 18 -> 1300L; else -> 2000L
+        }
+        // Human-style errors on the low rungs (slightly gentler than the built-in
+        // engine's, since low Skill already randomizes among candidate moves).
+        blunderPct = when {
+            skillLevel <= 1 -> 35; skillLevel <= 3 -> 22
+            skillLevel <= 5 -> 12; skillLevel <= 8 -> 6; else -> 0
+        }
         applySkill()
     }
 
     override suspend fun bestMove(board: Board): Move? = withContext(Dispatchers.IO) {
+        if (blunderPct > 0 && kotlin.random.Random.nextInt(100) < blunderPct) {
+            // A real beginner sometimes just hangs a piece; so does Level 1 now.
+            MoveGenerator.legalMoves(board).randomOrNull()?.let { return@withContext it }
+        }
         send("position fen ${board.toFen()}")
         send("go movetime $moveTimeMillis")
         val line = waitFor("bestmove")          // e.g. "bestmove e2e4 ponder e7e5"
