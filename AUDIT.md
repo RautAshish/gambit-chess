@@ -822,3 +822,15 @@ architecture (removed). Verified clean: manifest permissions == privacy claim
 exactly; shortcut chain end-to-end under new appId; XML brass-free; proguard
 minimal-sane; listing claims all backed; all five rule-based endings have
 correct user copy.
+
+## FEATURE: 10-level difficulty ladder (+Random color, per-level records)
+Owner-requested vs 4 tiers; reference screenshots used for IDEAS only (levels,
+Random, per-level W/D/L) — visual language deliberately ours (numbered gold
+chips, no wood/slider; slider rejected: drag precision, a11y, untestable).
+Engines were pre-adapted (port speaks skill 0..20): Levels object maps 1..10
+onto [0,2,4,7,9,11,13,15,17,20]; NativeEngine gained a real ladder (depth 1-6
++ blunder 45%->0) with ChessAI depth-primary ctor; legacy settings migrate
+(EASY/MEDIUM/HARD/EXPERT -> 2/5/7/10, playAsBlack -> playAs). Saved-game
+labels parse both eras. Stats: lvl_{w,d,l}_N keys, recorded once per finished
+vs-AI game (resumed games excluded, documented v1 tradeoff). 14 test pins
+retargeted to numeral chips.

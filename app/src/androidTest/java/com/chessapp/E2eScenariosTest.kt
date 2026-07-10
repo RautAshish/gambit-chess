@@ -68,7 +68,7 @@ class E2eScenariosTest {
         // settings persist across tests, and a stray Black flips the board
         // under the taps (the deleteAll lesson, applied family-wide).
         rule.onNodeWithText("White").performClick()
-        rule.onNodeWithText("Easy").performClick()
+        rule.onNodeWithText("2").performClick()
         rule.onNodeWithText("Play vs Computer").performClick()
         waitForText("White to move")
     }
@@ -219,7 +219,7 @@ class E2eScenariosTest {
     @Test
     fun allDifficultiesSelectable_andStartGame() {
         // Chips SELECT a difficulty (persisted); the primary card starts the game.
-        for (d in listOf("Easy", "Medium", "Hard", "Expert")) {
+        for (d in listOf("2", "5", "7", "10")) {
             waitForText("EMERSION")
             rule.onNodeWithText(d).performClick()
             rule.onNodeWithText("Play vs Computer").performClick()

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import com.chessapp.domain.ai.ChessAI
+import com.chessapp.domain.ai.Levels
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -13,6 +14,9 @@ private val Context.dataStore by preferencesDataStore(name = "settings")
 /** User preferences, persisted with DataStore. */
 data class Settings(
     val difficulty: ChessAI.Difficulty = ChessAI.Difficulty.MEDIUM,
+    val aiLevel: Int = Levels.DEFAULT,
+    val playAs: String = "WHITE",                    // WHITE | RANDOM | BLACK
+    val levelStats: Map<Int, Triple<Int, Int, Int>> = emptyMap(),
     val soundEnabled: Boolean = true,
     val hapticsEnabled: Boolean = true,
     val showLegalMoves: Boolean = true,
@@ -44,6 +48,8 @@ class SettingsRepository(private val context: Context) {
         val CLOCK_INC = intPreferencesKey("clock_inc")
             val BOARD_THEME = stringPreferencesKey("board_theme")
         val PLAY_AS_BLACK = booleanPreferencesKey("play_as_black")
+        val AI_LEVEL = intPreferencesKey("ai_level")
+        val PLAY_AS = stringPreferencesKey("play_as")
         val ONLINE_PROJECT = stringPreferencesKey("online_project_id")
         val ONLINE_APIKEY = stringPreferencesKey("online_api_key")
         val SOLVED_PUZZLES = stringSetPreferencesKey("solved_puzzles")
@@ -58,6 +64,14 @@ class SettingsRepository(private val context: Context) {
         Settings(
             difficulty = p[Keys.DIFFICULTY]?.let { runCatching { ChessAI.Difficulty.valueOf(it) }.getOrNull() }
                 ?: ChessAI.Difficulty.MEDIUM,
+            aiLevel = p[Keys.AI_LEVEL] ?: Levels.fromLabel(p[Keys.DIFFICULTY]),
+            playAs = p[Keys.PLAY_AS]
+                ?: if (p[Keys.PLAY_AS_BLACK] == true) "BLACK" else "WHITE",
+            levelStats = (1..10).associateWith { n ->
+                Triple(p[intPreferencesKey("lvl_w_$n")] ?: 0,
+                       p[intPreferencesKey("lvl_d_$n")] ?: 0,
+                       p[intPreferencesKey("lvl_l_$n")] ?: 0)
+            },
             soundEnabled = p[Keys.SOUND] ?: true,
             hapticsEnabled = p[Keys.HAPTICS] ?: true,
             showLegalMoves = p[Keys.SHOW_MOVES] ?: true,
@@ -79,6 +93,20 @@ class SettingsRepository(private val context: Context) {
     suspend fun update(transform: (MutablePreferences) -> Unit) {
         context.dataStore.edit(transform)
     }
+
+    suspend fun setAiLevel(level: Int) =
+        context.dataStore.edit { it[Keys.AI_LEVEL] = level.coerceIn(Levels.MIN, Levels.MAX) }
+
+    suspend fun setPlayAs(v: String) =
+        context.dataStore.edit { it[Keys.PLAY_AS] = v }
+
+    /** Lifetime record vs the computer, per level. outcome: 'W','D','L'. */
+    suspend fun recordLevelResult(level: Int, outcome: Char) =
+        context.dataStore.edit { p ->
+            val k = intPreferencesKey(
+                "lvl_${when (outcome) { 'W'->"w"; 'D'->"d"; else->"l" }}_${level.coerceIn(1,10)}")
+            p[k] = (p[k] ?: 0) + 1
+        }
 
     suspend fun setDifficulty(d: ChessAI.Difficulty) =
         update { it[Keys.DIFFICULTY] = d.name }

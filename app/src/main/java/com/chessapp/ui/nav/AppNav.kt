@@ -17,7 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.chessapp.data.db.ChessDatabase
 import com.chessapp.data.db.GameRepository
 import com.chessapp.data.prefs.SettingsRepository
-import com.chessapp.domain.ai.ChessAI
+import com.chessapp.domain.ai.Levels
 import com.chessapp.domain.model.Color
 import com.chessapp.engine.NativeEngine
 import com.chessapp.ui.board.ChessScreen
@@ -31,7 +31,7 @@ import com.chessapp.ui.settings.SettingsScreen
 sealed interface Screen {
     data object Home : Screen
     data class Game(
-        val difficulty: ChessAI.Difficulty,
+        val level: Int,
         val playerColor: Color,
         val resumeId: Long? = null,
         val passAndPlay: Boolean = false,
@@ -61,8 +61,8 @@ fun AppNav(app: Application, initialDest: String? = null) {
             "new_game" -> {
                 val s = settingsRepo.settings.first()
                 screen = Screen.Game(
-                    difficulty = s.difficulty,
-                    playerColor = if (s.playAsBlack) Color.BLACK else Color.WHITE,
+                    level = s.aiLevel,
+                    playerColor = resolvePlayAs(s.playAs),
                     serial = -1
                 )
             }
@@ -75,18 +75,18 @@ fun AppNav(app: Application, initialDest: String? = null) {
 
     when (val s = screen) {
         Screen.Home -> HomeScreen(
-            selectedDifficulty = settings.difficulty,
-            selectedColor = if (settings.playAsBlack) Color.BLACK else Color.WHITE,
-            onSelectColor = { c ->
-                scope.launch { settingsRepo.setPlayAsBlack(c == Color.BLACK) }
+            selectedLevel = settings.aiLevel,
+            onSelectLevel = { n -> scope.launch { settingsRepo.setAiLevel(n) } },
+            selectedPlayAs = settings.playAs,
+            onSelectPlayAs = { v -> scope.launch { settingsRepo.setPlayAs(v) } },
+            levelStats = settings.levelStats,
+            onPlayAi = { level, playAs ->
+                gameSerial++
+                screen = Screen.Game(level, resolvePlayAs(playAs), serial = gameSerial)
             },
-            onSelectDifficulty = { d ->
-                scope.launch { settingsRepo.setDifficulty(d) }
-            },
-            onPlayAi = { diff, color -> gameSerial++; screen = Screen.Game(diff, color, serial = gameSerial) },
             onPlayLocal = {
                 gameSerial++
-                screen = Screen.Game(settings.difficulty, Color.WHITE, passAndPlay = true, serial = gameSerial)
+                screen = Screen.Game(settings.aiLevel, Color.WHITE, passAndPlay = true, serial = gameSerial)
             },
             onPuzzles = { screen = Screen.Puzzles },
             puzzlesSolved = settings.solvedPuzzles.size,
@@ -126,11 +126,8 @@ fun AppNav(app: Application, initialDest: String? = null) {
             repo = gameRepo,
             onResume = { saved ->
                 gameSerial++
-                val diff = saved.difficulty
-                    ?.let { runCatching { ChessAI.Difficulty.valueOf(it) }.getOrNull() }
-                    ?: ChessAI.Difficulty.MEDIUM
                 screen = Screen.Game(
-                    difficulty = diff,
+                    level = Levels.fromLabel(saved.difficulty),
                     playerColor = Color.WHITE,
                     resumeId = saved.id,
                     passAndPlay = !saved.vsAi,
@@ -161,12 +158,13 @@ private fun buildGameViewModel(
                     game.passAndPlay -> com.chessapp.engine.NoEngine
                     useStockfish && stockfishPath != null ->
                         com.chessapp.engine.stockfish.StockfishEngine(stockfishPath)
-                            .apply { setSkill(skillFor(game.difficulty)) }
-                    else -> NativeEngine(game.difficulty)
+                            .apply { setSkill(Levels.skill(game.level)) }
+                    else -> NativeEngine().apply { setSkill(Levels.skill(game.level)) }
                 },
                 settingsRepo = settingsRepo,
                 gameRepo = gameRepo,
-                difficultyLabel = game.difficulty.name,
+                difficultyLabel = Levels.label(game.level),
+                aiLevel = game.level,
                 vsAi = !game.passAndPlay
             ) as T
         }
@@ -176,10 +174,9 @@ private fun buildGameViewModel(
     return ViewModelProvider(owner, factory)[key, ChessViewModel::class.java]
 }
 
-/** Map our four tiers to Stockfish skill levels (0..20). */
-private fun skillFor(d: com.chessapp.domain.ai.ChessAI.Difficulty): Int = when (d) {
-    com.chessapp.domain.ai.ChessAI.Difficulty.EASY -> 3
-    com.chessapp.domain.ai.ChessAI.Difficulty.MEDIUM -> 8
-    com.chessapp.domain.ai.ChessAI.Difficulty.HARD -> 14
-    com.chessapp.domain.ai.ChessAI.Difficulty.EXPERT -> 20
+/** RANDOM resolves at launch time so the game itself always has a concrete seat. */
+private fun resolvePlayAs(v: String): Color = when (v) {
+    "BLACK" -> Color.BLACK
+    "RANDOM" -> if (kotlin.random.Random.nextBoolean()) Color.WHITE else Color.BLACK
+    else -> Color.WHITE
 }

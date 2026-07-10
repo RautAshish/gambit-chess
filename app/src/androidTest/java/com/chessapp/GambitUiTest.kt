@@ -60,7 +60,7 @@ class GambitUiTest {
         // settings persist across tests, and a stray Black flips the board
         // under the taps (the deleteAll lesson, applied family-wide).
         rule.onNodeWithText("White").performClick()
-        rule.onNodeWithText("Easy").performClick()
+        rule.onNodeWithText("2").performClick()
         rule.onNodeWithText("Play vs Computer").performClick()
         waitForText("White to move")
 

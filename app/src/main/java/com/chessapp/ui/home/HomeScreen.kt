@@ -25,6 +25,9 @@ import androidx.compose.ui.unit.sp
 import com.chessapp.domain.ai.ChessAI
 import com.chessapp.domain.model.Color
 import com.chessapp.domain.model.PieceType
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import com.chessapp.domain.ai.Levels
 import com.chessapp.ui.board.PieceRenderer
 
 private val BG = UiColor(0xFF1C1F17)
@@ -40,11 +43,12 @@ private val MUTED = UiColor(0xFF8A8B7E)
  */
 @Composable
 fun HomeScreen(
-    selectedDifficulty: ChessAI.Difficulty,
-    onSelectDifficulty: (ChessAI.Difficulty) -> Unit,
-    selectedColor: Color,
-    onSelectColor: (Color) -> Unit,
-    onPlayAi: (ChessAI.Difficulty, Color) -> Unit,
+    selectedLevel: Int,
+    onSelectLevel: (Int) -> Unit,
+    selectedPlayAs: String,
+    onSelectPlayAs: (String) -> Unit,
+    levelStats: Map<Int, Triple<Int, Int, Int>> = emptyMap(),
+    onPlayAi: (Int, String) -> Unit,
     onPlayLocal: () -> Unit,
     onPuzzles: () -> Unit,
     puzzlesSolved: Int = 0,
@@ -80,8 +84,8 @@ fun HomeScreen(
         // game right after tapping a chip must use the tapped value, not wait for
         // the DataStore round-trip (Round-3 caught this race on device). Fresh
         // Home compositions initialise from the persisted values.
-        var playAs by remember { mutableStateOf(selectedColor) }
-        var diff by remember { mutableStateOf(selectedDifficulty) }
+        var playAs by remember { mutableStateOf(selectedPlayAs) }
+        var level by remember { mutableStateOf(selectedLevel) }
 
         // One visual group (#15): the card is the ACTION, the rows below are its
         // options — difficulty chips select (highlighted), they don't launch (#20).
@@ -89,12 +93,20 @@ fun HomeScreen(
             Column(Modifier.padding(12.dp)) {
                 PrimaryTile(
                     "Play vs Computer",
-                    "${diff.name.lowercase().replaceFirstChar { it.uppercase() }} \u00B7 as ${playAs.name.lowercase().replaceFirstChar { it.uppercase() }}"
-                ) { onPlayAi(diff, playAs) }
+                    "Level $level \u00B7 as ${playAs.lowercase().replaceFirstChar { it.uppercase() }}"
+                ) { onPlayAi(level, playAs) }
                 Spacer(Modifier.height(10.dp))
-                PlayAsRow(playAs) { playAs = it; onSelectColor(it) }
+                PlayAsRow(playAs) { playAs = it; onSelectPlayAs(it) }
                 Spacer(Modifier.height(8.dp))
-                DifficultySelector(diff) { d -> diff = d; onSelectDifficulty(d) }
+                LevelSelector(level) { n -> level = n; onSelectLevel(n) }
+                Spacer(Modifier.height(8.dp))
+                Text("Level $level \u00B7 ${Levels.name(level)}", color = BONE,
+                    fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                val st = levelStats[level]
+                if (st != null && st.first + st.second + st.third > 0) {
+                    Text("Won ${st.first} \u00B7 Drawn ${st.second} \u00B7 Lost ${st.third}",
+                        color = MUTED, fontSize = 12.sp)
+                }
             }
         }
         Spacer(Modifier.height(20.dp))
@@ -110,22 +122,22 @@ fun HomeScreen(
 }
 
 @Composable
-private fun PlayAsRow(selected: Color, onPick: (Color) -> Unit) {
+private fun PlayAsRow(selected: String, onPick: (String) -> Unit) {
     Row(
         Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text("Play as", color = MUTED, fontSize = 13.sp)
-        for (c in listOf(Color.WHITE, Color.BLACK)) {
-            val label = c.name.lowercase().replaceFirstChar { it.uppercase() }
+        for (v in listOf("WHITE", "RANDOM", "BLACK")) {
+            val label = v.lowercase().replaceFirstChar { it.uppercase() }
             OutlinedButton(
-                onClick = { onPick(c) },
+                onClick = { onPick(v) },
                 modifier = Modifier.weight(1f),
                 contentPadding = PaddingValues(vertical = 6.dp),
-                border = BorderStroke(1.dp, if (selected == c) BRASS else MUTED)
+                border = BorderStroke(1.dp, if (selected == v) BRASS else MUTED)
             ) {
-                Text(label, color = if (selected == c) BRASS else MUTED, fontSize = 13.sp)
+                Text(label, color = if (selected == v) BRASS else MUTED, fontSize = 13.sp)
             }
         }
     }
@@ -182,6 +194,32 @@ private fun SecondaryTile(title: String, comingSoon: Boolean = false, subtitle: 
             Spacer(Modifier.weight(1f))
             if (comingSoon) Text("Coming soon", color = MUTED, fontSize = 11.sp)
             else Text("\u203A", color = MUTED, fontSize = 17.sp)
+        }
+    }
+}
+
+
+/** Ten one-tap rungs — precise, screen-reader-friendly, and testable by text,
+ *  which a drag-slider is not. Selected rung glows gold; the name + record
+ *  render just beneath (see the card body). */
+@Composable
+private fun LevelSelector(selected: Int, onSelect: (Int) -> Unit) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        for (n in 1..10) {
+            val sel = n == selected
+            Box(
+                Modifier
+                    .weight(1f)
+                    .height(34.dp)
+                    .clip(RoundedCornerShape(17.dp))
+                    .border(BorderStroke(1.dp, if (sel) BRASS else MUTED), RoundedCornerShape(17.dp))
+                    .background(if (sel) BRASS.copy(alpha = 0.15f) else UiColor(0x00000000))
+                    .clickable { onSelect(n) },
+                contentAlignment = Alignment.Center
+            ) {
+                Text("$n", color = if (sel) BRASS else MUTED, fontSize = 13.sp,
+                    fontWeight = if (sel) FontWeight.Bold else FontWeight.Normal)
+            }
         }
     }
 }

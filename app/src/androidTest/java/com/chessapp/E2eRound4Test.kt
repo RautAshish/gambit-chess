@@ -51,7 +51,7 @@ class E2eRound4Test {
     @Test
     fun inputStorm_duringExpertThink() {
         waitForText("Play as")
-        rule.onNodeWithText("Expert").performClick()
+        rule.onNodeWithText("10").performClick()
         rule.onNodeWithText("Play vs Computer").performClick()
         waitForText("White to move")
         tap(4, 1); tap(4, 3)
@@ -67,7 +67,7 @@ class E2eRound4Test {
         rule.onNodeWithText("White to move").assertIsDisplayed()
         rule.onNodeWithText("\u2039 Home").performClick()
         waitForText("Play as")
-        rule.onNodeWithText("Medium").performClick()      // restore fast difficulty
+        rule.onNodeWithText("5").performClick()      // restore fast difficulty
     }
 
     /** Double-tapping a piece selects then deselects; no phantom move. */
@@ -127,7 +127,7 @@ class E2eRound4Test {
         // settings persist across tests, and a stray Black flips the board
         // under the taps (the deleteAll lesson, applied family-wide).
         rule.onNodeWithText("White").performClick()
-        rule.onNodeWithText("Easy").performClick()
+        rule.onNodeWithText("2").performClick()
         rule.onNodeWithText("Play vs Computer").performClick()
         waitForText("White to move")
         tap(4, 1); tap(4, 3)

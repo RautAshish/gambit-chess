@@ -7,7 +7,9 @@ import com.chessapp.domain.model.*
  * Negamax search with alpha-beta pruning. Difficulty maps to search depth.
  * Designed to run off the main thread (call from a coroutine on Dispatchers.Default).
  */
-class ChessAI(val difficulty: Difficulty = Difficulty.MEDIUM) {
+class ChessAI(private val depth: Int = Difficulty.MEDIUM.depth) {
+
+    constructor(difficulty: Difficulty) : this(difficulty.depth)
 
     enum class Difficulty(val depth: Int) {
         // EASY searches shallow AND picks loosely among near-best moves (below),
@@ -32,7 +34,7 @@ class ChessAI(val difficulty: Difficulty = Difficulty.MEDIUM) {
 
         val scored = ArrayList<Pair<Move, Int>>(moves.size)
         for (move in moves) {
-            val score = -negamax(board.apply(move), difficulty.depth - 1, -beta, -alpha, -sign)
+            val score = -negamax(board.apply(move), depth - 1, -beta, -alpha, -sign)
             scored.add(move to score)
             if (score > bestScore) { bestScore = score; best = move }
             if (score > alpha) alpha = score
@@ -41,7 +43,7 @@ class ChessAI(val difficulty: Difficulty = Difficulty.MEDIUM) {
         // Human-feel for EASY: never miss a mate, but otherwise pick randomly among
         // moves within a generous window of the best score. Beginners play
         // reasonable-looking, imperfect moves — not depth-perfect ones.
-        if (difficulty == Difficulty.EASY && bestScore < mateScore) {
+        if (depth <= 1 && bestScore < mateScore) {
             val window = 150
             val candidates = scored.filter { it.second >= bestScore - window }
             if (candidates.isNotEmpty()) return candidates.random().first

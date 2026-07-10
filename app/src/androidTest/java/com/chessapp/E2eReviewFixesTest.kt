@@ -42,7 +42,7 @@ class E2eReviewFixesTest {
     @Test
     fun undoAsBlack_aiRestartsPlay() {
         waitForText("Play as")
-        rule.onNodeWithText("Easy").performClick()       // pin fast AI: suite-order independent
+        rule.onNodeWithText("2").performClick()       // pin fast AI: suite-order independent
         rule.onNodeWithText("Black").performClick()
         rule.onNodeWithText("Play vs Computer").performClick()
         waitForText("Black to move", timeoutMs = 60_000)
@@ -68,7 +68,7 @@ class E2eReviewFixesTest {
         rule.onAllNodes(isToggleable())[1].performClick()    // row order: legal, flip, sound, haptics
         rule.onNodeWithText("\u2039 Home").performClick()
         waitForText("Play as")
-        rule.onNodeWithText("Easy").performClick()       // pin fast AI: suite-order independent
+        rule.onNodeWithText("2").performClick()       // pin fast AI: suite-order independent
         rule.onNodeWithText("Black").performClick()
         rule.onNodeWithText("Play vs Computer").performClick()
         waitForText("Black to move", timeoutMs = 60_000)

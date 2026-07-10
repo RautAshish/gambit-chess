@@ -74,6 +74,7 @@ class ChessViewModel(
     private val gameRepo: GameRepository =
         GameRepository(ChessDatabase.get(app).gameDao()),
     private val difficultyLabel: String = "MEDIUM",
+    private val aiLevel: Int = 5,
     private val vsAi: Boolean = true
 ) : AndroidViewModel(app) {
 
@@ -88,6 +89,7 @@ class ChessViewModel(
     // Bumped on every newGame/resume; in-flight AI work checks it before mutating
     // state so a stale coroutine can never drop a move onto a fresh game.
     private var gameGeneration = 0
+    private var resultRecorded = false
 
     // Player-action results, layered on top of the board status.
     private var resignedBy: Color? = null
@@ -184,6 +186,15 @@ class ChessViewModel(
             val winnerIsMe = rawHeadline.startsWith(if (playerColor == Color.WHITE) "White" else "Black")
             if (winnerIsMe) "You won!" else "You lost"
         } else rawHeadline
+        if (over && isVsAi && !resultRecorded) {
+            resultRecorded = true
+            val outcome = when {
+                !rawHeadline.endsWith(" wins") -> 'D'
+                rawHeadline.startsWith(if (playerColor == Color.WHITE) "White" else "Black") -> 'W'
+                else -> 'L'
+            }
+            viewModelScope.launch { settingsRepo.recordLevelResult(aiLevel, outcome) }
+        }
         val checkSq = if (boardStatus == GameStatus.CHECK || boardStatus == GameStatus.CHECKMATE)
             engine.board.kingSquare(engine.board.sideToMove) else null
         // Resign/draw are available only while the game is live and it's a real game.
@@ -364,6 +375,7 @@ class ChessViewModel(
         // Undo during the AI's think must invalidate that think, or the stale
         // reply lands on the rewound position (or never re-triggers).
         gameGeneration++
+        resultRecorded = false
         aiJob?.cancel()
         if (engine.undo()) {
             // In vs-AI, step back past the AI's reply so it's the human's turn again.
@@ -494,6 +506,10 @@ class ChessViewModel(
 
     /** Restore a previously saved game by replaying its moves. */
     fun resume(rowId: Long) {
+        // Resumed games never (re)record a result — including already-finished
+        // ones reopened for review. v1 tradeoff: finishing a resumed game also
+        // doesn't count; new games always do.
+        resultRecorded = true
         gameGeneration++
         aiJob?.cancel()
         viewModelScope.launch {

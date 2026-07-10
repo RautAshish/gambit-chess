@@ -57,7 +57,7 @@ class E2eRound3Test {
     @Test
     fun playAsBlack_survivesNavigation() {
         waitForText("Play as")
-        rule.onNodeWithText("Easy").performClick()       // pin fast AI
+        rule.onNodeWithText("2").performClick()       // pin fast AI
         rule.onNodeWithText("Black").performClick()
         rule.onNodeWithText("Play vs Computer").performClick()
         waitForText("Black to move", timeoutMs = 60_000)
@@ -126,7 +126,7 @@ class E2eRound3Test {
         // (root cause of this test's intermittent 60s timeout).
         waitForText("Play vs Computer")
         rule.onNodeWithText("White").performClick()
-        rule.onNodeWithText("Easy").performClick()
+        rule.onNodeWithText("2").performClick()
         rule.onNodeWithText("Play vs Computer").performClick()
         waitForText("White to move")
         tap(4, 1); tap(4, 3)
@@ -147,7 +147,7 @@ class E2eRound3Test {
     @Test
     fun muteDuringAiThink_doesNotCorruptState() {
         waitForText("Play as")
-        rule.onNodeWithText("Expert").performClick()
+        rule.onNodeWithText("10").performClick()
         rule.onNodeWithText("Play vs Computer").performClick()
         waitForText("White to move")
         tap(4, 1); tap(4, 3)
@@ -164,7 +164,7 @@ class E2eRound3Test {
         // Restore a fast difficulty for subsequent tests.
         rule.onNodeWithText("\u2039 Home").performClick()
         waitForText("Play as")
-        rule.onNodeWithText("Medium").performClick()
+        rule.onNodeWithText("5").performClick()
     }
 
     /** Bug B regression: a decided game locks Undo/Redo. */

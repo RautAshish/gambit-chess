@@ -45,7 +45,7 @@ class E2eNewFeaturesTest {
     @Test
     fun playAsBlack_aiMovesFirst_thenHumanReplies() {
         waitForText("Play as")
-        rule.onNodeWithText("Easy").performClick()       // pin fast AI
+        rule.onNodeWithText("2").performClick()       // pin fast AI
         rule.onNodeWithText("Black").performClick()
         rule.onNodeWithText("Play vs Computer").performClick()
         // The AI (White) must open the game on its own.
@@ -79,7 +79,7 @@ class E2eNewFeaturesTest {
         // settings persist across tests, and a stray Black flips the board
         // under the taps (the deleteAll lesson, applied family-wide).
         rule.onNodeWithText("White").performClick()
-        rule.onNodeWithText("Easy").performClick()
+        rule.onNodeWithText("2").performClick()
         rule.onNodeWithText("Play vs Computer").performClick()
         waitForText("White to move")
         tapSquare(4, 1); tapSquare(4, 3)
@@ -103,7 +103,7 @@ class E2eNewFeaturesTest {
     fun newGameDuringAiThinking_noStrayMoveLands() {
         waitForText("Play as")
         // EXPERT is the slowest thinker: widest window for the race.
-        rule.onNodeWithText("Expert").performClick()
+        rule.onNodeWithText("10").performClick()
         rule.onNodeWithText("White").performClick()   // seat pin; Expert is the test's point
         rule.onNodeWithText("Play vs Computer").performClick()
         waitForText("White to move")
@@ -121,6 +121,6 @@ class E2eNewFeaturesTest {
         // Restore a fast difficulty: selection persists across tests by design (#20).
         rule.onNodeWithText("\u2039 Home").performClick()
         waitForText("Play as")
-        rule.onNodeWithText("Medium").performClick()
+        rule.onNodeWithText("5").performClick()
     }
 }
