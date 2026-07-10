@@ -852,9 +852,10 @@ Level 1 literally played 1350 with 300ms/move. Cure: LimitStrength removed
 budget now 30ms→2000ms across the ladder; adapter-level blunder rate
 35/22/12/6% on rungs 1-4/5-8 (skill-scale), mirroring NativeEngine's
 philosophy. MIN_AI_REPLY_MS=550 keeps perceived pacing.
-Level-1 calibration round 2 ("still difficult"): time-starving proved a
-non-handicap — SF reaches depth 8-12 in 30ms on modern arm64, so 65% of
-moves were still deep. Cure = DEPTH caps on rungs 1-4 (go depth 1/1/2/3:
-depth-1 cannot see the reply to its own move) + dice raised (50/30/18/8%),
-mirroring on NativeEngine (55/35/22/12). Upper curve re-timed 120ms→2s.
-Next knob if a third round is needed: blunder toward worst-eval moves.
+Calibration round 2 REVERTED on owner retraction ("much easier compared to
+before" after a larger sample) — round 1 is the human-validated ladder. Kept
+on record: movetime-based low rungs are hardware-relative; if closed-test
+devices report drift, be59f3a's depth-capped ladder is the ready
+device-independent alternative. (Recovery note: first revert attempt used an
+invalid -q flag and amended the wrong commit; state reset to origin and
+re-reverted cleanly.)

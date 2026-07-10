@@ -30,7 +30,7 @@ class NativeEngine(
     override fun setSkill(level: Int) {
         val l = level.coerceIn(0, 20)
         searchDepth = when { l<=3->1; l<=8->2; l<=12->3; l<=16->4; l<=18->5; else->6 }
-        blunderPct  = when { l<=1->55; l<=3->35; l<=5->22; l<=8->12; l<=10->6; l<=12->3; l<=14->1; else->0 }
+        blunderPct  = when { l<=1->45; l<=3->28; l<=5->18; l<=8->10; l<=10->6; l<=12->3; l<=14->1; else->0 }
     }
 
     override fun close() { /* nothing to release */ }
