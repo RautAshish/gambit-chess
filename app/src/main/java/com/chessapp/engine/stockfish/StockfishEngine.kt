@@ -34,6 +34,7 @@ class StockfishEngine(enginePath: String) : ChessEnginePort {
 
     private var skillLevel = 10
     private var moveTimeMillis = 1000L
+    private var searchDepth: Int? = null   // non-null = depth-capped (low rungs)
     private var blunderPct = 0
 
     init {
@@ -67,20 +68,24 @@ class StockfishEngine(enginePath: String) : ChessEnginePort {
 
     override fun setSkill(level: Int) {
         skillLevel = level.coerceIn(0, 20)
-        // Think-budget curve: the bottom rungs get MILLISECONDS — at 30ms even
-        // Skill 0 wobbles like a human — scaling to real thinking at the top.
+        // Field-calibrated twice: milliseconds are NOT a handicap on modern
+        // phones (depth 8-12 in 30ms), so the bottom rungs are DEPTH-capped —
+        // "go depth 1" cannot see the reply to its own move at all. That, not
+        // time, is what makes an engine hang pieces like a beginner.
+        searchDepth = when {
+            skillLevel <= 3 -> 1      // rungs 1-2: one ply, blind to your reply
+            skillLevel <= 5 -> 2      // rung 3
+            skillLevel <= 8 -> 3      // rung 4
+            else -> null              // rungs 5+: real search, time-budgeted
+        }
         moveTimeMillis = when {
-            skillLevel <= 1 -> 30L;  skillLevel <= 3 -> 50L
-            skillLevel <= 5 -> 80L;  skillLevel <= 8 -> 150L
-            skillLevel <= 10 -> 250L; skillLevel <= 12 -> 400L
-            skillLevel <= 14 -> 600L; skillLevel <= 16 -> 900L
+            skillLevel <= 10 -> 120L; skillLevel <= 12 -> 250L
+            skillLevel <= 14 -> 450L; skillLevel <= 16 -> 800L
             skillLevel <= 18 -> 1300L; else -> 2000L
         }
-        // Human-style errors on the low rungs (slightly gentler than the built-in
-        // engine's, since low Skill already randomizes among candidate moves).
         blunderPct = when {
-            skillLevel <= 1 -> 35; skillLevel <= 3 -> 22
-            skillLevel <= 5 -> 12; skillLevel <= 8 -> 6; else -> 0
+            skillLevel <= 1 -> 50; skillLevel <= 3 -> 30
+            skillLevel <= 5 -> 18; skillLevel <= 8 -> 8; else -> 0
         }
         applySkill()
     }
@@ -91,7 +96,8 @@ class StockfishEngine(enginePath: String) : ChessEnginePort {
             MoveGenerator.legalMoves(board).randomOrNull()?.let { return@withContext it }
         }
         send("position fen ${board.toFen()}")
-        send("go movetime $moveTimeMillis")
+        searchDepth?.let { send("go depth $it") }
+            ?: send("go movetime $moveTimeMillis")
         val line = waitFor("bestmove")          // e.g. "bestmove e2e4 ponder e7e5"
         val token = line.split(" ").getOrNull(1) ?: return@withContext null
         if (token == "(none)") null else runCatching { Move.fromUci(token) }.getOrNull()
