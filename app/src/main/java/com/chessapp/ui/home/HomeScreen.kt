@@ -84,8 +84,13 @@ fun HomeScreen(
         // game right after tapping a chip must use the tapped value, not wait for
         // the DataStore round-trip (Round-3 caught this race on device). Fresh
         // Home compositions initialise from the persisted values.
-        var playAs by remember { mutableStateOf(selectedPlayAs) }
-        var level by remember { mutableStateOf(selectedLevel) }
+        // Keyed remembers: on cold start the first frame composes with the
+        // DataStore DEFAULTS (level 5, White) before the disk read lands; a
+        // keyless remember would lock those in — and Play would then LAUNCH
+        // at level 5 despite the saved choice (field-reported). Keying to the
+        // incoming value re-seeds the state the moment persistence arrives.
+        var playAs by remember(selectedPlayAs) { mutableStateOf(selectedPlayAs) }
+        var level by remember(selectedLevel) { mutableStateOf(selectedLevel) }
 
         // One visual group (#15): the card is the ACTION, the rows below are its
         // options — difficulty chips select (highlighted), they don't launch (#20).

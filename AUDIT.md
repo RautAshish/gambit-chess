@@ -859,3 +859,10 @@ devices report drift, be59f3a's depth-capped ladder is the ready
 device-independent alternative. (Recovery note: first revert attempt used an
 invalid -q flag and amended the wrong commit; state reset to origin and
 re-reverted cleanly.)
+Field report: app opens at Level 5 regardless of saved choice. Root cause:
+Home's keyless remembers locked in the first-frame DataStore DEFAULTS
+(settings flow's initial value) before the disk read emitted — and Play
+launched with that stale 5 until any chip was touched. Fix: remembers keyed
+to the incoming persisted values (codebase precedent: Settings' online
+fields). Levels 2-4 confirmed already on the validated curve
+(skill 2/4/7 · 50/80/150ms · 22/12/6%).
