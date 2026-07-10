@@ -14,7 +14,7 @@ internet required (arm64 devices; others use the capable built-in engine).
 An immersive, distraction-free board: hand-tuned wood themes, the classic
 piece set you know from the books, felt-thud move sounds and subtle haptics.
 
-• Four difficulty tiers, Easy to Expert, mapped to engine skill — beatable
+• Ten difficulty levels, Beginner to Maximum, riding the full engine range — beatable
   stays beatable
 • 137 puzzles mined and machine-verified by the engine itself: every
   mate-in-1 mates, every mate-in-2 forces it against ALL defenses

@@ -20,7 +20,7 @@ honestly in [AUDIT.md](AUDIT.md).
 
 - **Stockfish 18 on-device** (arm64, Android 10+) — analysis-grade opposition,
   fully offline; other devices automatically use the capable built-in engine
-- **Four difficulty tiers** (Easy→Expert) mapped to engine skill
+- **Ten difficulty levels** (1 Beginner → 10 Maximum) riding the engines' full skill range, with a per-level lifetime record
 - **137 tactics puzzles**, every one machine-verified by the engine itself:
   each mate-in-1 mates, each mate-in-2 forces mate against *all* defenses
 - **Play a friend**: pass-and-play on one phone, or online by 6-letter room
