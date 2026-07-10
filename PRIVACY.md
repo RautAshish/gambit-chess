@@ -1,9 +1,11 @@
 # Emersion Chess — Privacy Policy
 
+_Last updated: 10 July 2026_
+
 Emersion Chess is built to work offline and to collect as little as possible.
 
 ## On your device
-Games, puzzle progress, and settings live only on your device. There are no
+Games, per-level results, puzzle progress, and settings live only on your device. There are no
 ads, no analytics, no trackers, and no third-party SDKs. Deleting the app
 deletes all local data.
 
@@ -24,6 +26,10 @@ reaches the developer's server.
 
 ## Permissions
 INTERNET is used only for optional online play. VIBRATE powers move haptics.
+
+## Children
+Emersion Chess is a general-audience app and is not directed at children
+under 13.
 
 ## Contact
 Questions or deletion requests: the issue tracker at the source repository.

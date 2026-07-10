@@ -834,3 +834,13 @@ onto [0,2,4,7,9,11,13,15,17,20]; NativeEngine gained a real ladder (depth 1-6
 labels parse both eras. Stats: lvl_{w,d,l}_N keys, recorded once per finished
 vs-AI game (resumed games excluded, documented v1 tradeoff). 14 test pins
 retargeted to numeral chips.
+Design Q&A (owner, post-10-level): verdicts recorded so they don't regress —
+Title Case stays (caps = small labels only: the Settings-section system);
+popup casing audited-consistent (sentence case + em-dash detail); config
+stays ON Home (instant-replay card beats interstitial; revisit only if
+per-game options appear); "Pass & Play" stays (term of art; "2 Player" is
+ambiguous next to Play Online); no Home row icons (one-mark principle; only
+a custom thin-line set would qualify, post-launch at most). PRIVACY.md:
++Last-updated date, +per-level records in on-device list, +children's note.
+Reference app's policy NOT adopted: its length reflects ad/analytics
+practices we don't have — brevity is our accuracy.
