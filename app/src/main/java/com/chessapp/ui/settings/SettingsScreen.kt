@@ -133,6 +133,21 @@ fun SettingsScreen(repo: SettingsRepository, onBack: () -> Unit) {
         )
         val uriHandler = LocalUriHandler.current
         TextButton(onClick = {
+            // Pre-filled mail = every report arrives with the build SHA and
+            // device attached. No mail app -> fall back to the issue tracker.
+            val v = com.chessapp.BuildConfig.VERSION_NAME
+            val subject = android.net.Uri.encode("Emersion Chess feedback ($v)")
+            val body = android.net.Uri.encode(
+                "App version: $v\nDevice: ${android.os.Build.MANUFACTURER} " +
+                "${android.os.Build.MODEL} (Android ${android.os.Build.VERSION.RELEASE})\n\n" +
+                "What happened:\n")
+            runCatching {
+                uriHandler.openUri("mailto:emersionplay@gmail.com?subject=$subject&body=$body")
+            }.onFailure {
+                uriHandler.openUri("https://github.com/emersionplay/emersion-chess/issues")
+            }
+        }) { Text("Report a problem", color = BRASS) }
+        TextButton(onClick = {
             uriHandler.openUri("https://github.com/emersionplay/emersion-chess/blob/main/PRIVACY.md")
         }) { Text("Privacy Policy", color = BRASS) }
         TextButton(onClick = {

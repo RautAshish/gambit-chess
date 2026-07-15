@@ -866,3 +866,11 @@ launched with that stale 5 until any chip was touched. Fix: remembers keyed
 to the incoming persisted values (codebase precedent: Settings' online
 fields). Levels 2-4 confirmed already on the validated curve
 (skill 2/4/7 · 50/80/150ms · 22/12/6%).
+Feedback channel (owner request, pre-soak): "Report a problem" About row —
+mailto with prefilled subject/body carrying VERSION_NAME (incl. build SHA)
++ manufacturer/model/Android version; runCatching fallback to GitHub Issues
+when no mail app. Rationale: closed-testers won't file GitHub issues but
+will tap a prefilled email; version+device arrive attached for free.
+PRIVACY contact extended with the alias. OWNER DEPENDENCY: create
+emersionplay@gmail.com before the tester link goes out (runbook Phase 4 —
+now load-bearing).

@@ -32,4 +32,5 @@ Emersion Chess is a general-audience app and is not directed at children
 under 13.
 
 ## Contact
-Questions or deletion requests: the issue tracker at the source repository.
+Questions or deletion requests: emersionplay@gmail.com, or the issue tracker
+at the source repository.
