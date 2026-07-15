@@ -171,6 +171,11 @@ class E2eRound3Test {
     @Test
     fun undoRedoDisabled_afterGameOver() {
         waitForText("Play vs Computer")
+        // The last unpinned coordinate-tapper: the cold-start bug used to hide
+        // persisted state from every test; once Home became honest (8f7d609),
+        // the Black seat persisted by an earlier test flipped this board.
+        rule.onNodeWithText("White").performClick()
+        rule.onNodeWithText("2").performClick()
         rule.onNodeWithText("Play vs Computer").performClick()
         waitForText("White to move")
         tap(4, 1); tap(4, 3)

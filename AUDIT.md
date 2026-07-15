@@ -874,3 +874,10 @@ will tap a prefilled email; version+device arrive attached for free.
 PRIVACY contact extended with the alias. OWNER DEPENDENCY: create
 emersionplay@gmail.com before the tester link goes out (runbook Phase 4 —
 now load-bearing).
+E2E red at 6131705 decoded: the keyed-remember fix UNMASKED persisted state
+for tests — the cold-start bug had made every fresh Home compose with
+defaults, so pins were belt-over-nothing until now. undoRedoDisabled was the
+one coordinate-tapper never pinned; inherited BLACK from playAsBlack test,
+taps hit air. Pinned. Sweep verdict: all other unpinned starters are
+seat/level-agnostic by assert-design or deliberately Black. Pins are now
+load-bearing for the first time.
