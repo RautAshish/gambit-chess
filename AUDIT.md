@@ -881,3 +881,11 @@ one coordinate-tapper never pinned; inherited BLACK from playAsBlack test,
 taps hit air. Pinned. Sweep verdict: all other unpinned starters are
 seat/level-agnostic by assert-design or deliberately Black. Pins are now
 load-bearing for the first time.
+Owner spot-check round: (1) alignment — the three About rows lacked the 10dp
+horizontal padding the custom-server button set as precedent, sitting ~8dp
+left of body rhythm; fixed. (2) Race-class sweep post-Home-fix: all five
+remaining keyless remembers are constant-seeded (dialog flags, input "",
+serial 0) — Home was the class's only instance; six keyed instances = safe
+column. (3) Missing-feature pass: nothing launch-gating absent; Rate-on-Play
++ Share-app rows are pre-planned day-one-post-listing (blocked on the store
+URL existing); share-PGN and a help screen stay deliberate backlog.

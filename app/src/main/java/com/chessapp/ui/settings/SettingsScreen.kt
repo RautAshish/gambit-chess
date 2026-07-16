@@ -146,13 +146,13 @@ fun SettingsScreen(repo: SettingsRepository, onBack: () -> Unit) {
             }.onFailure {
                 uriHandler.openUri("https://github.com/emersionplay/emersion-chess/issues")
             }
-        }) { Text("Report a problem", color = BRASS) }
+        }, modifier = Modifier.padding(horizontal = 10.dp)) { Text("Report a problem", color = BRASS) }
         TextButton(onClick = {
             uriHandler.openUri("https://github.com/emersionplay/emersion-chess/blob/main/PRIVACY.md")
-        }) { Text("Privacy Policy", color = BRASS) }
+        }, modifier = Modifier.padding(horizontal = 10.dp)) { Text("Privacy Policy", color = BRASS) }
         TextButton(onClick = {
             uriHandler.openUri("https://github.com/emersionplay/emersion-chess")
-        }) { Text("Source code & licenses", color = BRASS) }
+        }, modifier = Modifier.padding(horizontal = 10.dp)) { Text("Source code & licenses", color = BRASS) }
 
         Spacer(Modifier.height(32.dp))
     }
