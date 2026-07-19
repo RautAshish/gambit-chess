@@ -70,7 +70,7 @@ service cloud.firestore {
 ```
 
 ## Test & release engineering
-- Phone-only development: GitHub Actions is the sole build path. Per push: 45 JUnit + lint → signed release APK/AAB with a **self-verifying log chain** (keystore + key-password verifiers, apksigner cert print CN=Gambit Chess, size report, online-defaults print) → separate job: 46 instrumented E2E on an x86 emulator (built-in engine as opponent) + release crash gate (R8 build cold-boot + monkey).
+- Phone-only development: GitHub Actions is the sole build path. Per push: 45 JUnit + lint → signed release APK/AAB with a **self-verifying log chain** (keystore + key-password verifiers, apksigner cert print CN=Gambit Chess, size report, online-defaults print) → separate job: 47 instrumented E2E on an x86 emulator (built-in engine as opponent) + release crash gate (R8 build cold-boot + monkey).
 - Known test-isolation compromise to critique: persisted DataStore settings cross test boundaries; current mitigation is a suite rule (coordinate-tapping tests self-pin seat+difficulty). Propose the better isolation if you see one.
 
 ## Specific questions (answer each)

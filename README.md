@@ -47,7 +47,7 @@ Every push runs the full pipeline on GitHub Actions:
 2. A **signed release APK + AAB** with a self-verifying log chain: keystore &
    key-password verification, the release certificate printed via `apksigner`,
    a byte-exact size report, and confirmation the online defaults are baked
-3. **46 instrumented E2E tests** on an emulator, plus a **release crash gate**
+3. **47 instrumented E2E tests** on an emulator, plus a **release crash gate**
    that cold-boots the actual R8-minified build and monkey-tests it
 
 Logs publish to the `ci-logs` / `ci-logs-ui` branches; R8 mappings ship as
@@ -86,7 +86,7 @@ multiplayer baked in.
 
 ```bash
 ./gradlew :app:testDebugUnitTest      # 45 JVM tests
-./gradlew :app:connectedDebugAndroidTest   # 46 E2E (device/emulator)
+./gradlew :app:connectedDebugAndroidTest   # 47 E2E (device/emulator)
 ```
 
 ## License

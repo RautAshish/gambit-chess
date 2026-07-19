@@ -347,7 +347,9 @@ fun BoardCanvas(state: BoardUiState, flipped: Boolean, pal: BoardPalette, onTap:
         val side = maxWidth
         Canvas(
             Modifier.size(side).testTag("board")
-                .semantics { this.contentDescription = "Chess board" }.clip(RoundedCornerShape(6.dp)).pointerInput(flipped) {
+                .semantics { this.contentDescription =
+                    if (state.animating != null) "Chess board, piece moving" else "Chess board"
+                }.clip(RoundedCornerShape(6.dp)).pointerInput(flipped) {
                 detectTapGestures { offset ->
                     val cell = size.width / 8f
                     val col = (offset.x / cell).toInt().coerceIn(0, 7)

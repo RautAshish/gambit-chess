@@ -380,7 +380,7 @@ class ChessViewModel(
         if (engine.undo()) {
             // In vs-AI, step back past the AI's reply so it's the human's turn again.
             if (isVsAi && engine.board.sideToMove != playerColor) engine.undo()
-            _state.value = snapshot(last = engine.moveHistory().lastOrNull())
+            _state.value = snapshot(last = engine.moveHistory().lastOrNull(), animating = null)
             autoSave()
             // If we rewound to a position where it's STILL the AI's turn (only
             // possible when its move was the first of the game), it must move again.
@@ -394,7 +394,7 @@ class ChessViewModel(
         if (_state.value.gameOver) return
         gameGeneration++
         aiJob?.cancel()
-        if (engine.redo()) { _state.value = snapshot(last = engine.moveHistory().lastOrNull()); autoSave() }
+        if (engine.redo()) { _state.value = snapshot(last = engine.moveHistory().lastOrNull(), animating = null); autoSave() }
     }
 
     fun newGame() {
@@ -405,9 +405,18 @@ class ChessViewModel(
         resignedBy = null
         drawAgreed = false
         drawOfferPending = false
+        // Without this, only the FIRST finished game per session records to the
+        // per-level lifetime record — every rematch was invisible.
+        resultRecorded = false
         clock = ChessClock(settings.clockMinutes * 60_000L, settings.clockIncrementSeconds * 1000L)
         if (clockEnabled) { clock.start(Color.WHITE); startClockLoop() }
-        _state.value = snapshot()
+        // snapshot()'s continuity defaults (last/animating ride along) exist for
+        // in-game refreshes; a reset must override them. Cancelling aiJob mid-slide
+        // kills the coroutine INSIDE delay(ANIM_MS), so its own animating=null
+        // cleanup never runs — the bare snapshot() here used to inherit the orphaned
+        // slide (a ghost piece parked on anim.to, board frozen by the tap guard)
+        // plus the dead game's last-move glow.
+        _state.value = snapshot(last = null, animating = null)
         if (playerColor == Color.BLACK) maybeTriggerAi()
     }
 
@@ -519,7 +528,7 @@ class ChessViewModel(
             resignedBy = null
             drawAgreed = false
             drawOfferPending = false
-            _state.value = snapshot(last = engine.moveHistory().lastOrNull())
+            _state.value = snapshot(last = engine.moveHistory().lastOrNull(), animating = null)
             maybeTriggerAi()
         }
     }

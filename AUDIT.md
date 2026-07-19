@@ -889,3 +889,31 @@ serial 0) — Home was the class's only instance; six keyed instances = safe
 column. (3) Missing-feature pass: nothing launch-gating absent; Rate-on-Play
 + Share-app rows are pre-planned day-one-post-listing (blocked on the store
 URL existing); share-PGN and a help screen stay deliberate backlog.
+Field report (screenshot): a "new" game wearing TWO black kings — the full
+starting position plus a black king parked on e4 and a stale last-move glow
+on h7/h6; the board also silently rejected every tap. Root cause: New game
+during the AI's 220ms reply slide. aiJob.cancel() kills the slide coroutine
+INSIDE its delay, so the post-slide snapshot(animating = null) cleanup never
+runs — and snapshot()'s continuity defaults (last/animating ride along from
+_state.value, correct for in-game refreshes) faithfully copied the orphaned
+slide and the dead game's highlight into the fresh state. BoardCanvas then
+draws anim.piece at anim.to forever (the ghost king; anim.from is empty at
+the start position, so all 32 real pieces render too), and onSquareTapped's
+animating guard freezes the board — with the ghost re-surviving every
+further New game through the same defaults. Cure: the reset family
+(newGame/resume/undo/redo) passes animating = null explicitly (newGame also
+last = null); continuity defaults are now for refreshes only. The board's
+contentDescription voices "piece moving" during a slide (a11y gain + the
+test's probe). New E2E races the slide window three times via the 550ms
+pacing runway (~[770,990]ms after the tap at level 2); a missed window
+degrades to the guarded think-race, so it can miss but never flake, and a
+final move-entry probe proves the board still takes input. E2E count 46→47.
+Found adjacent in the same function: newGame() never cleared resultRecorded,
+so only the FIRST finished vs-AI game per session reached the per-level
+lifetime record — every rematch in a sitting was invisible. Now cleared on
+reset (undo already did).
+OPEN (owner verdict requested): "New game" has no confirmation while a game
+is live — the misclick that exposed this bug also silently executed a won
+endgame. One guarded tap ("Game in progress — start over?") would have saved
+both; counterweight is the instant-rematch flow the config-on-Home verdict
+protects. Not changed unilaterally.
