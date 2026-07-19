@@ -209,12 +209,20 @@ private fun StatusBar(state: BoardUiState) {
 @Composable
 private fun Controls(state: BoardUiState, vm: ChessViewModel) {
     var confirmResign by remember { mutableStateOf(false) }
+    var confirmNewGame by remember { mutableStateOf(false) }
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedButton(onClick = { vm.undo() }, enabled = state.canUndo) { Text("Undo") }
             OutlinedButton(onClick = { vm.redo() }, enabled = state.canRedo) { Text("Redo") }
             Button(
-                onClick = { vm.newGame() },
+                onClick = {
+                    // Owner verdict (field incident): a misclicked New game silently
+                    // executed a won endgame. Confirm ONLY when a live game with
+                    // moves is on the board — the post-game rematch and the pristine
+                    // board stay one tap by design (config-on-Home verdict family).
+                    if (!state.gameOver && state.moveList.isNotBlank()) confirmNewGame = true
+                    else vm.newGame()
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = BRASS, contentColor = BG)
             ) { Text("New game") }
         }
@@ -243,6 +251,26 @@ private fun Controls(state: BoardUiState, vm: ChessViewModel) {
             },
             dismissButton = {
                 TextButton(onClick = { confirmResign = false }) { Text("Cancel", color = BRASS) }
+            }
+        )
+    }
+
+    if (confirmNewGame) {
+        AlertDialog(
+            onDismissRequest = { confirmNewGame = false },
+            containerColor = PANEL,
+            title = { Text("Start a new game?", color = BONE, fontWeight = FontWeight.Bold) },
+            // Honest copy: autosave means the game isn't destroyed — it's parked.
+            text = { Text("This game will be set aside \u2014 you can finish it later from Saved Games.", color = BONE) },
+            confirmButton = {
+                Button(
+                    onClick = { confirmNewGame = false; vm.newGame() },
+                    // BRASS, not the resign red: nothing is destroyed here.
+                    colors = ButtonDefaults.buttonColors(containerColor = BRASS, contentColor = BG)
+                ) { Text("New game") }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmNewGame = false }) { Text("Keep playing", color = BRASS) }
             }
         )
     }

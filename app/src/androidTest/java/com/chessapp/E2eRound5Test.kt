@@ -44,6 +44,10 @@ class E2eRound5Test {
         }
     }
 
+    private fun clickInDialog(text: String) {
+        rule.onNode(hasText(text) and hasAnyAncestor(isDialog())).performClick()
+    }
+
     /** Read the SAN move list straight out of the semantics tree. */
     private fun movesText(): String {
         val nodes = rule.onAllNodesWithText("1.", substring = true).fetchSemanticsNodes()
@@ -102,6 +106,8 @@ class E2eRound5Test {
 
         // Fresh game: en passant.
         rule.onNodeWithText("New game").performClick()
+        waitForText("Start a new game?")            // live game -> confirm gate
+        clickInDialog("New game")
         waitForText("White to move")
         mv(4, 1, 4, 3, "e4");  mv(0, 6, 0, 5, "a6")
         mv(4, 3, 4, 4, "e5");  mv(3, 6, 3, 4, "d5")

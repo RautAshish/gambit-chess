@@ -1,6 +1,9 @@
 package com.chessapp
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithTag
@@ -42,6 +45,10 @@ class E2eNewFeaturesTest {
         rule.onNodeWithTag("board").performTouchInput {
             click(Offset(width * (file + 0.5f) / 8f, height * ((7 - rank) + 0.5f) / 8f))
         }
+    }
+
+    private fun clickInDialog(text: String) {
+        rule.onNode(hasText(text) and hasAnyAncestor(isDialog())).performClick()
     }
 
     @Test
@@ -112,6 +119,8 @@ class E2eNewFeaturesTest {
         tapSquare(4, 1); tapSquare(4, 3)                 // 1. e4
         waitForText("Thinking\u2026", timeoutMs = 60_000)
         rule.onNodeWithText("New game").performClick()    // reset mid-think
+        waitForText("Start a new game?")                  // live game -> confirm gate
+        clickInDialog("New game")
         waitGone("Thinking\u2026")
         // Give a cancelled/stale coroutine ample time to (incorrectly) land a move.
         Thread.sleep(5_000)
@@ -128,22 +137,27 @@ class E2eNewFeaturesTest {
 
     @Test
     fun newGameDuringAiSlide_noGhostAnimationSurvivesReset() {
-        // Field report: New game tapped during the AI's 220ms reply slide left a
+        // Field report: a reset landing during the AI's 220ms reply slide left a
         // ghost piece parked on the fresh board (anim inherited through reset) and
-        // froze the tap guard permanently. Level 2 thinks near-instantly, so the
-        // 550ms pacing makes the slide window predictable: ~[770, 990]ms after the
+        // froze the tap guard permanently. With the confirm gate, the honest
+        // reproduction is: open the dialog during the think, hesitate, confirm as
+        // the reply slides underneath. Level 2 thinks near-instantly, so the 550ms
+        // pacing makes the slide window predictable: ~[770, 990]ms after the
         // destination tap (own slide 220 + pacing 550 + AI slide 220). Three
-        // staggered attempts land inside it; a miss degrades to the guarded
+        // staggered confirms land inside it; a miss degrades to the guarded
         // think-race, so the race can be missed but never spuriously failed.
         waitForText("Play as")
         rule.onNodeWithText("2").performClick()
         rule.onNodeWithText("White").performClick()   // seat pin (suite rule)
         rule.onNodeWithText("Play vs Computer").performClick()
         waitForText("White to move")
-        for (ms in longArrayOf(800, 860, 920)) {
+        for (ms in longArrayOf(780, 840, 900)) {
             tapSquare(4, 1); tapSquare(4, 3)          // 1. e4 (board fresh each pass)
-            Thread.sleep(ms)
+            Thread.sleep(350)                          // inside the think/pacing runway
             rule.onNodeWithText("New game").performClick()
+            waitForText("Start a new game?")           // dialog over the live board
+            Thread.sleep(ms - 350)
+            clickInDialog("New game")                  // the confirm IS the race
             // A leaked slide is PERMANENT state — give it ample time to show.
             Thread.sleep(1_500)
             rule.waitForIdle()

@@ -60,6 +60,10 @@ class E2eRound4Test {
         repeat(3) { rule.onNodeWithText("Redo").performClick() }
         repeat(4) { tap(3, 3); tap(5, 4) }
         rule.onNodeWithText("New game").performClick()
+        // Post-storm move count is the storm's business: confirm through the
+        // gate only if a live game with moves put it up.
+        if (rule.onAllNodesWithText("Start a new game?").fetchSemanticsNodes().isNotEmpty())
+            clickInDialog("New game")
         waitGone("Thinking\u2026")
         Thread.sleep(4_000)               // let any zombie coroutine try to land
         rule.waitForIdle()
@@ -98,6 +102,8 @@ class E2eRound4Test {
         )
         rule.onNodeWithTag("board").assertIsDisplayed()
         rule.onNodeWithText("New game").performClick()
+        if (rule.onAllNodesWithText("Start a new game?").fetchSemanticsNodes().isNotEmpty())
+            clickInDialog("New game")
         waitForText("White to move")
     }
 

@@ -917,3 +917,19 @@ is live — the misclick that exposed this bug also silently executed a won
 endgame. One guarded tap ("Game in progress — start over?") would have saved
 both; counterweight is the instant-rematch flow the config-on-Home verdict
 protects. Not changed unilaterally.
+Owner verdict on the New-game confirm: APPROVED ("should pop up dialog which
+should ask for confirmation before ending old game"). Shipped with the guard
+rail that motivated the hesitation: the gate arms ONLY for a live game with
+moves on the board — the post-game rematch and the pristine board stay one
+tap (config-on-Home verdict family). Dialog mirrors the Resign confirm
+(PANEL, sentence case + em-dash detail); BRASS confirm rather than the
+resign red — autosave means the game is parked, not destroyed, and the copy
+says exactly that ("set aside — you can finish it later from Saved Games");
+dismiss is "Keep playing". Four E2E sites that bar-tapped New game on live
+boards now confirm through the gate (Round4's storm pair conditionally —
+post-storm move count is the storm's business); the slide-race test was
+REDESIGNED to stay a race: with the gate in the path, the honest
+reproduction is dialog-open-during-think, then the CONFIRM tap lands inside
+the slide window (sleeps rebased 780/840/900 to absorb the dialog hop).
+GameOverDialog's New game is untouched by construction (gameOver short-
+circuits the gate).
