@@ -933,3 +933,18 @@ reproduction is dialog-open-during-think, then the CONFIRM tap lands inside
 the slide window (sleeps rebased 780/840/900 to absorb the dialog hop).
 GameOverDialog's New game is untouched by construction (gameOver short-
 circuits the gate).
+Self-audit after the confirm-gate round (owner asked for a bug sweep):
+aebefe8 green end-to-end (45 JVM + 47 E2E + crash gate). Two defects found
+in b333ad5, both mine, fixed same day: (1) the redesigned slide-race test
+armed the gate off a blind 350ms sleep — emulator jitter pushing the 220ms
+apply past it would skip the dialog and the waitFor would time out: a
+spurious red the test's own contract forbids. Now anchored on the move list
+appearing ("1.") with the confirm delay computed from t0 — miss-safe,
+never-false restored. (2) the confirm could survive the game ending beneath
+it (AI mates during the think, or the flag falls): GameOverDialog stacked
+with a stale question, which then floated over the fresh board after a
+dialog rematch. The confirm now auto-dismisses when gameOver flips — the
+post-game rematch is one tap by design, so the question expires with the
+game. Reuse sweep: online/puzzle import only BoardCanvas (the a11y "piece
+moving" rides along, inert without animation) — the gate cannot reach them;
+workflows pin no test counts, so 46→47 gates nothing.

@@ -210,6 +210,9 @@ private fun StatusBar(state: BoardUiState) {
 private fun Controls(state: BoardUiState, vm: ChessViewModel) {
     var confirmResign by remember { mutableStateOf(false) }
     var confirmNewGame by remember { mutableStateOf(false) }
+    // If the game ends while the confirm is open (AI mates mid-think, clock
+    // flags), the question changes meaning — rematch is one tap by design.
+    LaunchedEffect(state.gameOver) { if (state.gameOver) confirmNewGame = false }
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedButton(onClick = { vm.undo() }, enabled = state.canUndo) { Text("Undo") }

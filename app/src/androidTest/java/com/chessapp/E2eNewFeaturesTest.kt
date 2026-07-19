@@ -152,11 +152,16 @@ class E2eNewFeaturesTest {
         rule.onNodeWithText("Play vs Computer").performClick()
         waitForText("White to move")
         for (ms in longArrayOf(780, 840, 900)) {
+            val t0 = System.currentTimeMillis()
             tapSquare(4, 1); tapSquare(4, 3)          // 1. e4 (board fresh each pass)
-            Thread.sleep(350)                          // inside the think/pacing runway
+            // Anchor on the APPLIED move, not a blind sleep: the gate arms only
+            // once the move list exists, and emulator jitter can push the apply
+            // past any fixed delay — a missed dialog would time out spuriously.
+            waitForText("1.", substring = true)
             rule.onNodeWithText("New game").performClick()
             waitForText("Start a new game?")           // dialog over the live board
-            Thread.sleep(ms - 350)
+            val remaining = ms - (System.currentTimeMillis() - t0)
+            if (remaining > 0) Thread.sleep(remaining)
             clickInDialog("New game")                  // the confirm IS the race
             // A leaked slide is PERMANENT state — give it ample time to show.
             Thread.sleep(1_500)
