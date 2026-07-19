@@ -948,3 +948,9 @@ post-game rematch is one tap by design, so the question expires with the
 game. Reuse sweep: online/puzzle import only BoardCanvas (the a11y "piece
 moving" rides along, inert without animation) — the gate cannot reach them;
 workflows pin no test counts, so 46→47 gates nothing.
+Saved-games delete review (owner-prompted): Delete all already carries its
+confirm ("removes every saved game and can't be undone") — predates today.
+A per-row Delete confirm was drafted (the button borders the resume
+tap-target) and VETOED by owner verdict before commit: per-row Delete stays
+one-tap. Recorded so it doesn't regress: single-game loss is bounded, the
+row flow stays friction-free, and Delete all remains the guarded bulk path.
