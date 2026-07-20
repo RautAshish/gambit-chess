@@ -954,3 +954,24 @@ A per-row Delete confirm was drafted (the button borders the resume
 tap-target) and VETOED by owner verdict before commit: per-row Delete stays
 one-tap. Recorded so it doesn't regress: single-game loss is bounded, the
 row flow stays friction-free, and Delete all remains the guarded bulk path.
+Field report: "uninstalled old, installed new, and my deleted saved games
+are all back" — a wall of Jul 19 games after a Jul 20 reinstall. Not
+today's code: persistence was untouched and the timestamps predate the new
+APK. Root cause: Google Auto Backup. The nightly snapshot was taken BEFORE
+the in-app delete; the uninstall followed minutes later (no re-backup ran),
+and reinstalling the same package restored the stale snapshot — deletion
+lost the race with the cloud. The old backup_rules were thoughtfully aimed
+at a NARROWER threat (excluding the settings store from device-transfer to
+block online-identity transplant) while the games DB rode along in cloud
+backup by default. This also made PRIVACY.md provably false on two counts:
+"live only on your device" and "Deleting the app deletes all local data."
+OWNER VERDICT: option A — android:allowBackup="false". Manifest carries the
+full rationale; both rules files deleted (no-backup subsumes the transplant
+defense: nothing to transplant); PRIVACY.md updated (20 Jul) and now
+STRONGER than before: opts out of cloud backup, never uploaded even to the
+user's own account, new phone starts fresh — the flip-side surprise is now
+documented before anyone hits it. Continuity story on the roadmap is
+user-held PGN export (share-PGN, backlog), not silent cloud. Residuals:
+existing Drive snapshots can never restore into an allowBackup=false app
+and age out on Google's schedule; Play Data-safety form (runbook) stays a
+clean "no data collected" with no off-device-transfer nuance to disclose.

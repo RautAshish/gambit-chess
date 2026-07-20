@@ -4,10 +4,16 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- allowBackup=false (owner verdict, field incident): Google Auto Backup
+         restored a pre-deletion saved-games snapshot after uninstall/reinstall,
+         contradicting PRIVACY.md's "only on your device" / "deleting the app
+         deletes all local data". Opting out makes both claims literally true and
+         subsumes the old backup_rules' narrower goal (blocking online-identity
+         transplant via device transfer) — with no backup there is nothing to
+         transplant. Continuity across devices is planned as user-held PGN
+         export instead (backlog: share-PGN). -->
     <application
-        android:allowBackup="true"
-        android:fullBackupContent="@xml/backup_rules"
-        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="Emersion Chess"
         android:supportsRtl="true"

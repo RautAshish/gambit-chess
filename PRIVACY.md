@@ -1,12 +1,14 @@
 # Emersion Chess — Privacy Policy
 
-_Last updated: 10 July 2026_
+_Last updated: 20 July 2026_
 
 Emersion Chess is built to work offline and to collect as little as possible.
 
 ## On your device
 Games, per-level results, puzzle progress, and settings live only on your device. There are no
-ads, no analytics, no trackers, and no third-party SDKs. Deleting the app
+ads, no analytics, no trackers, and no third-party SDKs. The app opts out of
+Android's cloud backup, so this data is never uploaded anywhere — not even to
+your own Google account — and moving to a new phone starts fresh. Deleting the app
 deletes all local data.
 
 ## Online play (optional)
